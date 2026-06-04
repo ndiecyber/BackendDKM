@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\V1\AuthController;
+use App\Http\Controllers\Api\V1\UserController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -36,6 +37,11 @@ Route::prefix('v1')->group(function () {
             Route::get('/me', [AuthController::class, 'me']);
             Route::post('/refresh', [AuthController::class, 'refresh']);
         });
+
+        // User Management
+        Route::apiResource('users', UserController::class);
+        Route::patch('users/{id}/restore', [UserController::class, 'restore']);
+        Route::patch('users/{id}/reset-password', [UserController::class, 'resetPassword']);
 
         // Future module routes:
         // Route::prefix('keuangan')->group(base_path('routes/modules/keuangan.php'));

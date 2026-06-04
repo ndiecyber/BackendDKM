@@ -55,7 +55,7 @@ class RolePermissionSeeder extends Seeder
 
         $admin = Role::firstOrCreate(['name' => 'admin']);
         $admin->syncPermissions([
-            'user.view',
+            'user.view', 'user.create', 'user.update', 'user.delete',
             'keuangan.view', 'keuangan.create', 'keuangan.update', 'keuangan.delete', 'keuangan.export',
             'kurban.view', 'kurban.create', 'kurban.update', 'kurban.delete',
             'profile.view', 'profile.create', 'profile.update', 'profile.delete',
