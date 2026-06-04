@@ -25,6 +25,12 @@ class RolePermissionSeeder extends Seeder
             'user.update',
             'user.delete',
 
+            // Jamaah module
+            'jamaah.view',
+            'jamaah.create',
+            'jamaah.update',
+            'jamaah.delete',
+
             // Keuangan module
             'keuangan.view',
             'keuangan.create',
@@ -56,6 +62,7 @@ class RolePermissionSeeder extends Seeder
         $admin = Role::firstOrCreate(['name' => 'admin']);
         $admin->syncPermissions([
             'user.view', 'user.create', 'user.update', 'user.delete',
+            'jamaah.view', 'jamaah.create', 'jamaah.update', 'jamaah.delete',
             'keuangan.view', 'keuangan.create', 'keuangan.update', 'keuangan.delete', 'keuangan.export',
             'kurban.view', 'kurban.create', 'kurban.update', 'kurban.delete',
             'profile.view', 'profile.create', 'profile.update', 'profile.delete',
@@ -63,6 +70,7 @@ class RolePermissionSeeder extends Seeder
 
         $viewer = Role::firstOrCreate(['name' => 'viewer']);
         $viewer->syncPermissions([
+            'jamaah.view',
             'keuangan.view',
             'kurban.view',
             'profile.view',

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\V1\AuthController;
+use App\Http\Controllers\Api\V1\JamaahController;
 use App\Http\Controllers\Api\V1\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -42,6 +43,10 @@ Route::prefix('v1')->group(function () {
         Route::apiResource('users', UserController::class);
         Route::patch('users/{id}/restore', [UserController::class, 'restore']);
         Route::patch('users/{id}/reset-password', [UserController::class, 'resetPassword']);
+
+        // Jamaah
+        Route::apiResource('jamaah', JamaahController::class);
+        Route::patch('jamaah/{id}/restore', [JamaahController::class, 'restore']);
 
         // Future module routes:
         // Route::prefix('keuangan')->group(base_path('routes/modules/keuangan.php'));
