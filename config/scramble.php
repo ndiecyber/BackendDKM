@@ -1,6 +1,7 @@
 <?php
 
 use Dedoc\Scramble\Http\Middleware\RestrictedDocsAccess;
+use Dedoc\Scramble\SecurityDocumentation\MiddlewareAuthSecurityStrategy;
 
 return [
     /*
@@ -93,7 +94,7 @@ return [
      * ```
      */
     'servers' => [
-        'Local' => env('APP_ENV') === 'local' ? 'http://' . env('API_DOMAIN', 'api.localhost') . ':8000/v1' : 'https://' . env('API_DOMAIN') . '/v1',
+        'Local' => env('APP_ENV') === 'local' ? 'http://'.env('API_DOMAIN', 'api.localhost').':8000/v1' : 'https://'.env('API_DOMAIN').'/v1',
     ],
 
     /**
@@ -161,5 +162,5 @@ return [
      *     ],
      * ],
      */
-    'security_strategy' => \Dedoc\Scramble\SecurityDocumentation\MiddlewareAuthSecurityStrategy::class,
+    'security_strategy' => MiddlewareAuthSecurityStrategy::class,
 ];
