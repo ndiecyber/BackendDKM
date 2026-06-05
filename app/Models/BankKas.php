@@ -101,7 +101,7 @@ class BankKas extends Model
             ->where('tipe', 'transfer')
             ->sum('biaya_admin');
 
-        $this->saldo_terkini = $this->saldo_awal + $pemasukan - $pengeluaran - $biayaAdmin;
+        $this->setAttribute('saldo_terkini', $this->saldo_awal + $pemasukan - $pengeluaran - $biayaAdmin);
         $this->saveQuietly();
     }
 }
