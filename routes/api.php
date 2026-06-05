@@ -49,7 +49,7 @@ Route::prefix('v1')->group(function () {
         Route::patch('jamaah/{id}/restore', [JamaahController::class, 'restore']);
 
         // Future module routes:
-        // Route::prefix('keuangan')->group(base_path('routes/modules/keuangan.php'));
+        Route::prefix('keuangan')->group(base_path('routes/modules/keuangan.php'));
         // Route::prefix('kurban')->group(base_path('routes/modules/kurban.php'));
         // Route::prefix('profile')->group(base_path('routes/modules/profile.php'));
     });
