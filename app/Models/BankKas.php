@@ -101,10 +101,7 @@ class BankKas extends Model
             ->where('tipe', 'transfer')
             ->sum('biaya_admin');
 
-        // Sum selisih from balance adjustments
-        $adjustments = $this->balanceAdjustments()->sum('selisih');
-
-        $this->saldo_terkini = $this->saldo_awal + $pemasukan - $pengeluaran - $biayaAdmin + $adjustments;
+        $this->saldo_terkini = $this->saldo_awal + $pemasukan - $pengeluaran - $biayaAdmin;
         $this->saveQuietly();
     }
 }

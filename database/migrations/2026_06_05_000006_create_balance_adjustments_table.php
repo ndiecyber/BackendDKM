@@ -20,6 +20,7 @@ return new class extends Migration
             $table->date('tanggal');
             $table->text('deskripsi')->nullable();
             $table->foreignId('created_by')->constrained('users');
+            $table->foreignId('transaction_id')->nullable()->constrained('transactions')->nullOnDelete();
             $table->timestamps();
         });
     }

@@ -13,6 +13,7 @@ class BalanceAdjustment extends Model
         'selisih',
         'tanggal',
         'deskripsi',
+        'transaction_id',
         'created_by',
     ];
 
@@ -34,5 +35,10 @@ class BalanceAdjustment extends Model
     public function createdBy()
     {
         return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function transaction()
+    {
+        return $this->belongsTo(Transaction::class);
     }
 }
