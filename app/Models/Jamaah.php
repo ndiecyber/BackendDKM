@@ -19,7 +19,6 @@ class Jamaah extends Model
         'no_hp',
         'email',
         'jenis_kelamin',
-        'status',
         'user_id',
     ];
 
@@ -37,10 +36,5 @@ class Jamaah extends Model
                     ->orWhere('email', 'ilike', '%'.$search.'%');
             });
         });
-    }
-
-    public function scopeAktif($query)
-    {
-        return $query->where('status', 'aktif');
     }
 }

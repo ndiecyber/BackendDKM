@@ -39,7 +39,7 @@ class JamaahTest extends TestCase
                 'success',
                 'data' => [
                     'data' => [
-                        '*' => ['id', 'nama_lengkap', 'no_hp', 'email', 'jenis_kelamin', 'status'],
+                        '*' => ['id', 'nama_lengkap', 'no_hp', 'email', 'jenis_kelamin'],
                     ],
                     'current_page',
                     'total',
@@ -82,7 +82,6 @@ class JamaahTest extends TestCase
             'no_hp' => '08111222333',
             'email' => 'ahmad@example.com',
             'jenis_kelamin' => 'L',
-            'status' => 'aktif',
         ]);
 
         $response->assertStatus(201)
@@ -109,7 +108,6 @@ class JamaahTest extends TestCase
 
         $response = $this->putJson("/api/v1/jamaah/{$jamaah->id}", [
             'nama_lengkap' => 'Updated Name',
-            'status' => 'nonaktif',
         ]);
 
         $response->assertOk()
@@ -117,14 +115,12 @@ class JamaahTest extends TestCase
                 'success' => true,
                 'data' => [
                     'nama_lengkap' => 'Updated Name',
-                    'status' => 'nonaktif',
                 ],
             ]);
 
         $this->assertDatabaseHas('jamaah', [
             'id' => $jamaah->id,
             'nama_lengkap' => 'Updated Name',
-            'status' => 'nonaktif',
         ]);
     }
 

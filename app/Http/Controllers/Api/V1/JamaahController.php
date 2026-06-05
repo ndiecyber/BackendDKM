@@ -24,9 +24,6 @@ class JamaahController extends Controller
 
         $jamaah = Jamaah::query()
             ->search($request->search)
-            ->when($request->status, function ($query, $status) {
-                $query->where('status', $status);
-            })
             ->with('user:id,name,email')
             ->paginate($request->per_page ?? 15);
 

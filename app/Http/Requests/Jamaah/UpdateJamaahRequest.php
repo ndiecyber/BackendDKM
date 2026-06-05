@@ -27,7 +27,6 @@ class UpdateJamaahRequest extends FormRequest
             'no_hp' => ['nullable', 'string', 'max:20'],
             'email' => ['nullable', 'email', 'max:255'],
             'jenis_kelamin' => ['nullable', 'in:L,P'],
-            'status' => ['sometimes', 'in:aktif,nonaktif'],
             'user_id' => ['nullable', 'exists:users,id'],
         ];
     }

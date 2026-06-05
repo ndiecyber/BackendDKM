@@ -17,7 +17,6 @@ return new class extends Migration
             $table->string('no_hp')->nullable();
             $table->string('email')->nullable();
             $table->enum('jenis_kelamin', ['L', 'P'])->nullable();
-            $table->enum('status', ['aktif', 'nonaktif'])->default('aktif');
             $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
             $table->softDeletes();
