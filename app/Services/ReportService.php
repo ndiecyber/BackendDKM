@@ -82,7 +82,7 @@ class ReportService
             ->groupBy('category_id')
             ->with('category:id,nama')
             ->get()
-            ->map(fn($item) => [
+            ->map(fn ($item) => [
                 'kategori' => $item->category?->nama ?? 'Tanpa Kategori',
                 'category_id' => $item->category_id,
                 'total' => (float) $item->total,
@@ -95,7 +95,7 @@ class ReportService
             ->groupBy('category_id')
             ->with('category:id,nama')
             ->get()
-            ->map(fn($item) => [
+            ->map(fn ($item) => [
                 'kategori' => $item->category?->nama ?? 'Tanpa Kategori',
                 'category_id' => $item->category_id,
                 'total' => (float) $item->total,
@@ -124,7 +124,7 @@ class ReportService
 
         $headers = [
             'Content-Type' => 'text/csv; charset=UTF-8',
-            'Content-Disposition' => 'attachment; filename="buku-kas-umum-' . now()->format('Y-m-d') . '.csv"',
+            'Content-Disposition' => 'attachment; filename="buku-kas-umum-'.now()->format('Y-m-d').'.csv"',
         ];
 
         return new StreamedResponse(function () use ($data) {
@@ -198,7 +198,7 @@ class ReportService
     private function applyPeriodFilter($query, array $filters): void
     {
         // Custom date range takes priority
-        if (!empty($filters['tanggal_mulai']) && !empty($filters['tanggal_akhir'])) {
+        if (! empty($filters['tanggal_mulai']) && ! empty($filters['tanggal_akhir'])) {
             $query->byDateRange($filters['tanggal_mulai'], $filters['tanggal_akhir']);
 
             return;
@@ -206,7 +206,7 @@ class ReportService
 
         $periode = $filters['periode'] ?? null;
 
-        if (!$periode) {
+        if (! $periode) {
             return;
         }
 
@@ -237,9 +237,9 @@ class ReportService
     {
         $startDate = null;
 
-        if (!empty($filters['tanggal_mulai'])) {
+        if (! empty($filters['tanggal_mulai'])) {
             $startDate = $filters['tanggal_mulai'];
-        } elseif (!empty($filters['periode'])) {
+        } elseif (! empty($filters['periode'])) {
             $now = Carbon::now();
             $startDate = match ($filters['periode']) {
                 'mingguan' => $now->copy()->startOfWeek(Carbon::MONDAY)->toDateString(),
@@ -249,7 +249,7 @@ class ReportService
             };
         }
 
-        if (!$startDate) {
+        if (! $startDate) {
             // If no period filter, start from 0 (show all-time)
             return 0;
         }
@@ -270,14 +270,15 @@ class ReportService
      */
     private function getPeriodLabel(array $filters): string
     {
-        if (!empty($filters['label_periode'])) {
+        if (! empty($filters['label_periode'])) {
             return $filters['label_periode'];
         }
 
-        if (!empty($filters['tanggal_mulai']) && !empty($filters['tanggal_akhir'])) {
+        if (! empty($filters['tanggal_mulai']) && ! empty($filters['tanggal_akhir'])) {
             $startDate = Carbon::parse($filters['tanggal_mulai']);
             $endDate = Carbon::parse($filters['tanggal_akhir']);
-            return $startDate->format('d/m/Y') . ' - ' . $endDate->format('d/m/Y');
+
+            return $startDate->format('d/m/Y').' - '.$endDate->format('d/m/Y');
         }
 
         $periode = $filters['periode'] ?? null;
@@ -287,12 +288,14 @@ class ReportService
             case 'mingguan':
                 $startDate = $now->copy()->startOfWeek(Carbon::MONDAY);
                 $endDate = $now->copy()->endOfWeek(Carbon::SUNDAY);
-                return 'Pekan ' . $now->weekOfYear . ' (' . $startDate->format('d/m/Y') . ' - ' . $endDate->format('d/m/Y') . ')';
+
+                return 'Pekan '.$now->weekOfYear.' ('.$startDate->format('d/m/Y').' - '.$endDate->format('d/m/Y').')';
             case 'bulanan':
                 $bulanIndo = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
-                return 'Bulan ' . $bulanIndo[$now->month - 1] . ' ' . $now->year;
+
+                return 'Bulan '.$bulanIndo[$now->month - 1].' '.$now->year;
             case 'tahunan':
-                return 'Tahun ' . $now->year;
+                return 'Tahun '.$now->year;
             default:
                 return 'Semua Periode';
         }
