@@ -24,9 +24,14 @@ class StoreJamaahRequest extends FormRequest
     {
         return [
             'nama_lengkap' => ['required', 'string', 'max:255'],
+            'kategori_entitas' => ['sometimes', 'in:individu,organisasi'],
             'no_hp' => ['nullable', 'string', 'max:20'],
             'email' => ['nullable', 'email', 'max:255'],
             'jenis_kelamin' => ['nullable', 'in:L,P'],
+            'tempat_lahir' => ['nullable', 'string', 'max:255'],
+            'tanggal_lahir' => ['nullable', 'date'],
+            'alamat' => ['nullable', 'string', 'max:1000'],
+            'tipe_jamaah' => ['sometimes', 'in:internal_dkm,warga_sekitar,eksternal,mitra_organisasi'],
             'user_id' => ['nullable', 'exists:users,id'],
         ];
     }

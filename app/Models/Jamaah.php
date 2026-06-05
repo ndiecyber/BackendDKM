@@ -16,16 +16,45 @@ class Jamaah extends Model
 
     protected $fillable = [
         'nama_lengkap',
+        'kategori_entitas',
         'no_hp',
         'email',
         'jenis_kelamin',
+        'tempat_lahir',
+        'tanggal_lahir',
+        'alamat',
+        'tipe_jamaah',
         'user_id',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'tanggal_lahir' => 'date',
+        ];
+    }
+
+    /*
+    |----------------------------------------------------------------------
+    | Relationships
+    |----------------------------------------------------------------------
+    */
 
     public function user()
     {
         return $this->belongsTo(User::class);
     }
+
+    public function transactions()
+    {
+        return $this->hasMany(Transaction::class);
+    }
+
+    /*
+    |----------------------------------------------------------------------
+    | Scopes
+    |----------------------------------------------------------------------
+    */
 
     public function scopeSearch($query, $search)
     {
