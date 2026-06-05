@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Api\V1\Keuangan;
 
 use App\Http\Controllers\Controller;
-use App\Models\BankKas;
 use App\Models\BalanceAdjustment;
+use App\Models\BankKas;
 use App\Services\BalanceAdjustmentService;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
@@ -56,7 +56,7 @@ class BalanceAdjustmentController extends Controller
             ], 201);
         } catch (\Exception $e) {
             throw ValidationException::withMessages([
-                'general' => 'Gagal melakukan penyesuaian saldo: ' . $e->getMessage()
+                'general' => 'Gagal melakukan penyesuaian saldo: '.$e->getMessage(),
             ]);
         }
     }

@@ -7,7 +7,6 @@ use App\Models\BankKas;
 use App\Models\Transaction;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 
 class BalanceAdjustmentService
 {
@@ -33,12 +32,12 @@ class BalanceAdjustmentService
                 // Buat transaksi riil di jurnal agar Arus Kas seimbang
                 $tipe = $selisih > 0 ? 'pemasukan' : 'pengeluaran';
                 $nominal = abs($selisih);
-                
+
                 $prefix = $tipe === 'pemasukan' ? 'IN' : 'OUT';
                 $dateStr = $tanggal->format('Ymd');
                 // Nomor Transaksi auto generate sederhana
                 $countToday = Transaction::whereDate('created_at', Carbon::today())->count() + 1;
-                $nomorTransaksi = "{$prefix}-{$dateStr}-ADJ-" . str_pad($countToday, 4, '0', STR_PAD_LEFT);
+                $nomorTransaksi = "{$prefix}-{$dateStr}-ADJ-".str_pad($countToday, 4, '0', STR_PAD_LEFT);
 
                 $transactionData = [
                     'nomor_transaksi' => $nomorTransaksi,
@@ -108,7 +107,7 @@ class BalanceAdjustmentService
             ->where('tanggal', '<=', $tanggal->format('Y-m-d'))
             ->where('tipe', 'transfer')
             ->where('bank_kas_asal_id', $bankKas->id);
-            
+
         $transferKeluar = clone $transferKeluarQuery;
         $totalTransferKeluar = $transferKeluar->sum('nominal') + $transferKeluarQuery->sum('biaya_admin');
 

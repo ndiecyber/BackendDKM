@@ -2,12 +2,10 @@
 
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\JamaahController;
-use App\Http\Controllers\Api\V1\UserController;
 use App\Http\Controllers\Api\V1\Keuangan\BalanceAdjustmentController;
 use App\Http\Controllers\Api\V1\Keuangan\BankKasController;
-use App\Http\Controllers\Api\V1\Keuangan\CategoryController;
-use App\Http\Controllers\Api\V1\Keuangan\ReportController;
 use App\Http\Controllers\Api\V1\Keuangan\TransactionController;
+use App\Http\Controllers\Api\V1\UserController;
 use Illuminate\Support\Facades\Route;
 
 /*
