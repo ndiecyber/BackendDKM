@@ -26,7 +26,7 @@ class UserTest extends TestCase
 
         User::factory()->count(5)->create();
 
-        $response = $this->getJson('/api/v1/users');
+        $response = $this->getJson('/v1/users');
 
         $response->assertOk()
             ->assertJsonStructure([
@@ -47,7 +47,7 @@ class UserTest extends TestCase
         $viewer->assignRole('viewer');
         Sanctum::actingAs($viewer);
 
-        $response = $this->postJson('/api/v1/users', [
+        $response = $this->postJson('/v1/users', [
             'name' => 'Test User',
             'email' => 'test@example.com',
             'password' => 'password',
@@ -64,7 +64,7 @@ class UserTest extends TestCase
         $admin->assignRole('admin');
         Sanctum::actingAs($admin);
 
-        $response = $this->postJson('/api/v1/users', [
+        $response = $this->postJson('/v1/users', [
             'name' => 'New User',
             'email' => 'new@example.com',
             'password' => 'password123',
@@ -92,7 +92,7 @@ class UserTest extends TestCase
         $admin->assignRole('admin');
         Sanctum::actingAs($admin);
 
-        $response = $this->postJson('/api/v1/users', [
+        $response = $this->postJson('/v1/users', [
             'name' => 'Super User',
             'email' => 'super@example.com',
             'password' => 'password123',
@@ -112,7 +112,7 @@ class UserTest extends TestCase
         $userToUpdate = User::factory()->create();
         $userToUpdate->assignRole('viewer');
 
-        $response = $this->putJson("/api/v1/users/{$userToUpdate->id}", [
+        $response = $this->putJson("/v1/users/{$userToUpdate->id}", [
             'name' => 'Updated Name',
         ]);
 
@@ -136,7 +136,7 @@ class UserTest extends TestCase
         $admin->assignRole('admin');
         Sanctum::actingAs($admin);
 
-        $response = $this->deleteJson("/api/v1/users/{$admin->id}");
+        $response = $this->deleteJson("/v1/users/{$admin->id}");
 
         $response->assertStatus(400)
             ->assertJson([
@@ -153,7 +153,7 @@ class UserTest extends TestCase
 
         $userToDelete = User::factory()->create();
 
-        $response = $this->deleteJson("/api/v1/users/{$userToDelete->id}");
+        $response = $this->deleteJson("/v1/users/{$userToDelete->id}");
 
         $response->assertOk();
         $this->assertSoftDeleted('users', ['id' => $userToDelete->id]);
@@ -170,7 +170,7 @@ class UserTest extends TestCase
 
         $this->assertSoftDeleted('users', ['id' => $userToRestore->id]);
 
-        $response = $this->patchJson("/api/v1/users/{$userToRestore->id}/restore");
+        $response = $this->patchJson("/v1/users/{$userToRestore->id}/restore");
 
         $response->assertOk();
         $this->assertDatabaseHas('users', [
@@ -187,7 +187,7 @@ class UserTest extends TestCase
 
         $userToReset = User::factory()->create();
 
-        $response = $this->patchJson("/api/v1/users/{$userToReset->id}/reset-password");
+        $response = $this->patchJson("/v1/users/{$userToReset->id}/reset-password");
 
         $response->assertOk()
             ->assertJsonStructure([

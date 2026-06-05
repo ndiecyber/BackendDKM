@@ -19,7 +19,7 @@ class RegisterTest extends TestCase
 
     public function test_user_can_register_with_valid_data(): void
     {
-        $response = $this->postJson('/api/v1/auth/register', [
+        $response = $this->postJson('/v1/auth/register', [
             'name' => 'John Doe',
             'email' => 'john@example.com',
             'password' => 'password123',
@@ -50,7 +50,7 @@ class RegisterTest extends TestCase
     {
         User::factory()->create(['email' => 'john@example.com']);
 
-        $response = $this->postJson('/api/v1/auth/register', [
+        $response = $this->postJson('/v1/auth/register', [
             'name' => 'John Doe',
             'email' => 'john@example.com',
             'password' => 'password123',
@@ -68,7 +68,7 @@ class RegisterTest extends TestCase
 
     public function test_register_fails_with_short_password(): void
     {
-        $response = $this->postJson('/api/v1/auth/register', [
+        $response = $this->postJson('/v1/auth/register', [
             'name' => 'John Doe',
             'email' => 'john@example.com',
             'password' => 'short',
@@ -83,7 +83,7 @@ class RegisterTest extends TestCase
 
     public function test_register_fails_without_password_confirmation(): void
     {
-        $response = $this->postJson('/api/v1/auth/register', [
+        $response = $this->postJson('/v1/auth/register', [
             'name' => 'John Doe',
             'email' => 'john@example.com',
             'password' => 'password123',
@@ -97,7 +97,7 @@ class RegisterTest extends TestCase
 
     public function test_registered_user_gets_viewer_role(): void
     {
-        $response = $this->postJson('/api/v1/auth/register', [
+        $response = $this->postJson('/v1/auth/register', [
             'name' => 'Jane Doe',
             'email' => 'jane@example.com',
             'password' => 'password123',

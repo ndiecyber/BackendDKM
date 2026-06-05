@@ -44,7 +44,7 @@ class ReportTest extends TestCase
             'category_id' => $cat->id, 'status' => 'approved', 'created_by' => $this->admin->id,
         ]);
 
-        $r = $this->getJson('/api/v1/keuangan/reports/buku-kas?tanggal_mulai=2026-06-01&tanggal_akhir=2026-06-30');
+        $r = $this->getJson('/v1/keuangan/reports/buku-kas?tanggal_mulai=2026-06-01&tanggal_akhir=2026-06-30');
         $r->assertOk();
 
         $entries = $r->json('data.entries');
@@ -71,7 +71,7 @@ class ReportTest extends TestCase
             'category_id' => $cat2->id, 'status' => 'approved', 'created_by' => $this->admin->id,
         ]);
 
-        $r = $this->getJson('/api/v1/keuangan/reports/rekap-kategori?tanggal_mulai=2026-06-01&tanggal_akhir=2026-06-30');
+        $r = $this->getJson('/v1/keuangan/reports/rekap-kategori?tanggal_mulai=2026-06-01&tanggal_akhir=2026-06-30');
         $r->assertOk();
         $this->assertEquals(500000, $r->json('data.pemasukan.total'));
         $this->assertEquals(200000, $r->json('data.pengeluaran.total'));
@@ -82,7 +82,7 @@ class ReportTest extends TestCase
     {
         Sanctum::actingAs($this->admin);
 
-        $r = $this->get('/api/v1/keuangan/reports/export/csv?tanggal_mulai=2026-06-01&tanggal_akhir=2026-06-30');
+        $r = $this->get('/v1/keuangan/reports/export/csv?tanggal_mulai=2026-06-01&tanggal_akhir=2026-06-30');
         $r->assertOk()->assertHeader('Content-Type', 'text/csv; charset=UTF-8');
     }
 
@@ -92,6 +92,6 @@ class ReportTest extends TestCase
         $viewer->assignRole('viewer');
         Sanctum::actingAs($viewer);
 
-        $this->get('/api/v1/keuangan/reports/export/csv')->assertStatus(403);
+        $this->get('/v1/keuangan/reports/export/csv')->assertStatus(403);
     }
 }

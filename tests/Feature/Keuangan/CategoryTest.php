@@ -27,7 +27,7 @@ class CategoryTest extends TestCase
 
         Category::create(['nama' => 'Infaq', 'tipe' => 'pemasukan']);
 
-        $response = $this->getJson('/api/v1/keuangan/categories');
+        $response = $this->getJson('/v1/keuangan/categories');
 
         $response->assertOk()
             ->assertJsonStructure([
@@ -46,7 +46,7 @@ class CategoryTest extends TestCase
         $viewer->assignRole('viewer');
         Sanctum::actingAs($viewer);
 
-        $response = $this->getJson('/api/v1/keuangan/categories');
+        $response = $this->getJson('/v1/keuangan/categories');
 
         $response->assertOk();
     }
@@ -57,7 +57,7 @@ class CategoryTest extends TestCase
         $viewer->assignRole('viewer');
         Sanctum::actingAs($viewer);
 
-        $response = $this->postJson('/api/v1/keuangan/categories', [
+        $response = $this->postJson('/v1/keuangan/categories', [
             'nama' => 'Test',
             'tipe' => 'pemasukan',
         ]);
@@ -71,7 +71,7 @@ class CategoryTest extends TestCase
         $admin->assignRole('admin');
         Sanctum::actingAs($admin);
 
-        $response = $this->postJson('/api/v1/keuangan/categories', [
+        $response = $this->postJson('/v1/keuangan/categories', [
             'nama' => 'Zakat Fitrah',
             'tipe' => 'pemasukan',
             'deskripsi' => 'Zakat fitrah dari jamaah',
@@ -97,7 +97,7 @@ class CategoryTest extends TestCase
 
         $category = Category::create(['nama' => 'Old', 'tipe' => 'pemasukan']);
 
-        $response = $this->putJson("/api/v1/keuangan/categories/{$category->id}", [
+        $response = $this->putJson("/v1/keuangan/categories/{$category->id}", [
             'nama' => 'Updated',
             'status' => 'non_aktif',
         ]);
@@ -118,12 +118,12 @@ class CategoryTest extends TestCase
         $category = Category::create(['nama' => 'To Delete', 'tipe' => 'pengeluaran']);
 
         // Delete
-        $response = $this->deleteJson("/api/v1/keuangan/categories/{$category->id}");
+        $response = $this->deleteJson("/v1/keuangan/categories/{$category->id}");
         $response->assertOk();
         $this->assertSoftDeleted('categories', ['id' => $category->id]);
 
         // Restore
-        $response = $this->patchJson("/api/v1/keuangan/categories/{$category->id}/restore");
+        $response = $this->patchJson("/v1/keuangan/categories/{$category->id}/restore");
         $response->assertOk();
         $this->assertDatabaseHas('categories', ['id' => $category->id, 'deleted_at' => null]);
     }
@@ -137,7 +137,7 @@ class CategoryTest extends TestCase
         Category::create(['nama' => 'Infaq', 'tipe' => 'pemasukan']);
         Category::create(['nama' => 'Operasional', 'tipe' => 'pengeluaran']);
 
-        $response = $this->getJson('/api/v1/keuangan/categories?tipe=pemasukan');
+        $response = $this->getJson('/v1/keuangan/categories?tipe=pemasukan');
 
         $response->assertOk();
         $data = $response->json('data.data');

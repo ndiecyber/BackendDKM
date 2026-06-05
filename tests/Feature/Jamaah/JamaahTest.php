@@ -32,7 +32,7 @@ class JamaahTest extends TestCase
             'jenis_kelamin' => 'L',
         ]);
 
-        $response = $this->getJson('/api/v1/jamaah');
+        $response = $this->getJson('/v1/jamaah');
 
         $response->assertOk()
             ->assertJsonStructure([
@@ -53,7 +53,7 @@ class JamaahTest extends TestCase
         $viewer->assignRole('viewer');
         Sanctum::actingAs($viewer);
 
-        $response = $this->getJson('/api/v1/jamaah');
+        $response = $this->getJson('/v1/jamaah');
 
         $response->assertOk();
     }
@@ -64,7 +64,7 @@ class JamaahTest extends TestCase
         $viewer->assignRole('viewer');
         Sanctum::actingAs($viewer);
 
-        $response = $this->postJson('/api/v1/jamaah', [
+        $response = $this->postJson('/v1/jamaah', [
             'nama_lengkap' => 'Siti',
         ]);
 
@@ -77,7 +77,7 @@ class JamaahTest extends TestCase
         $admin->assignRole('admin');
         Sanctum::actingAs($admin);
 
-        $response = $this->postJson('/api/v1/jamaah', [
+        $response = $this->postJson('/v1/jamaah', [
             'nama_lengkap' => 'Ahmad',
             'no_hp' => '08111222333',
             'email' => 'ahmad@example.com',
@@ -106,7 +106,7 @@ class JamaahTest extends TestCase
             'nama_lengkap' => 'Old Name',
         ]);
 
-        $response = $this->putJson("/api/v1/jamaah/{$jamaah->id}", [
+        $response = $this->putJson("/v1/jamaah/{$jamaah->id}", [
             'nama_lengkap' => 'Updated Name',
         ]);
 
@@ -134,7 +134,7 @@ class JamaahTest extends TestCase
             'nama_lengkap' => 'To Be Deleted',
         ]);
 
-        $response = $this->deleteJson("/api/v1/jamaah/{$jamaah->id}");
+        $response = $this->deleteJson("/v1/jamaah/{$jamaah->id}");
 
         $response->assertOk();
         $this->assertSoftDeleted('jamaah', ['id' => $jamaah->id]);
@@ -153,7 +153,7 @@ class JamaahTest extends TestCase
 
         $this->assertSoftDeleted('jamaah', ['id' => $jamaah->id]);
 
-        $response = $this->patchJson("/api/v1/jamaah/{$jamaah->id}/restore");
+        $response = $this->patchJson("/v1/jamaah/{$jamaah->id}/restore");
 
         $response->assertOk();
         $this->assertDatabaseHas('jamaah', [

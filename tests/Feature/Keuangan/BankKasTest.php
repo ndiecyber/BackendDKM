@@ -27,7 +27,7 @@ class BankKasTest extends TestCase
 
         BankKas::create(['nama' => 'Kas Tunai', 'tipe' => 'tunai', 'saldo_awal' => 0, 'saldo_terkini' => 0]);
 
-        $response = $this->getJson('/api/v1/keuangan/bank-kas');
+        $response = $this->getJson('/v1/keuangan/bank-kas');
 
         $response->assertOk()
             ->assertJsonStructure([
@@ -46,7 +46,7 @@ class BankKasTest extends TestCase
         $admin->assignRole('admin');
         Sanctum::actingAs($admin);
 
-        $response = $this->postJson('/api/v1/keuangan/bank-kas', [
+        $response = $this->postJson('/v1/keuangan/bank-kas', [
             'nama' => 'BSI Operasional',
             'tipe' => 'rekening',
             'nomor_rekening' => '1234567890',
@@ -80,7 +80,7 @@ class BankKasTest extends TestCase
             'saldo_terkini' => 0,
         ]);
 
-        $response = $this->putJson("/api/v1/keuangan/bank-kas/{$bankKas->id}", [
+        $response = $this->putJson("/v1/keuangan/bank-kas/{$bankKas->id}", [
             'nama' => 'Updated Name',
             'status' => 'non_aktif',
         ]);
@@ -105,11 +105,11 @@ class BankKasTest extends TestCase
             'saldo_terkini' => 0,
         ]);
 
-        $response = $this->deleteJson("/api/v1/keuangan/bank-kas/{$bankKas->id}");
+        $response = $this->deleteJson("/v1/keuangan/bank-kas/{$bankKas->id}");
         $response->assertOk();
         $this->assertSoftDeleted('bank_kas', ['id' => $bankKas->id]);
 
-        $response = $this->patchJson("/api/v1/keuangan/bank-kas/{$bankKas->id}/restore");
+        $response = $this->patchJson("/v1/keuangan/bank-kas/{$bankKas->id}/restore");
         $response->assertOk();
         $this->assertDatabaseHas('bank_kas', ['id' => $bankKas->id, 'deleted_at' => null]);
     }
@@ -127,7 +127,7 @@ class BankKasTest extends TestCase
             'saldo_terkini' => 1000000,
         ]);
 
-        $response = $this->postJson("/api/v1/keuangan/bank-kas/{$bankKas->id}/adjust", [
+        $response = $this->postJson("/v1/keuangan/bank-kas/{$bankKas->id}/adjust", [
             'saldo_sesudah' => 950000,
             'deskripsi' => 'Penyesuaian setelah hitung kas fisik',
         ]);
@@ -153,7 +153,7 @@ class BankKasTest extends TestCase
         $viewer->assignRole('viewer');
         Sanctum::actingAs($viewer);
 
-        $response = $this->postJson('/api/v1/keuangan/bank-kas', [
+        $response = $this->postJson('/v1/keuangan/bank-kas', [
             'nama' => 'Test',
             'tipe' => 'tunai',
             'saldo_awal' => 0,

@@ -39,7 +39,7 @@ class TransactionTest extends TestCase
     public function test_create_income(): void
     {
         Sanctum::actingAs($this->admin);
-        $r = $this->postJson('/api/v1/keuangan/transactions', [
+        $r = $this->postJson('/v1/keuangan/transactions', [
             'tipe' => 'pemasukan', 'nama' => 'Infaq Jumat', 'nominal' => 500000,
             'tanggal' => '2026-06-05', 'bank_kas_tujuan_id' => $this->kasTunai->id,
             'category_id' => $this->kategoriPemasukan->id, 'status' => 'draft',
@@ -51,7 +51,7 @@ class TransactionTest extends TestCase
     public function test_create_expense(): void
     {
         Sanctum::actingAs($this->admin);
-        $r = $this->postJson('/api/v1/keuangan/transactions', [
+        $r = $this->postJson('/v1/keuangan/transactions', [
             'tipe' => 'pengeluaran', 'nama' => 'Beli Sapu', 'nominal' => 50000,
             'tanggal' => '2026-06-05', 'bank_kas_asal_id' => $this->kasTunai->id,
             'category_id' => $this->kategoriPengeluaran->id, 'status' => 'draft',
@@ -63,7 +63,7 @@ class TransactionTest extends TestCase
     public function test_create_transfer(): void
     {
         Sanctum::actingAs($this->admin);
-        $r = $this->postJson('/api/v1/keuangan/transactions', [
+        $r = $this->postJson('/v1/keuangan/transactions', [
             'tipe' => 'transfer', 'nama' => 'Setor', 'nominal' => 500000,
             'tanggal' => '2026-06-05', 'bank_kas_asal_id' => $this->kasTunai->id,
             'bank_kas_tujuan_id' => $this->kasBank->id, 'biaya_admin' => 2500, 'status' => 'draft',
@@ -75,7 +75,7 @@ class TransactionTest extends TestCase
     public function test_transfer_requires_different_accounts(): void
     {
         Sanctum::actingAs($this->admin);
-        $r = $this->postJson('/api/v1/keuangan/transactions', [
+        $r = $this->postJson('/v1/keuangan/transactions', [
             'tipe' => 'transfer', 'nama' => 'Bad', 'nominal' => 100000, 'tanggal' => '2026-06-05',
             'bank_kas_asal_id' => $this->kasTunai->id, 'bank_kas_tujuan_id' => $this->kasTunai->id,
         ]);
@@ -85,7 +85,7 @@ class TransactionTest extends TestCase
     public function test_saldo_updates_on_approval(): void
     {
         Sanctum::actingAs($this->admin);
-        $r = $this->postJson('/api/v1/keuangan/transactions', [
+        $r = $this->postJson('/v1/keuangan/transactions', [
             'tipe' => 'pemasukan', 'nama' => 'Infaq', 'nominal' => 200000, 'tanggal' => '2026-06-05',
             'bank_kas_tujuan_id' => $this->kasTunai->id, 'status' => 'draft',
         ]);
@@ -93,7 +93,7 @@ class TransactionTest extends TestCase
         $this->kasTunai->refresh();
         $this->assertEquals(1000000, $this->kasTunai->saldo_terkini);
 
-        $this->patchJson("/api/v1/keuangan/transactions/{$id}/status", ['status' => 'approved'])->assertOk();
+        $this->patchJson("/v1/keuangan/transactions/{$id}/status", ['status' => 'approved'])->assertOk();
         $this->kasTunai->refresh();
         $this->assertEquals(1200000, $this->kasTunai->saldo_terkini);
     }
@@ -101,7 +101,7 @@ class TransactionTest extends TestCase
     public function test_saldo_reverts_on_delete(): void
     {
         Sanctum::actingAs($this->admin);
-        $r = $this->postJson('/api/v1/keuangan/transactions', [
+        $r = $this->postJson('/v1/keuangan/transactions', [
             'tipe' => 'pengeluaran', 'nama' => 'ATK', 'nominal' => 100000, 'tanggal' => '2026-06-05',
             'bank_kas_asal_id' => $this->kasTunai->id, 'status' => 'approved',
         ]);
@@ -109,7 +109,7 @@ class TransactionTest extends TestCase
         $this->kasTunai->refresh();
         $this->assertEquals(900000, $this->kasTunai->saldo_terkini);
 
-        $this->deleteJson("/api/v1/keuangan/transactions/{$id}");
+        $this->deleteJson("/v1/keuangan/transactions/{$id}");
         $this->kasTunai->refresh();
         $this->assertEquals(1000000, $this->kasTunai->saldo_terkini);
     }
@@ -117,36 +117,36 @@ class TransactionTest extends TestCase
     public function test_cannot_edit_approved(): void
     {
         Sanctum::actingAs($this->admin);
-        $r = $this->postJson('/api/v1/keuangan/transactions', [
+        $r = $this->postJson('/v1/keuangan/transactions', [
             'tipe' => 'pemasukan', 'nama' => 'Approved', 'nominal' => 100000, 'tanggal' => '2026-06-05',
             'bank_kas_tujuan_id' => $this->kasTunai->id, 'status' => 'approved',
         ]);
-        $this->putJson("/api/v1/keuangan/transactions/{$r->json('data.id')}", ['nama' => 'Edit'])->assertStatus(422);
+        $this->putJson("/v1/keuangan/transactions/{$r->json('data.id')}", ['nama' => 'Edit'])->assertStatus(422);
     }
 
     public function test_status_workflow(): void
     {
         Sanctum::actingAs($this->admin);
-        $r = $this->postJson('/api/v1/keuangan/transactions', [
+        $r = $this->postJson('/v1/keuangan/transactions', [
             'tipe' => 'pemasukan', 'nama' => 'Test', 'nominal' => 100000, 'tanggal' => '2026-06-05',
             'bank_kas_tujuan_id' => $this->kasTunai->id, 'status' => 'approved',
         ]);
         // approved → draft is not allowed
-        $this->patchJson("/api/v1/keuangan/transactions/{$r->json('data.id')}/status", ['status' => 'draft'])->assertStatus(422);
+        $this->patchJson("/v1/keuangan/transactions/{$r->json('data.id')}/status", ['status' => 'draft'])->assertStatus(422);
     }
 
     public function test_filters(): void
     {
         Sanctum::actingAs($this->admin);
-        $this->postJson('/api/v1/keuangan/transactions', [
+        $this->postJson('/v1/keuangan/transactions', [
             'tipe' => 'pemasukan', 'nama' => 'A', 'nominal' => 100000, 'tanggal' => '2026-06-05',
             'bank_kas_tujuan_id' => $this->kasTunai->id, 'status' => 'draft',
         ]);
-        $this->postJson('/api/v1/keuangan/transactions', [
+        $this->postJson('/v1/keuangan/transactions', [
             'tipe' => 'pengeluaran', 'nama' => 'B', 'nominal' => 50000, 'tanggal' => '2026-06-05',
             'bank_kas_asal_id' => $this->kasTunai->id, 'status' => 'draft',
         ]);
-        $r = $this->getJson('/api/v1/keuangan/transactions?tipe=pemasukan');
+        $r = $this->getJson('/v1/keuangan/transactions?tipe=pemasukan');
         $r->assertOk();
         $this->assertCount(1, $r->json('data.data'));
     }
@@ -154,11 +154,11 @@ class TransactionTest extends TestCase
     public function test_auto_increment(): void
     {
         Sanctum::actingAs($this->admin);
-        $this->postJson('/api/v1/keuangan/transactions', [
+        $this->postJson('/v1/keuangan/transactions', [
             'tipe' => 'pemasukan', 'nama' => '1st', 'nominal' => 100000, 'tanggal' => '2026-06-05',
             'bank_kas_tujuan_id' => $this->kasTunai->id, 'status' => 'draft',
         ]);
-        $r = $this->postJson('/api/v1/keuangan/transactions', [
+        $r = $this->postJson('/v1/keuangan/transactions', [
             'tipe' => 'pemasukan', 'nama' => '2nd', 'nominal' => 200000, 'tanggal' => '2026-06-05',
             'bank_kas_tujuan_id' => $this->kasTunai->id, 'status' => 'draft',
         ]);
@@ -170,7 +170,7 @@ class TransactionTest extends TestCase
         $viewer = User::factory()->create();
         $viewer->assignRole('viewer');
         Sanctum::actingAs($viewer);
-        $this->postJson('/api/v1/keuangan/transactions', [
+        $this->postJson('/v1/keuangan/transactions', [
             'tipe' => 'pemasukan', 'nama' => 'X', 'nominal' => 100000, 'tanggal' => '2026-06-05',
             'bank_kas_tujuan_id' => $this->kasTunai->id,
         ])->assertStatus(403);
@@ -179,7 +179,7 @@ class TransactionTest extends TestCase
     public function test_income_requires_tujuan(): void
     {
         Sanctum::actingAs($this->admin);
-        $this->postJson('/api/v1/keuangan/transactions', [
+        $this->postJson('/v1/keuangan/transactions', [
             'tipe' => 'pemasukan', 'nama' => 'No Tujuan', 'nominal' => 100000, 'tanggal' => '2026-06-05',
         ])->assertStatus(422)->assertJsonValidationErrors('bank_kas_tujuan_id');
     }

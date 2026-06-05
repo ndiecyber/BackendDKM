@@ -27,7 +27,7 @@ class DashboardTest extends TestCase
 
         BankKas::create(['nama' => 'Kas', 'tipe' => 'tunai', 'saldo_awal' => 1000000, 'saldo_terkini' => 1000000]);
 
-        $response = $this->getJson('/api/v1/keuangan/dashboard/overview');
+        $response = $this->getJson('/v1/keuangan/dashboard/overview');
         $response->assertOk()->assertJsonStructure([
             'success', 'data' => [
                 'total_saldo', 'ringkasan_bank_kas', 'pemasukan_bulan_ini',
@@ -42,7 +42,7 @@ class DashboardTest extends TestCase
         $admin->assignRole('admin');
         Sanctum::actingAs($admin);
 
-        $response = $this->getJson('/api/v1/keuangan/dashboard/chart/income-vs-expense');
+        $response = $this->getJson('/v1/keuangan/dashboard/chart/income-vs-expense');
         $response->assertOk()->assertJsonStructure([
             'success', 'data' => [['bulan', 'pemasukan', 'pengeluaran']],
         ]);
@@ -54,7 +54,7 @@ class DashboardTest extends TestCase
         $admin->assignRole('admin');
         Sanctum::actingAs($admin);
 
-        $this->getJson('/api/v1/keuangan/dashboard/chart/income-composition')->assertOk();
-        $this->getJson('/api/v1/keuangan/dashboard/chart/expense-composition')->assertOk();
+        $this->getJson('/v1/keuangan/dashboard/chart/income-composition')->assertOk();
+        $this->getJson('/v1/keuangan/dashboard/chart/expense-composition')->assertOk();
     }
 }
