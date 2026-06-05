@@ -42,9 +42,18 @@ class ReportService
             } elseif ($trx->tipe === 'pengeluaran') {
                 $keluar = $trx->nominal;
             } elseif ($trx->tipe === 'transfer') {
-                // Transfer doesn't affect overall balance but show movement
-                // Display as keluar from asal perspective
-                $keluar = $trx->nominal + ($trx->biaya_admin ?? 0);
+                $bankKasFilter = $filters['bank_kas_id'] ?? null;
+
+                if ($bankKasFilter) {
+                    if ($trx->bank_kas_asal_id == $bankKasFilter) {
+                        $keluar = $trx->nominal + ($trx->biaya_admin ?? 0);
+                    } elseif ($trx->bank_kas_tujuan_id == $bankKasFilter) {
+                        $masuk = $trx->nominal;
+                    }
+                } else {
+                    // Global view: Uang DKM tidak berkurang kecuali untuk biaya admin bank
+                    $keluar = $trx->biaya_admin ?? 0;
+                }
             }
 
             $runningBalance = $runningBalance + $masuk - $keluar;
@@ -262,7 +271,34 @@ class ReportService
         $pemasukan = (clone $query)->where('tipe', 'pemasukan')->sum('nominal');
         $pengeluaran = (clone $query)->where('tipe', 'pengeluaran')->sum('nominal');
 
-        return $pemasukan - $pengeluaran;
+        $transferKeluar = 0;
+        $transferMasuk = 0;
+
+        if (!empty($filters['bank_kas_id'])) {
+            $transferKeluar = Transaction::query()
+                ->where('status', 'approved')
+                ->where('tanggal', '<', $startDate)
+                ->where('tipe', 'transfer')
+                ->where('bank_kas_asal_id', $filters['bank_kas_id'])
+                ->selectRaw('SUM(nominal + COALESCE(biaya_admin, 0)) as total')
+                ->value('total') ?? 0;
+
+            $transferMasuk = Transaction::query()
+                ->where('status', 'approved')
+                ->where('tanggal', '<', $startDate)
+                ->where('tipe', 'transfer')
+                ->where('bank_kas_tujuan_id', $filters['bank_kas_id'])
+                ->sum('nominal');
+        } else {
+            // Global view: Uang keseluruhan hanya berkurang sebesar biaya admin
+            $transferKeluar = Transaction::query()
+                ->where('status', 'approved')
+                ->where('tanggal', '<', $startDate)
+                ->where('tipe', 'transfer')
+                ->sum('biaya_admin') ?? 0;
+        }
+
+        return $pemasukan + $transferMasuk - $pengeluaran - $transferKeluar;
     }
 
     /**
