@@ -31,12 +31,34 @@ class RolePermissionSeeder extends Seeder
             'jamaah.update',
             'jamaah.delete',
 
-            // Keuangan module
+            // Keuangan module (legacy — kept for backward compatibility)
             'keuangan.view',
             'keuangan.create',
             'keuangan.update',
             'keuangan.delete',
             'keuangan.export',
+
+            // Keuangan module (granular)
+            'keuangan.category.view',
+            'keuangan.category.create',
+            'keuangan.category.update',
+            'keuangan.category.delete',
+
+            'keuangan.bank_kas.view',
+            'keuangan.bank_kas.create',
+            'keuangan.bank_kas.update',
+            'keuangan.bank_kas.delete',
+
+            'keuangan.transaksi.view',
+            'keuangan.transaksi.create',
+            'keuangan.transaksi.update',
+            'keuangan.transaksi.delete',
+            'keuangan.transaksi.approve',
+
+            'keuangan.laporan.view',
+            'keuangan.laporan.export',
+
+            'keuangan.rekonsiliasi.create',
 
             // Kurban module
             'kurban.view',
@@ -64,6 +86,11 @@ class RolePermissionSeeder extends Seeder
             'user.view', 'user.create', 'user.update', 'user.delete',
             'jamaah.view', 'jamaah.create', 'jamaah.update', 'jamaah.delete',
             'keuangan.view', 'keuangan.create', 'keuangan.update', 'keuangan.delete', 'keuangan.export',
+            'keuangan.category.view', 'keuangan.category.create', 'keuangan.category.update', 'keuangan.category.delete',
+            'keuangan.bank_kas.view', 'keuangan.bank_kas.create', 'keuangan.bank_kas.update', 'keuangan.bank_kas.delete',
+            'keuangan.transaksi.view', 'keuangan.transaksi.create', 'keuangan.transaksi.update', 'keuangan.transaksi.delete', 'keuangan.transaksi.approve',
+            'keuangan.laporan.view', 'keuangan.laporan.export',
+            'keuangan.rekonsiliasi.create',
             'kurban.view', 'kurban.create', 'kurban.update', 'kurban.delete',
             'profile.view', 'profile.create', 'profile.update', 'profile.delete',
         ]);
@@ -72,6 +99,10 @@ class RolePermissionSeeder extends Seeder
         $viewer->syncPermissions([
             'jamaah.view',
             'keuangan.view',
+            'keuangan.category.view',
+            'keuangan.bank_kas.view',
+            'keuangan.transaksi.view',
+            'keuangan.laporan.view',
             'kurban.view',
             'profile.view',
         ]);

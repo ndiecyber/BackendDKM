@@ -23,7 +23,7 @@ class LogoutTest extends TestCase
         $user = User::factory()->create();
         Sanctum::actingAs($user);
 
-        $response = $this->postJson('/api/v1/auth/logout');
+        $response = $this->postJson('/v1/auth/logout');
 
         $response->assertOk()
             ->assertJson([
@@ -34,7 +34,7 @@ class LogoutTest extends TestCase
 
     public function test_unauthenticated_user_cannot_logout(): void
     {
-        $response = $this->postJson('/api/v1/auth/logout');
+        $response = $this->postJson('/v1/auth/logout');
 
         $response->assertStatus(401)
             ->assertJson([
@@ -49,7 +49,7 @@ class LogoutTest extends TestCase
         $user->assignRole('admin');
         Sanctum::actingAs($user);
 
-        $response = $this->getJson('/api/v1/auth/me');
+        $response = $this->getJson('/v1/auth/me');
 
         $response->assertOk()
             ->assertJsonStructure([
@@ -69,7 +69,7 @@ class LogoutTest extends TestCase
         $user = User::factory()->create();
         Sanctum::actingAs($user);
 
-        $response = $this->postJson('/api/v1/auth/refresh');
+        $response = $this->postJson('/v1/auth/refresh');
 
         $response->assertOk()
             ->assertJsonStructure([

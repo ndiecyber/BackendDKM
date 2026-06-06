@@ -80,6 +80,7 @@ DB_PORT=5432
 DB_DATABASE=dkm_db
 DB_USERNAME=postgres
 DB_PASSWORD=your_password
+API_DOMAIN=api.localhost
 ```
 
 ### 4. Database Setup
@@ -193,6 +194,7 @@ DB_PORT=5432
 DB_DATABASE=dkm_db
 DB_USERNAME=dkm_user
 DB_PASSWORD=your_password
+API_DOMAIN=api.localhost
 ```
 
 ### 4. Database Setup
@@ -216,7 +218,7 @@ Server berjalan di `http://localhost:8000`.
 
 ## API Endpoints
 
-Base URL: `http://localhost:8000/api/v1`
+Base URL: `http://api.localhost:8000/v1`
 
 ### Authentication
 
@@ -232,25 +234,25 @@ Base URL: `http://localhost:8000/api/v1`
 
 ```bash
 # Register
-curl -X POST http://localhost:8000/api/v1/auth/register \
+curl -X POST http://api.localhost:8000/v1/auth/register \
   -H "Content-Type: application/json" \
   -d '{"name":"John","email":"john@example.com","password":"password123","password_confirmation":"password123"}'
 
 # Login
-curl -X POST http://localhost:8000/api/v1/auth/login \
+curl -X POST http://api.localhost:8000/v1/auth/login \
   -H "Content-Type: application/json" \
   -d '{"email":"admin@dkm.local","password":"password"}'
 
 # Access protected endpoint
-curl http://localhost:8000/api/v1/auth/me \
+curl http://api.localhost:8000/v1/auth/me \
   -H "Authorization: Bearer YOUR_TOKEN_HERE"
 ```
 
 ### API Documentation
 
 Dokumentasi interaktif tersedia di:
-- **UI**: `http://localhost:8000/docs/api`
-- **OpenAPI JSON**: `http://localhost:8000/docs/api.json`
+- **UI**: `http://api.localhost:8000/docs/api`
+- **OpenAPI JSON**: `http://api.localhost:8000/docs/api.json`
 
 ## Default Admin Account
 
