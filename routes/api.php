@@ -2,9 +2,8 @@
 
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\JamaahController;
-use App\Http\Controllers\Api\V1\Keuangan\BalanceAdjustmentController;
-use App\Http\Controllers\Api\V1\Keuangan\BankKasController;
-use App\Http\Controllers\Api\V1\Keuangan\TransactionController;
+
+use App\Http\Controllers\Api\V1\ProfileController;
 use App\Http\Controllers\Api\V1\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -42,13 +41,11 @@ Route::prefix('v1')->group(function () {
             Route::post('/refresh', [AuthController::class, 'refresh']);
         });
 
-        // Transaction Management
-        Route::apiResource('transactions', TransactionController::class);
+        // Profile Management (Authenticated User)
+        Route::put('/profile', [ProfileController::class, 'updateProfile']);
+        Route::put('/profile/password', [ProfileController::class, 'updatePassword']);
 
-        // Bank/Kas Management
-        Route::apiResource('bank-kas', BankKasController::class);
-        Route::get('bank-kas/{bank_kas}/adjustments', [BalanceAdjustmentController::class, 'index']);
-        Route::post('bank-kas/{bank_kas}/adjustments', [BalanceAdjustmentController::class, 'store']);
+
 
         // User Management
         Route::apiResource('users', UserController::class);
@@ -64,4 +61,7 @@ Route::prefix('v1')->group(function () {
         // Route::prefix('kurban')->group(base_path('routes/modules/kurban.php'));
         // Route::prefix('profile')->group(base_path('routes/modules/profile.php'));
     });
+
+    // Web Profile Module (contains both public and protected routes inside)
+    Route::prefix('web-profile')->group(base_path('routes/modules/web_profile.php'));
 });

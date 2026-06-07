@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\V1\Keuangan\BalanceAdjustmentController;
 use App\Http\Controllers\Api\V1\Keuangan\BankKasController;
 use App\Http\Controllers\Api\V1\Keuangan\CategoryController;
 use App\Http\Controllers\Api\V1\Keuangan\DashboardController;
@@ -24,7 +25,8 @@ Route::patch('categories/{id}/restore', [CategoryController::class, 'restore']);
 // Bank/Kas
 Route::apiResource('bank-kas', BankKasController::class);
 Route::patch('bank-kas/{id}/restore', [BankKasController::class, 'restore']);
-Route::post('bank-kas/{id}/adjust', [BankKasController::class, 'adjust']);
+Route::get('bank-kas/{bank_kas}/adjustments', [BalanceAdjustmentController::class, 'index']);
+Route::post('bank-kas/{bank_kas}/adjustments', [BalanceAdjustmentController::class, 'store']);
 
 // Transactions
 Route::apiResource('transactions', TransactionController::class);
