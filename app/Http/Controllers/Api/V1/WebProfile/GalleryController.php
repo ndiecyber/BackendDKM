@@ -16,6 +16,7 @@ class GalleryController extends Controller
     public function index(): JsonResponse
     {
         $galleries = Gallery::latest()->get();
+
         return $this->successResponse($galleries);
     }
 
@@ -41,6 +42,7 @@ class GalleryController extends Controller
     public function show(string $id): JsonResponse
     {
         $gallery = Gallery::findOrFail($id);
+
         return $this->successResponse($gallery);
     }
 

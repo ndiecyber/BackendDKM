@@ -15,6 +15,7 @@ class ServiceController extends Controller
     public function index(): JsonResponse
     {
         $services = Service::latest()->get();
+
         return $this->successResponse($services);
     }
 
@@ -35,6 +36,7 @@ class ServiceController extends Controller
     public function show(string $id): JsonResponse
     {
         $service = Service::findOrFail($id);
+
         return $this->successResponse($service);
     }
 

@@ -15,6 +15,7 @@ class EventController extends Controller
     public function index(): JsonResponse
     {
         $events = Event::orderBy('date', 'desc')->get();
+
         return $this->successResponse($events);
     }
 
@@ -37,6 +38,7 @@ class EventController extends Controller
     public function show(string $id): JsonResponse
     {
         $event = Event::findOrFail($id);
+
         return $this->successResponse($event);
     }
 

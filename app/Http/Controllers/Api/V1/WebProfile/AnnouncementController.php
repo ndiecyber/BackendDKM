@@ -15,6 +15,7 @@ class AnnouncementController extends Controller
     public function index(): JsonResponse
     {
         $announcements = Announcement::latest()->get();
+
         return $this->successResponse($announcements);
     }
 
@@ -34,6 +35,7 @@ class AnnouncementController extends Controller
     public function show(string $id): JsonResponse
     {
         $announcement = Announcement::findOrFail($id);
+
         return $this->successResponse($announcement);
     }
 

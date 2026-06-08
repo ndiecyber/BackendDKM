@@ -28,7 +28,7 @@ class DashboardController extends Controller
         $totalEvents = Event::count();
         $totalAnnouncementsActive = Announcement::where('is_active', true)->count();
         $totalGalleries = Gallery::count();
-        
+
         $visitorsThisMonth = Visitor::whereBetween('visited_date', [$startOfMonth, $endOfMonth])->count();
 
         return $this->successResponse([

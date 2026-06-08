@@ -43,22 +43,22 @@ Route::get('/finance-summary', [FinanceSummaryController::class, 'index']);
 // Protected routes (Admin Web Profile)
 Route::middleware('auth:sanctum')->group(function () {
     Route::put('/settings', [SettingController::class, 'update']);
-    
+
     // CRUD for Services
     Route::post('/services', [ServiceController::class, 'store']);
     Route::put('/services/{id}', [ServiceController::class, 'update']);
     Route::delete('/services/{id}', [ServiceController::class, 'destroy']);
-    
+
     // CRUD for Galleries
     Route::post('/galleries', [GalleryController::class, 'store']);
     Route::put('/galleries/{id}', [GalleryController::class, 'update']);
     Route::delete('/galleries/{id}', [GalleryController::class, 'destroy']);
-    
+
     // CRUD for Events
     Route::post('/events', [EventController::class, 'store']);
     Route::put('/events/{id}', [EventController::class, 'update']);
     Route::delete('/events/{id}', [EventController::class, 'destroy']);
-    
+
     // CRUD for Announcements
     Route::post('/announcements', [AnnouncementController::class, 'store']);
     Route::put('/announcements/{id}', [AnnouncementController::class, 'update']);
