@@ -80,6 +80,7 @@ DB_PORT=5432
 DB_DATABASE=dkm_db
 DB_USERNAME=postgres
 DB_PASSWORD=your_password
+API_DOMAIN=api.localhost
 ```
 
 ### 4. Database Setup
@@ -193,6 +194,7 @@ DB_PORT=5432
 DB_DATABASE=dkm_db
 DB_USERNAME=dkm_user
 DB_PASSWORD=your_password
+API_DOMAIN=api.localhost
 ```
 
 ### 4. Database Setup
@@ -214,9 +216,57 @@ php artisan serve
 
 Server berjalan di `http://localhost:8000`.
 
+---
+
+## Docker Setup
+
+Untuk local development maupun deployment ke VPS, sangat disarankan menggunakan Docker.
+
+### 1. Prasyarat
+
+- Install [Docker Desktop](https://www.docker.com/products/docker-desktop/) (Windows/Mac) atau Docker Engine (Linux).
+- Pastikan Port `80` (Nginx), `9000` (PHP), dan `5432` (PostgreSQL) tidak sedang dipakai aplikasi lain.
+
+### 2. Konfigurasi Environment
+
+Copy file `.env`:
+```bash
+cp .env.example .env
+```
+Karena kita menggunakan container, ubah host database di `.env` menjadi nama service Docker-nya (`db`):
+```env
+DB_HOST=db
+DB_PASSWORD=secret
+```
+
+### 3. Menjalankan Docker Compose
+
+Build dan jalankan container di *background*:
+```bash
+docker compose up -d --build
+```
+
+Setelah container berjalan (bisa dicek dengan `docker compose ps`), masuk ke container aplikasi untuk menginstall dependency dan migrasi database:
+```bash
+# Masuk ke container app
+docker compose exec app bash
+
+# Di dalam container, jalankan:
+composer install
+php artisan key:generate
+php artisan migrate --seed
+
+# Keluar dari container
+exit
+```
+
+Aplikasi sekarang dapat diakses di `http://localhost`.
+
+---
+
 ## API Endpoints
 
-Base URL: `http://localhost:8000/api/v1`
+Base URL: `http://api.localhost:8000/v1`
 
 ### Authentication
 
@@ -232,25 +282,25 @@ Base URL: `http://localhost:8000/api/v1`
 
 ```bash
 # Register
-curl -X POST http://localhost:8000/api/v1/auth/register \
+curl -X POST http://api.localhost:8000/v1/auth/register \
   -H "Content-Type: application/json" \
   -d '{"name":"John","email":"john@example.com","password":"password123","password_confirmation":"password123"}'
 
 # Login
-curl -X POST http://localhost:8000/api/v1/auth/login \
+curl -X POST http://api.localhost:8000/v1/auth/login \
   -H "Content-Type: application/json" \
   -d '{"email":"admin@dkm.local","password":"password"}'
 
 # Access protected endpoint
-curl http://localhost:8000/api/v1/auth/me \
+curl http://api.localhost:8000/v1/auth/me \
   -H "Authorization: Bearer YOUR_TOKEN_HERE"
 ```
 
 ### API Documentation
 
 Dokumentasi interaktif tersedia di:
-- **UI**: `http://localhost:8000/docs/api`
-- **OpenAPI JSON**: `http://localhost:8000/docs/api.json`
+- **UI**: `http://api.localhost:8000/docs/api`
+- **OpenAPI JSON**: `http://api.localhost:8000/docs/api.json`
 
 ## Default Admin Account
 

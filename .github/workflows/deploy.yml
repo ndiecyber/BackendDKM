@@ -1,0 +1,41 @@
+name: Deploy to VPS
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    name: Deploy Application
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USERNAME }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ secrets.VPS_PORT }}
+          script: |
+            # Pindah ke direktori project di VPS
+            # Pastikan Anda telah melakukan git clone project ini di folder tersebut!
+            cd /var/www/backend-dkm 
+            
+            # Tarik kode terbaru
+            git fetch origin
+            git reset --hard origin/main
+            
+            # Build dan nyalakan container Docker
+            docker compose up -d --build
+            
+            # Install dependency (jika ada package baru) dan jalankan migrasi
+            docker compose exec -T app composer install --no-interaction --prefer-dist --optimize-autoloader
+            docker compose exec -T app php artisan migrate --force
+            
+            # Optimasi cache Laravel untuk production
+            docker compose exec -T app php artisan optimize:clear
+            docker compose exec -T app php artisan optimize
+            
+            echo "Deployment Completed Successfully!"

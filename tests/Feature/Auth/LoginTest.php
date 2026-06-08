@@ -23,7 +23,7 @@ class LoginTest extends TestCase
             'password' => bcrypt('password123'),
         ]);
 
-        $response = $this->postJson('/api/v1/auth/login', [
+        $response = $this->postJson('/v1/auth/login', [
             'email' => $user->email,
             'password' => 'password123',
         ]);
@@ -49,7 +49,7 @@ class LoginTest extends TestCase
             'password' => bcrypt('password123'),
         ]);
 
-        $response = $this->postJson('/api/v1/auth/login', [
+        $response = $this->postJson('/v1/auth/login', [
             'email' => $user->email,
             'password' => 'wrong-password',
         ]);
@@ -63,7 +63,7 @@ class LoginTest extends TestCase
 
     public function test_login_fails_with_nonexistent_email(): void
     {
-        $response = $this->postJson('/api/v1/auth/login', [
+        $response = $this->postJson('/v1/auth/login', [
             'email' => 'nonexistent@example.com',
             'password' => 'password123',
         ]);
@@ -77,7 +77,7 @@ class LoginTest extends TestCase
 
     public function test_login_fails_with_missing_fields(): void
     {
-        $response = $this->postJson('/api/v1/auth/login', []);
+        $response = $this->postJson('/v1/auth/login', []);
 
         $response->assertStatus(422)
             ->assertJson([
@@ -95,7 +95,7 @@ class LoginTest extends TestCase
             'password' => bcrypt('password123'),
         ]);
 
-        $response = $this->postJson('/api/v1/auth/login', [
+        $response = $this->postJson('/v1/auth/login', [
             'email' => $user->email,
             'password' => 'password123',
         ]);
@@ -115,14 +115,14 @@ class LoginTest extends TestCase
 
         // Make 5 failed login attempts
         for ($i = 0; $i < 5; $i++) {
-            $this->postJson('/api/v1/auth/login', [
+            $this->postJson('/v1/auth/login', [
                 'email' => $user->email,
                 'password' => 'wrong-password',
             ]);
         }
 
         // 6th attempt should be rate limited
-        $response = $this->postJson('/api/v1/auth/login', [
+        $response = $this->postJson('/v1/auth/login', [
             'email' => $user->email,
             'password' => 'wrong-password',
         ]);

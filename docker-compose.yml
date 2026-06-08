@@ -1,0 +1,52 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: backend-dkm-app
+    container_name: dkm_app
+    restart: unless-stopped
+    working_dir: /var/www/html
+    volumes:
+      - ./:/var/www/html
+    depends_on:
+      - db
+    networks:
+      - dkm_network
+
+  nginx:
+    image: nginx:alpine
+    container_name: dkm_nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - ./:/var/www/html
+      - ./docker/nginx/conf.d:/etc/nginx/conf.d
+    depends_on:
+      - app
+    networks:
+      - dkm_network
+
+  db:
+    image: postgres:16
+    container_name: dkm_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_DATABASE:-dkm_db}
+      POSTGRES_USER: ${DB_USERNAME:-dkm_user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-secret}
+    ports:
+      - "5432:5432"
+    volumes:
+      - dkm_pgdata:/var/lib/postgresql/data
+    networks:
+      - dkm_network
+
+networks:
+  dkm_network:
+    driver: bridge
+
+volumes:
+  dkm_pgdata:
+    driver: local
