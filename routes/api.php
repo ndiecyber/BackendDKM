@@ -2,7 +2,6 @@
 
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\JamaahController;
-
 use App\Http\Controllers\Api\V1\ProfileController;
 use App\Http\Controllers\Api\V1\UserController;
 use Illuminate\Support\Facades\Route;
@@ -44,8 +43,6 @@ Route::prefix('v1')->group(function () {
         // Profile Management (Authenticated User)
         Route::put('/profile', [ProfileController::class, 'updateProfile']);
         Route::put('/profile/password', [ProfileController::class, 'updatePassword']);
-
-
 
         // User Management
         Route::apiResource('users', UserController::class);
