@@ -38,7 +38,7 @@ jobs:
             php artisan optimize
             
             # Reload PM2 Process (Octane via FrankenPHP)
-            # If the process doesn't exist yet, it will be started using the ecosystem.config.js file
-            pm2 startOrReload ecosystem.config.js
+            # If the process doesn't exist yet, it will be started using the ecosystem.config.cjs file
+            pm2 startOrReload ecosystem.config.cjs
             
             echo "Deployment Completed Successfully!"
