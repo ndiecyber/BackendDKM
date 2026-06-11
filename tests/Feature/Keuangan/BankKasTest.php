@@ -127,19 +127,21 @@ class BankKasTest extends TestCase
             'saldo_terkini' => 1000000,
         ]);
 
-        $response = $this->postJson("/v1/keuangan/bank-kas/{$bankKas->id}/adjust", [
-            'saldo_sesudah' => 950000,
+        $response = $this->postJson("/v1/keuangan/bank-kas/{$bankKas->id}/adjustments", [
+            'tanggal' => now()->format('Y-m-d'),
+            'target_saldo' => 950000,
             'deskripsi' => 'Penyesuaian setelah hitung kas fisik',
         ]);
 
         $response->assertStatus(201)
             ->assertJson([
-                'success' => true,
+                'message' => 'Penyesuaian saldo berhasil dilakukan.',
                 'data' => [
                     'saldo_sebelum' => '1000000.00',
                     'saldo_sesudah' => '950000.00',
                     'selisih' => '-50000.00',
                 ],
+                'saldo_terkini_baru' => '950000.00',
             ]);
 
         $this->assertDatabaseHas('balance_adjustments', [

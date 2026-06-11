@@ -216,6 +216,54 @@ php artisan serve
 
 Server berjalan di `http://localhost:8000`.
 
+---
+
+## Docker Setup
+
+Untuk local development maupun deployment ke VPS, sangat disarankan menggunakan Docker.
+
+### 1. Prasyarat
+
+- Install [Docker Desktop](https://www.docker.com/products/docker-desktop/) (Windows/Mac) atau Docker Engine (Linux).
+- Pastikan Port `80` (Nginx), `9000` (PHP), dan `5432` (PostgreSQL) tidak sedang dipakai aplikasi lain.
+
+### 2. Konfigurasi Environment
+
+Copy file `.env`:
+```bash
+cp .env.example .env
+```
+Karena kita menggunakan container, ubah host database di `.env` menjadi nama service Docker-nya (`db`):
+```env
+DB_HOST=db
+DB_PASSWORD=secret
+```
+
+### 3. Menjalankan Docker Compose
+
+Build dan jalankan container di *background*:
+```bash
+docker compose up -d --build
+```
+
+Setelah container berjalan (bisa dicek dengan `docker compose ps`), masuk ke container aplikasi untuk menginstall dependency dan migrasi database:
+```bash
+# Masuk ke container app
+docker compose exec app bash
+
+# Di dalam container, jalankan:
+composer install
+php artisan key:generate
+php artisan migrate --seed
+
+# Keluar dari container
+exit
+```
+
+Aplikasi sekarang dapat diakses di `http://localhost`.
+
+---
+
 ## API Endpoints
 
 Base URL: `http://api.localhost:8000/v1`

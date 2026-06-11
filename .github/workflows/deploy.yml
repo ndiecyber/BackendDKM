@@ -1,0 +1,44 @@
+name: Deploy to VPS
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    name: Deploy Application
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USERNAME }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ secrets.VPS_PORT }}
+          script: |
+            sudo chown -R $USER:$USER /var/www/backend-dkm
+            cd /var/www/backend-dkm 
+            
+            git config --global --add safe.directory /var/www/backend-dkm
+            
+            git fetch origin
+            git reset --hard origin/main
+            
+            # Install PHP dependencies
+            composer install --no-interaction --prefer-dist --optimize-autoloader
+            
+            # Run migrations
+            php artisan migrate --force
+            
+            # Optimize Laravel
+            php artisan optimize:clear
+            php artisan optimize
+            
+            # Reload PM2 Process (Octane via FrankenPHP)
+            # If the process doesn't exist yet, it will be started using the ecosystem.config.cjs file
+            pm2 startOrReload ecosystem.config.cjs
+            
+            echo "Deployment Completed Successfully!"
