@@ -61,4 +61,8 @@ Route::prefix('v1')->group(function () {
 
     // Web Profile Module (contains both public and protected routes inside)
     Route::prefix('web-profile')->group(base_path('routes/modules/web_profile.php'));
+
+    // Future module routes:
+        Route::prefix('keuangan')->group(base_path('routes/modules/keuangan.php'));
+        Route::prefix('kurban')->group(base_path('routes/modules/kurban.php'));
 });
