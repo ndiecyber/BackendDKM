@@ -28,7 +28,9 @@ class ShohibulController extends Controller
      */
     public function index(Request $request): JsonResponse
     {
-        $period = QurbanPeriod::active()->first();
+        $period = $request->has('period_id')
+            ? QurbanPeriod::find($request->period_id)
+            : QurbanPeriod::active()->first();
 
         if (! $period) {
             return $this->errorResponse('Tidak ada periode aktif.', 404);
@@ -76,6 +78,10 @@ class ShohibulController extends Controller
 
         if (! $period) {
             return $this->errorResponse('Tidak ada periode aktif.', 404);
+        }
+
+        if (now()->startOfDay()->gt($period->deadline_date)) {
+            return $this->errorResponse('Pendaftaran untuk periode ini telah ditutup.', 422);
         }
 
         $data = $request->validated();

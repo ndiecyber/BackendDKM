@@ -19,9 +19,11 @@ class AnimalGroupController extends Controller
     /**
      * List all groups with members for active period (public).
      */
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
-        $period = QurbanPeriod::active()->first();
+        $period = $request->has('period_id')
+            ? QurbanPeriod::find($request->period_id)
+            : QurbanPeriod::active()->first();
 
         if (! $period) {
             return $this->errorResponse('Tidak ada periode aktif.', 404);

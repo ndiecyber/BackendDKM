@@ -9,12 +9,18 @@ use Illuminate\Support\Facades\Log;
 
 class RolloverService
 {
+    public function __construct(
+        private QurbanTransactionService $transactionService
+    ) {}
+
     /**
      * Execute period close (tutup buku) and create a new period.
      *
-     * 1. Close current active period.
-     * 2. Create new period from provided data.
-     * 3. Clone all shohibuls to new period:
+     * 1. Get current active period.
+     * 2. Cancel all pending transactions in the old period.
+     * 3. Close current active period.
+     * 4. Create new period from provided data.
+     * 5. Clone all shohibuls to new period:
      *    - Lunas: reset collected_amount to 0, clear group.
      *    - Belum lunas: carry over collected_amount, clear group.
      *    - Both: update target_amount to new price.
@@ -22,8 +28,23 @@ class RolloverService
     public function execute(array $newPeriodData): QurbanPeriod
     {
         return DB::transaction(function () use ($newPeriodData) {
-            // 1. Get and close current active period
+            // 1. Get current active period
             $oldPeriod = QurbanPeriod::active()->firstOrFail();
+
+            // 2. Cancel all pending transactions in the old period
+            $pendingTransactions = \App\Models\Qurban\QurbanTransaction::whereHas('shohibul', function ($q) use ($oldPeriod) {
+                $q->where('period_id', $oldPeriod->id);
+            })->where('status', 'pending')->get();
+
+            foreach ($pendingTransactions as $tx) {
+                try {
+                    $this->transactionService->cancelTransaction($tx);
+                } catch (\Exception $e) {
+                    Log::error('Rollover: failed to cancel transaction', ['order_id' => $tx->order_id, 'error' => $e->getMessage()]);
+                }
+            }
+
+            // 3. Close current active period
             $oldPeriod->update(['is_active' => false]);
 
             Log::info('Rollover: closed period', ['period_id' => $oldPeriod->id, 'name' => $oldPeriod->name]);

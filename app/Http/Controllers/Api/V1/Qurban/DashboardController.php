@@ -17,9 +17,11 @@ class DashboardController extends Controller
     /**
      * Get aggregated dashboard statistics (public).
      */
-    public function stats(): JsonResponse
+    public function stats(\Illuminate\Http\Request $request): JsonResponse
     {
-        $period = QurbanPeriod::active()->first();
+        $period = $request->has('period_id')
+            ? QurbanPeriod::find($request->period_id)
+            : QurbanPeriod::active()->first();
 
         if (! $period) {
             return $this->errorResponse('Tidak ada periode aktif.', 404);

@@ -42,7 +42,12 @@ class QurbanTransactionController extends Controller
      */
     public function deposit(DepositRequest $request): JsonResponse
     {
-        $shohibul = Shohibul::findOrFail($request->shohibul_id);
+        $shohibul = Shohibul::with('period')->findOrFail($request->shohibul_id);
+
+        // Check: Deadline
+        if ($shohibul->period && now()->startOfDay()->gt($shohibul->period->deadline_date)) {
+            return $this->errorResponse('Masa penyetoran untuk periode ini telah ditutup.', 422);
+        }
 
         // Check: already lunas
         if ($shohibul->is_lunas) {
