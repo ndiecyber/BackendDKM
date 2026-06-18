@@ -60,11 +60,31 @@ class RolePermissionSeeder extends Seeder
 
             'keuangan.rekonsiliasi.create',
 
-            // Kurban module
+            // Kurban module (legacy — kept for backward compatibility)
             'kurban.view',
             'kurban.create',
             'kurban.update',
             'kurban.delete',
+
+            // Kurban/Qurban module (granular)
+            'qurban.periode.view',
+            'qurban.periode.create',
+            'qurban.periode.update',
+
+            'qurban.shohibul.view',
+            'qurban.shohibul.create',
+            'qurban.shohibul.update',
+            'qurban.shohibul.delete',
+
+            'qurban.transaksi.view',
+            'qurban.transaksi.create',
+            'qurban.transaksi.cancel',
+
+            'qurban.kelompok.view',
+            'qurban.kelompok.create',
+            'qurban.kelompok.update',
+
+            'qurban.rollover.execute',
 
             // Profile module
             'profile.view',
@@ -92,6 +112,11 @@ class RolePermissionSeeder extends Seeder
             'keuangan.laporan.view', 'keuangan.laporan.export',
             'keuangan.rekonsiliasi.create',
             'kurban.view', 'kurban.create', 'kurban.update', 'kurban.delete',
+            'qurban.periode.view', 'qurban.periode.create', 'qurban.periode.update',
+            'qurban.shohibul.view', 'qurban.shohibul.create', 'qurban.shohibul.update', 'qurban.shohibul.delete',
+            'qurban.transaksi.view', 'qurban.transaksi.create', 'qurban.transaksi.cancel',
+            'qurban.kelompok.view', 'qurban.kelompok.create', 'qurban.kelompok.update',
+            'qurban.rollover.execute',
             'profile.view', 'profile.create', 'profile.update', 'profile.delete',
         ]);
 
@@ -104,6 +129,10 @@ class RolePermissionSeeder extends Seeder
             'keuangan.transaksi.view',
             'keuangan.laporan.view',
             'kurban.view',
+            'qurban.periode.view',
+            'qurban.shohibul.view',
+            'qurban.transaksi.view',
+            'qurban.kelompok.view',
             'profile.view',
         ]);
     }
