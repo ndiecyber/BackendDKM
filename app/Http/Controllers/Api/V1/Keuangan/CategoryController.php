@@ -7,10 +7,12 @@ use App\Http\Requests\Keuangan\StoreCategoryRequest;
 use App\Http\Requests\Keuangan\UpdateCategoryRequest;
 use App\Models\Category;
 use App\Traits\ApiResponse;
+use Dedoc\Scramble\Attributes\Group;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
+#[Group('Keuangan - Kategori')]
 class CategoryController extends Controller
 {
     use ApiResponse;

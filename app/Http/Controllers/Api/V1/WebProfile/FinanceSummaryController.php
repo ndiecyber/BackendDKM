@@ -5,10 +5,12 @@ namespace App\Http\Controllers\Api\V1\WebProfile;
 use App\Http\Controllers\Controller;
 use App\Models\BankKas;
 use App\Models\Transaction;
+use Dedoc\Scramble\Attributes\Group;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 
+#[Group('Profil Web - Ringkasan & Statistik')]
 class FinanceSummaryController extends Controller
 {
     /**

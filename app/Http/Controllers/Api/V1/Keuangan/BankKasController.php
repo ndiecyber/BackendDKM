@@ -9,12 +9,14 @@ use App\Http\Requests\Keuangan\UpdateBankKasRequest;
 use App\Models\BalanceAdjustment;
 use App\Models\BankKas;
 use App\Traits\ApiResponse;
+use Dedoc\Scramble\Attributes\Group;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 
+#[Group('Keuangan - Bank & Kas')]
 class BankKasController extends Controller
 {
     use ApiResponse;
