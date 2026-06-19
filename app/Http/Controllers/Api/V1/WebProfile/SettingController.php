@@ -5,9 +5,11 @@ namespace App\Http\Controllers\Api\V1\WebProfile;
 use App\Http\Controllers\Controller;
 use App\Models\WebProfile\Setting;
 use App\Traits\ApiResponse;
+use Dedoc\Scramble\Attributes\Group;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
+#[Group('Profil Web - Pengaturan')]
 class SettingController extends Controller
 {
     use ApiResponse;

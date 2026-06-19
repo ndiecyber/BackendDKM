@@ -10,10 +10,12 @@ use App\Models\Qurban\Shohibul;
 use App\Services\Qurban\GroupingService;
 use App\Services\Qurban\QurbanTransactionService;
 use App\Traits\ApiResponse;
+use Dedoc\Scramble\Attributes\Group;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
+#[Group('Qurban - Shohibul')]
 class ShohibulController extends Controller
 {
     use ApiResponse;

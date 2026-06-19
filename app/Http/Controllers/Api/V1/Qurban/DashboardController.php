@@ -8,8 +8,10 @@ use App\Models\Qurban\QurbanPeriod;
 use App\Models\Qurban\QurbanTransaction;
 use App\Models\Qurban\Shohibul;
 use App\Traits\ApiResponse;
+use Dedoc\Scramble\Attributes\Group;
 use Illuminate\Http\JsonResponse;
 
+#[Group('Qurban - Dashboard')]
 class DashboardController extends Controller
 {
     use ApiResponse;

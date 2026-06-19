@@ -6,12 +6,14 @@ use App\Http\Controllers\Controller;
 use App\Models\BankKas;
 use App\Models\Transaction;
 use App\Traits\ApiResponse;
+use Dedoc\Scramble\Attributes\Group;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 
+#[Group('Keuangan - Dashboard')]
 class DashboardController extends Controller
 {
     use ApiResponse;

@@ -67,22 +67,5 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('admin/transactions/{id}/cancel', [QurbanTransactionController::class, 'cancel']);
 
     // Rollover (Tutup Buku)
-    Route::post('admin/rollover/execute', function (Request $request) {
-        Gate::authorize('qurban.rollover.execute');
-
-        $validated = $request->validate([
-            'name' => ['required', 'string'],
-            'sapi_price_per_slot' => ['required', 'numeric', 'min:0'],
-            'kambing_price' => ['required', 'numeric', 'min:0'],
-            'deadline_date' => ['required', 'date', 'after:today'],
-        ]);
-
-        $newPeriod = app(RolloverService::class)->execute($validated);
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Tutup buku berhasil. Periode baru telah diaktifkan.',
-            'data' => $newPeriod,
-        ], 201);
-    });
+    Route::post('admin/rollover/execute', [PeriodController::class, 'rollover']);
 });

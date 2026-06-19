@@ -5,11 +5,13 @@ namespace App\Http\Controllers\Api\V1\Keuangan;
 use App\Http\Controllers\Controller;
 use App\Services\ReportService;
 use App\Traits\ApiResponse;
+use Dedoc\Scramble\Attributes\Group;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
+#[Group('Keuangan - Laporan')]
 class ReportController extends Controller
 {
     use ApiResponse;

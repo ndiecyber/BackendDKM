@@ -5,10 +5,14 @@ namespace App\Http\Controllers\Api\V1\Qurban;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Qurban\StorePeriodRequest;
 use App\Models\Qurban\QurbanPeriod;
+use App\Services\Qurban\RolloverService;
 use App\Traits\ApiResponse;
+use Dedoc\Scramble\Attributes\Group;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
+#[Group('Qurban - Periode')]
 class PeriodController extends Controller
 {
     use ApiResponse;
@@ -86,5 +90,28 @@ class PeriodController extends Controller
         $periods = QurbanPeriod::orderByDesc('created_at')->get();
 
         return $this->successResponse($periods);
+    }
+
+    /**
+     * Execute rollover / tutup buku (admin).
+     */
+    public function rollover(Request $request, RolloverService $rolloverService): JsonResponse
+    {
+        Gate::authorize('qurban.rollover.execute');
+
+        $validated = $request->validate([
+            'name' => ['required', 'string'],
+            'sapi_price_per_slot' => ['required', 'numeric', 'min:0'],
+            'kambing_price' => ['required', 'numeric', 'min:0'],
+            'deadline_date' => ['required', 'date', 'after:today'],
+        ]);
+
+        $newPeriod = $rolloverService->execute($validated);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Tutup buku berhasil. Periode baru telah diaktifkan.',
+            'data' => $newPeriod,
+        ], 201);
     }
 }
