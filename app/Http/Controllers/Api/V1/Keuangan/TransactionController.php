@@ -9,10 +9,12 @@ use App\Http\Requests\Keuangan\UpdateTransactionStatusRequest;
 use App\Models\Transaction;
 use App\Services\TransactionService;
 use App\Traits\ApiResponse;
+use Dedoc\Scramble\Attributes\Group;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
+#[Group('Keuangan - Transaksi')]
 class TransactionController extends Controller
 {
     use ApiResponse;

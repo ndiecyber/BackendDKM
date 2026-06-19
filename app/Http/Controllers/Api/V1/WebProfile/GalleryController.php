@@ -5,10 +5,12 @@ namespace App\Http\Controllers\Api\V1\WebProfile;
 use App\Http\Controllers\Controller;
 use App\Models\WebProfile\Gallery;
 use App\Traits\ApiResponse;
+use Dedoc\Scramble\Attributes\Group;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
+#[Group('Profil Web - Galeri')]
 class GalleryController extends Controller
 {
     use ApiResponse;

@@ -27,6 +27,12 @@ Route::prefix('v1')->group(function () {
         Route::post('/login', [AuthController::class, 'login']);
     });
 
+    // Qurban Module (contains both public and admin routes inside)
+    Route::prefix('qurban')->group(base_path('routes/modules/kurban.php'));
+
+    // Web Profile Module (contains both public and protected routes inside)
+    Route::prefix('web-profile')->group(base_path('routes/modules/web_profile.php'));
+
     /*
     |----------------------------------------------------------------------
     | Protected Routes (require auth:sanctum)
@@ -53,12 +59,7 @@ Route::prefix('v1')->group(function () {
         Route::apiResource('jamaah', JamaahController::class);
         Route::patch('jamaah/{id}/restore', [JamaahController::class, 'restore']);
 
-        // Future module routes:
+        // Keuangan Module
         Route::prefix('keuangan')->group(base_path('routes/modules/keuangan.php'));
-        // Route::prefix('kurban')->group(base_path('routes/modules/kurban.php'));
-        // Route::prefix('profile')->group(base_path('routes/modules/profile.php'));
     });
-
-    // Web Profile Module (contains both public and protected routes inside)
-    Route::prefix('web-profile')->group(base_path('routes/modules/web_profile.php'));
 });

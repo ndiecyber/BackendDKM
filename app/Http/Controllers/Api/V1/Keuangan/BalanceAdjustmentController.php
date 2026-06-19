@@ -6,9 +6,11 @@ use App\Http\Controllers\Controller;
 use App\Models\BalanceAdjustment;
 use App\Models\BankKas;
 use App\Services\BalanceAdjustmentService;
+use Dedoc\Scramble\Attributes\Group;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 
+#[Group('Keuangan - Bank & Kas')]
 class BalanceAdjustmentController extends Controller
 {
     private BalanceAdjustmentService $adjustmentService;

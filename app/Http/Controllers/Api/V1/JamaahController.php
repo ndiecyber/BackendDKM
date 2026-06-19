@@ -7,10 +7,12 @@ use App\Http\Requests\Jamaah\StoreJamaahRequest;
 use App\Http\Requests\Jamaah\UpdateJamaahRequest;
 use App\Models\Jamaah;
 use App\Traits\ApiResponse;
+use Dedoc\Scramble\Attributes\Group;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
+#[Group('Manajemen Jamaah')]
 class JamaahController extends Controller
 {
     use ApiResponse;
