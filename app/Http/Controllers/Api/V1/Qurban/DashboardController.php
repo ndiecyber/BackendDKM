@@ -10,6 +10,7 @@ use App\Models\Qurban\Shohibul;
 use App\Traits\ApiResponse;
 use Dedoc\Scramble\Attributes\Group;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 #[Group('Qurban - Dashboard')]
 class DashboardController extends Controller
@@ -19,7 +20,7 @@ class DashboardController extends Controller
     /**
      * Get aggregated dashboard statistics (public).
      */
-    public function stats(\Illuminate\Http\Request $request): JsonResponse
+    public function stats(Request $request): JsonResponse
     {
         $period = $request->has('period_id')
             ? QurbanPeriod::find($request->period_id)

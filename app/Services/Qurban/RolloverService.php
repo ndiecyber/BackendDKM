@@ -3,6 +3,7 @@
 namespace App\Services\Qurban;
 
 use App\Models\Qurban\QurbanPeriod;
+use App\Models\Qurban\QurbanTransaction;
 use App\Models\Qurban\Shohibul;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -32,7 +33,7 @@ class RolloverService
             $oldPeriod = QurbanPeriod::active()->firstOrFail();
 
             // 2. Cancel all pending transactions in the old period
-            $pendingTransactions = \App\Models\Qurban\QurbanTransaction::whereHas('shohibul', function ($q) use ($oldPeriod) {
+            $pendingTransactions = QurbanTransaction::whereHas('shohibul', function ($q) use ($oldPeriod) {
                 $q->where('period_id', $oldPeriod->id);
             })->where('status', 'pending')->get();
 
