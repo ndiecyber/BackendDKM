@@ -145,7 +145,7 @@ class MasterCategoryController extends Controller
         ];
 
         foreach ($typeMapping as $key => $dbType) {
-            if (!isset($validated[$key])) {
+            if (! isset($validated[$key])) {
                 continue;
             }
 
@@ -161,7 +161,7 @@ class MasterCategoryController extends Controller
                     'sort_order' => $index,
                 ];
 
-                if (!empty($itemData['id'])) {
+                if (! empty($itemData['id'])) {
                     $item = MasterCategory::find($itemData['id']);
                     if ($item && $item->type === $dbType) {
                         $item->update($data);

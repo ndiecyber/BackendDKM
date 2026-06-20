@@ -93,7 +93,7 @@ class SettingController extends Controller
             $existingIds = [];
 
             foreach ($whatsappData as $index => $contactData) {
-                if (!empty($contactData['id'])) {
+                if (! empty($contactData['id'])) {
                     // Update existing
                     $contact = WhatsappContact::find($contactData['id']);
                     if ($contact) {

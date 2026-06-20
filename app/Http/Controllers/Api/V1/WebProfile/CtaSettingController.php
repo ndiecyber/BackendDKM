@@ -69,7 +69,7 @@ class CtaSettingController extends Controller
             $existingIds = [];
 
             foreach ($programsData as $index => $programData) {
-                if (!empty($programData['id'])) {
+                if (! empty($programData['id'])) {
                     $program = CtaProgram::where('cta_setting_id', $cta->id)
                         ->find($programData['id']);
                     if ($program) {

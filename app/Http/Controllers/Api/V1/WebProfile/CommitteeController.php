@@ -138,11 +138,11 @@ class CommitteeController extends Controller
                 $data['image'] = $memberData['image'];
             }
 
-            if (!empty($memberData['id'])) {
+            if (! empty($memberData['id'])) {
                 $member = CommitteeMember::find($memberData['id']);
                 if ($member && $member->group === $group) {
                     // Only update image if explicitly provided
-                    if (!isset($memberData['image'])) {
+                    if (! isset($memberData['image'])) {
                         unset($data['image']);
                     }
                     $member->update($data);
@@ -179,7 +179,7 @@ class CommitteeController extends Controller
         foreach ($divisiData as $divIndex => $divData) {
             $slug = Str::slug($divData['name']);
 
-            if (!empty($divData['id'])) {
+            if (! empty($divData['id'])) {
                 $division = CommitteeDivision::find($divData['id']);
                 if ($division) {
                     $division->update([
@@ -190,7 +190,7 @@ class CommitteeController extends Controller
                 } else {
                     $division = CommitteeDivision::create([
                         'name' => $divData['name'],
-                        'slug' => $slug . '-' . Str::random(4),
+                        'slug' => $slug.'-'.Str::random(4),
                         'sort_order' => $divIndex,
                     ]);
                 }
@@ -199,7 +199,7 @@ class CommitteeController extends Controller
                 $existingSlug = CommitteeDivision::where('slug', $slug)->exists();
                 $division = CommitteeDivision::create([
                     'name' => $divData['name'],
-                    'slug' => $existingSlug ? $slug . '-' . Str::random(4) : $slug,
+                    'slug' => $existingSlug ? $slug.'-'.Str::random(4) : $slug,
                     'sort_order' => $divIndex,
                 ]);
             }
@@ -222,10 +222,10 @@ class CommitteeController extends Controller
                     $data['image'] = $memData['image'];
                 }
 
-                if (!empty($memData['id'])) {
+                if (! empty($memData['id'])) {
                     $member = CommitteeMember::find($memData['id']);
                     if ($member && $member->division_id === $division->id) {
-                        if (!isset($memData['image'])) {
+                        if (! isset($memData['image'])) {
                             unset($data['image']);
                         }
                         $member->update($data);
@@ -267,7 +267,7 @@ class CommitteeController extends Controller
      */
     private function deleteImage(?string $imagePath): void
     {
-        if (!$imagePath) {
+        if (! $imagePath) {
             return;
         }
 

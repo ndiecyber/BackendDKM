@@ -2,11 +2,14 @@
 
 namespace App\Models\WebProfile;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class CtaProgram extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'cta_setting_id',
         'name',

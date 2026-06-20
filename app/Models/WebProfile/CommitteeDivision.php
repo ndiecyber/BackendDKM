@@ -2,6 +2,9 @@
 
 namespace App\Models\WebProfile;
 
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
@@ -10,12 +13,14 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string $name
  * @property string $slug
  * @property int $sort_order
- * @property \Carbon\Carbon|null $created_at
- * @property \Carbon\Carbon|null $updated_at
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\WebProfile\CommitteeMember[] $members
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read Collection|CommitteeMember[] $members
  */
 class CommitteeDivision extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'slug',
         'name',

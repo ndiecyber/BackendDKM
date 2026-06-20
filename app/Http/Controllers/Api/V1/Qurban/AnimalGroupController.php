@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V1\Qurban;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Qurban\MoveMemberRequest;
+use App\Http\Requests\Qurban\StoreAnimalGroupRequest;
 use App\Models\Qurban\AnimalGroup;
 use App\Models\Qurban\QurbanPeriod;
 use App\Models\Qurban\Shohibul;
@@ -46,7 +47,7 @@ class AnimalGroupController extends Controller
      *
      * Digunakan untuk membuat kelompok hewan qurban baru secara manual.
      */
-    public function store(\App\Http\Requests\Qurban\StoreAnimalGroupRequest $request): JsonResponse
+    public function store(StoreAnimalGroupRequest $request): JsonResponse
     {
         Gate::authorize('qurban.kelompok.create');
 

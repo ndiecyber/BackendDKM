@@ -3,13 +3,13 @@
 namespace App\Http\Controllers\Api\V1\Qurban;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Qurban\RolloverRequest;
 use App\Http\Requests\Qurban\StorePeriodRequest;
 use App\Models\Qurban\QurbanPeriod;
 use App\Services\Qurban\RolloverService;
 use App\Traits\ApiResponse;
 use Dedoc\Scramble\Attributes\Group;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
 #[Group('Qurban - Periode')]
@@ -27,7 +27,7 @@ class PeriodController extends Controller
     {
         $period = QurbanPeriod::active()->first();
 
-        if (!$period) {
+        if (! $period) {
             return $this->errorResponse('Tidak ada periode qurban yang aktif saat ini.', 404);
         }
 
@@ -104,7 +104,7 @@ class PeriodController extends Controller
     /**
      * Execute rollover / tutup buku (admin).
      */
-    public function rollover(\App\Http\Requests\Qurban\RolloverRequest $request, RolloverService $rolloverService): JsonResponse
+    public function rollover(RolloverRequest $request, RolloverService $rolloverService): JsonResponse
     {
         Gate::authorize('qurban.rollover.execute');
 

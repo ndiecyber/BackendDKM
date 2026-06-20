@@ -2,11 +2,14 @@
 
 namespace App\Models\WebProfile;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class CtaSetting extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'title',
         'subtitle',

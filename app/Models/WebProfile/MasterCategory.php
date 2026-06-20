@@ -2,10 +2,13 @@
 
 namespace App\Models\WebProfile;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class MasterCategory extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'type',
         'name',
