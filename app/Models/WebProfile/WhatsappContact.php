@@ -4,23 +4,17 @@ namespace App\Models\WebProfile;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Gallery extends Model
+class WhatsappContact extends Model
 {
     protected $fillable = [
-        'image_path',
-        'caption',
-        'subcaption',
-        'tag',
-        'category',
-        'icon_name',
-        'is_active',
+        'name',
+        'number',
         'sort_order',
     ];
 
     protected function casts(): array
     {
         return [
-            'is_active' => 'boolean',
             'sort_order' => 'integer',
         ];
     }

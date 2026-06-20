@@ -27,7 +27,7 @@ class PeriodController extends Controller
     {
         $period = QurbanPeriod::active()->first();
 
-        if (! $period) {
+        if (!$period) {
             return $this->errorResponse('Tidak ada periode qurban yang aktif saat ini.', 404);
         }
 

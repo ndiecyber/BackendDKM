@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Api\V1\WebProfile;
 
 use App\Http\Controllers\Controller;
 use App\Models\WebProfile\Announcement;
+use App\Models\WebProfile\CommitteeMember;
 use App\Models\WebProfile\Event;
 use App\Models\WebProfile\Gallery;
+use App\Models\WebProfile\Service;
 use App\Models\WebProfile\Visitor;
 use App\Traits\ApiResponse;
 use Dedoc\Scramble\Attributes\Group;
@@ -21,6 +23,8 @@ class DashboardController extends Controller
 
     /**
      * Get summary stats.
+     *
+     * Returns aggregated statistics for the admin dashboard.
      */
     public function stats(Request $request): JsonResponse
     {
@@ -30,6 +34,8 @@ class DashboardController extends Controller
         $totalEvents = Event::count();
         $totalAnnouncementsActive = Announcement::where('is_active', true)->count();
         $totalGalleries = Gallery::count();
+        $totalServices = Service::where('is_active', true)->count();
+        $totalCommitteeMembers = CommitteeMember::count();
 
         $visitorsThisMonth = Visitor::whereBetween('visited_date', [$startOfMonth, $endOfMonth])->count();
 
@@ -37,12 +43,16 @@ class DashboardController extends Controller
             'total_events' => $totalEvents,
             'total_announcements_active' => $totalAnnouncementsActive,
             'total_galleries' => $totalGalleries,
+            'total_services' => $totalServices,
+            'total_committee_members' => $totalCommitteeMembers,
             'visitors_this_month' => $visitorsThisMonth,
         ]);
     }
 
     /**
      * Get visitor stats for chart.
+     *
+     * Returns daily visitor counts for the specified number of days (default 30).
      */
     public function visitorsChart(Request $request): JsonResponse
     {

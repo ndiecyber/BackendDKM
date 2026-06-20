@@ -11,8 +11,15 @@ class Event extends Model
         'date',
         'time',
         'type',
+        'category',
+        'badge',
+        'image',
+        'location',
+        'author',
         'description',
+        'content',
         'is_active',
+        'hits',
     ];
 
     protected function casts(): array
@@ -20,6 +27,7 @@ class Event extends Model
         return [
             'date' => 'date',
             'is_active' => 'boolean',
+            'hits' => 'integer',
         ];
     }
 }
