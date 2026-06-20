@@ -4,7 +4,7 @@ namespace App\Http\Requests\Qurban;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class StorePeriodRequest extends FormRequest
+class RolloverRequest extends FormRequest
 {
     public function authorize(): bool
     {
@@ -18,7 +18,6 @@ class StorePeriodRequest extends FormRequest
             'sapi_price_per_slot' => ['required', 'numeric', 'min:0'],
             'kambing_price' => ['required', 'numeric', 'min:0'],
             'deadline_date' => ['required', 'date', 'after:today'],
-            'is_active' => ['sometimes', 'boolean'],
         ];
     }
 

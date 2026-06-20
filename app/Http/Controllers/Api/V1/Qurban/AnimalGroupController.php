@@ -43,15 +43,14 @@ class AnimalGroupController extends Controller
 
     /**
      * Create a new group manually (admin).
+     *
+     * Digunakan untuk membuat kelompok hewan qurban baru secara manual.
      */
-    public function store(Request $request): JsonResponse
+    public function store(\App\Http\Requests\Qurban\StoreAnimalGroupRequest $request): JsonResponse
     {
         Gate::authorize('qurban.kelompok.create');
 
-        $validated = $request->validate([
-            'name' => ['required', 'string', 'max:100'],
-            'target_type' => ['required', 'in:sapi,kambing'],
-        ]);
+        $validated = $request->validated();
 
         $period = QurbanPeriod::active()->firstOrFail();
 

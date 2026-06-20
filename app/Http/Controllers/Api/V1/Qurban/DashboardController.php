@@ -48,11 +48,10 @@ class DashboardController extends Controller
             ? round(($totalCollected / $totalTarget) * 100, 1)
             : 0;
 
-        // Recent transactions (5 latest successful)
+        // Recent transactions (5 latest)
         $recentTransactions = QurbanTransaction::whereHas('shohibul', fn ($q) => $q->where('period_id', $period->id))
-            ->where('status', 'success')
             ->with('shohibul:id,name,target_type')
-            ->orderByDesc('completed_at')
+            ->orderByDesc('created_at')
             ->limit(5)
             ->get();
 

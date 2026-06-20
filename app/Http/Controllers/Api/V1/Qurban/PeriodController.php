@@ -19,6 +19,9 @@ class PeriodController extends Controller
 
     /**
      * Get the active period configuration (public).
+     *
+     * Digunakan untuk mengambil informasi periode qurban yang sedang aktif saat ini.
+     * Endpoint ini dapat diakses secara publik tanpa otentikasi.
      */
     public function active(): JsonResponse
     {
@@ -33,6 +36,9 @@ class PeriodController extends Controller
 
     /**
      * Create a new period (admin).
+     *
+     * Membuat konfigurasi periode qurban baru. Jika parameter `is_active` bernilai true,
+     * sistem secara otomatis akan menonaktifkan periode lain dan mengaktifkan periode ini.
      */
     public function store(StorePeriodRequest $request): JsonResponse
     {
@@ -53,6 +59,9 @@ class PeriodController extends Controller
 
     /**
      * Update the active period configuration (admin).
+     *
+     * Memperbarui konfigurasi harga dan nama untuk periode qurban yang sedang aktif saat ini.
+     * Jika harga berubah, ini akan memperbarui target donasi (target_amount) pada shohibul terkait.
      */
     public function update(StorePeriodRequest $request): JsonResponse
     {
@@ -95,16 +104,11 @@ class PeriodController extends Controller
     /**
      * Execute rollover / tutup buku (admin).
      */
-    public function rollover(Request $request, RolloverService $rolloverService): JsonResponse
+    public function rollover(\App\Http\Requests\Qurban\RolloverRequest $request, RolloverService $rolloverService): JsonResponse
     {
         Gate::authorize('qurban.rollover.execute');
 
-        $validated = $request->validate([
-            'name' => ['required', 'string'],
-            'sapi_price_per_slot' => ['required', 'numeric', 'min:0'],
-            'kambing_price' => ['required', 'numeric', 'min:0'],
-            'deadline_date' => ['required', 'date', 'after:today'],
-        ]);
+        $validated = $request->validated();
 
         $newPeriod = $rolloverService->execute($validated);
 
