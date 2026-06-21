@@ -28,6 +28,8 @@ return [
 
     'env' => env('APP_ENV', 'production'),
 
+    'enable_api_docs' => env('ENABLE_API_DOCS', false),
+
     /*
     |--------------------------------------------------------------------------
     | Application Debug Mode

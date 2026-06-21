@@ -28,7 +28,7 @@ class AppServiceProvider extends ServiceProvider
 
         // Allow access to Scramble API Docs based on environment
         Gate::define('viewApiDocs', function (?User $user) {
-            return env('APP_ENV') === 'local' || env('ENABLE_API_DOCS', false) === true;
+            return config('app.env') === 'local' || filter_var(config('app.enable_api_docs'), FILTER_VALIDATE_BOOLEAN);
         });
     }
 }
