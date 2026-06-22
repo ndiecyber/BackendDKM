@@ -289,7 +289,7 @@ curl -X POST http://api.localhost:8000/v1/auth/register \
 # Login
 curl -X POST http://api.localhost:8000/v1/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"email":"admin@dkm.local","password":"password"}'
+  -d '{"login":"admin","password":"password"}'
 
 # Access protected endpoint
 curl http://api.localhost:8000/v1/auth/me \
@@ -307,18 +307,29 @@ Dokumentasi interaktif tersedia di:
 | Field | Value |
 |---|---|
 | Email | `admin@dkm.local` |
+| Username | `admin` |
 | Password | `password` |
-| Role | `super-admin` |
+| Role | `superadmin` / `super-admin` |
 
 > ⚠️ **Ganti password default setelah setup pertama kali.**
 
 ## Roles & Permissions
 
-| Role | Deskripsi |
-|---|---|
-| `super-admin` | Akses penuh ke semua fitur |
-| `admin` | CRUD pada modul yang ditugaskan |
-| `viewer` | Read-only pada semua modul |
+Seeder role mengikuti struktur manajemen akses frontend: `key`, `name`, `hierarchy`, dan `modules`.
+
+| Key Frontend | Role Backend | Hierarchy | Modules | Deskripsi |
+|---|---|---:|---|---|
+| `superadmin` | `super-admin` | 1 | `web`, `keuangan`, `qurban`, `sistem` | Akses penuh ke semua fitur |
+| `admin` | `admin` | 2 | `web`, `keuangan`, `qurban`, `sistem` | Admin umum untuk seluruh modul |
+| `bendahara` | `bendahara` | 3 | `keuangan` | Pengelolaan kas, transaksi, dan laporan |
+| `sekretaris` | `sekretaris` | 4 | `web` | Pengelolaan konten web dan data jamaah/profil |
+| `viewer` | `viewer` | 99 | - | Read-only lewat permission granular |
+
+Jalankan ulang seeder ini setelah deploy perubahan role/permission:
+
+```bash
+php artisan db:seed --class=RolePermissionSeeder
+```
 
 ## Development
 
