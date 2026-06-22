@@ -23,6 +23,7 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'name',
+        'username',
         'email',
         'password',
     ];
@@ -51,13 +52,14 @@ class User extends Authenticatable
     }
 
     /**
-     * Scope a query to search users by name or email.
+     * Scope a query to search users by name, username, or email.
      */
     public function scopeSearch($query, $search)
     {
         return $query->when($search, function ($query, $search) {
             $query->where(function ($query) use ($search) {
                 $query->where('name', 'ilike', '%'.$search.'%')
+                    ->orWhere('username', 'ilike', '%'.$search.'%')
                     ->orWhere('email', 'ilike', '%'.$search.'%');
             });
         });

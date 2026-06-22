@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\User;
 
+use App\Models\Role;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -25,9 +26,19 @@ class StoreUserRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'username' => ['required_without:email', 'nullable', 'string', 'max:100', 'regex:/^(?=.*[a-zA-Z0-9])[a-zA-Z0-9_.-]+$/', Rule::unique('users', 'username')],
+            'email' => ['required_without:username', 'nullable', 'string', 'email', 'max:255', 'unique:users'],
+            'password' => ['required', 'string', 'min:8'],
             'role' => ['required', 'string', Rule::exists('roles', 'name')],
         ];
+    }
+
+    protected function prepareForValidation(): void
+    {
+        if ($this->has('role')) {
+            $this->merge([
+                'role' => Role::normalizeName($this->role),
+            ]);
+        }
     }
 }

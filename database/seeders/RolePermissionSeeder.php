@@ -2,9 +2,9 @@
 
 namespace Database\Seeders;
 
+use App\Models\Role;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Permission;
-use Spatie\Permission\Models\Role;
 use Spatie\Permission\PermissionRegistrar;
 
 class RolePermissionSeeder extends Seeder
@@ -99,9 +99,19 @@ class RolePermissionSeeder extends Seeder
 
         // Create roles and assign permissions
         $superAdmin = Role::firstOrCreate(['name' => 'super-admin']);
+        $superAdmin->forceFill([
+            'display_name' => 'Super Admin',
+            'hierarchy' => 1,
+            'modules' => ['web', 'keuangan', 'qurban', 'sistem'],
+        ])->save();
         // Super admin gets all permissions via Gate::before in AuthServiceProvider
 
         $admin = Role::firstOrCreate(['name' => 'admin']);
+        $admin->forceFill([
+            'display_name' => 'Admin',
+            'hierarchy' => 2,
+            'modules' => ['web', 'keuangan', 'qurban', 'sistem'],
+        ])->save();
         $admin->syncPermissions([
             'user.view', 'user.create', 'user.update', 'user.delete',
             'jamaah.view', 'jamaah.create', 'jamaah.update', 'jamaah.delete',
@@ -120,7 +130,28 @@ class RolePermissionSeeder extends Seeder
             'profile.view', 'profile.create', 'profile.update', 'profile.delete',
         ]);
 
+        $bendahara = Role::firstOrCreate(['name' => 'bendahara']);
+        $bendahara->forceFill([
+            'display_name' => 'Bendahara',
+            'hierarchy' => 3,
+            'modules' => ['keuangan'],
+        ])->save();
+        $bendahara->syncPermissions(Role::permissionsForModules(['keuangan']));
+
+        $sekretaris = Role::firstOrCreate(['name' => 'sekretaris']);
+        $sekretaris->forceFill([
+            'display_name' => 'Sekretaris',
+            'hierarchy' => 4,
+            'modules' => ['web'],
+        ])->save();
+        $sekretaris->syncPermissions(Role::permissionsForModules(['web']));
+
         $viewer = Role::firstOrCreate(['name' => 'viewer']);
+        $viewer->forceFill([
+            'display_name' => 'Viewer',
+            'hierarchy' => 99,
+            'modules' => [],
+        ])->save();
         $viewer->syncPermissions([
             'jamaah.view',
             'keuangan.view',
