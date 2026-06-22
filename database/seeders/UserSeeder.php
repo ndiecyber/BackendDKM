@@ -21,6 +21,11 @@ class UserSeeder extends Seeder
                 'password' => Hash::make('password'),
             ]
         );
+
+        $superAdmin->forceFill([
+            'username' => $superAdmin->username ?? 'admin',
+        ])->save();
+
         $superAdmin->assignRole('super-admin');
     }
 }

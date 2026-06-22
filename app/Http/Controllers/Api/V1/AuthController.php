@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterRequest;
+use App\Models\Role;
 use App\Models\User;
 use App\Traits\ApiResponse;
 use Dedoc\Scramble\Attributes\Group;
@@ -25,6 +26,7 @@ class AuthController extends Controller
     {
         $user = User::create([
             'name' => $request->name,
+            'username' => $request->username,
             'email' => $request->email,
             'password' => Hash::make($request->password),
         ]);
@@ -37,7 +39,9 @@ class AuthController extends Controller
             'user' => [
                 'id' => $user->id,
                 'name' => $user->name,
+                'username' => $user->username,
                 'email' => $user->email,
+                'role' => $this->primaryRole($user)?->frontendKey(),
                 'roles' => $user->getRoleNames(),
             ],
             'token' => $token,
@@ -60,7 +64,12 @@ class AuthController extends Controller
             );
         }
 
-        $user = User::where('email', $request->email)->first();
+        $login = $request->input('login', $request->input('email', $request->input('username')));
+
+        $user = User::query()
+            ->where('email', $login)
+            ->orWhere('username', $login)
+            ->first();
 
         if (! $user || ! Hash::check($request->password, $user->password)) {
             RateLimiter::hit($throttleKey, 60);
@@ -76,7 +85,10 @@ class AuthController extends Controller
             'user' => [
                 'id' => $user->id,
                 'name' => $user->name,
+                'username' => $user->username,
                 'email' => $user->email,
+                'role' => $this->primaryRole($user)?->frontendKey(),
+                'role_data' => $this->primaryRoleResource($user),
                 'roles' => $user->getRoleNames(),
                 'permissions' => $user->getAllPermissions()->pluck('name'),
             ],
@@ -104,7 +116,10 @@ class AuthController extends Controller
         return $this->successResponse([
             'id' => $user->id,
             'name' => $user->name,
+            'username' => $user->username,
             'email' => $user->email,
+            'role' => $this->primaryRole($user)?->frontendKey(),
+            'role_data' => $this->primaryRoleResource($user),
             'roles' => $user->getRoleNames(),
             'permissions' => $user->getAllPermissions()->pluck('name'),
             'created_at' => $user->created_at,
@@ -122,5 +137,30 @@ class AuthController extends Controller
         return $this->successResponse([
             'token' => $token,
         ], 'Token refreshed successfully');
+    }
+
+    private function primaryRole(User $user): ?Role
+    {
+        /** @var Role|null $role */
+        $role = $user->roles->sortBy(fn (Role $role) => $role->effectiveHierarchy())->first();
+
+        return $role;
+    }
+
+    private function primaryRoleResource(User $user): ?array
+    {
+        $role = $this->primaryRole($user);
+
+        if (! $role) {
+            return null;
+        }
+
+        return [
+            'id' => $role->id,
+            'key' => $role->frontendKey(),
+            'name' => $role->displayName(),
+            'hierarchy' => $role->effectiveHierarchy(),
+            'modules' => $role->effectiveModules(),
+        ];
     }
 }

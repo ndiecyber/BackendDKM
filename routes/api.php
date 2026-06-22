@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\JamaahController;
 use App\Http\Controllers\Api\V1\ProfileController;
+use App\Http\Controllers\Api\V1\RoleController;
 use App\Http\Controllers\Api\V1\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -54,6 +55,8 @@ Route::prefix('v1')->group(function () {
         Route::apiResource('users', UserController::class);
         Route::patch('users/{id}/restore', [UserController::class, 'restore']);
         Route::patch('users/{id}/reset-password', [UserController::class, 'resetPassword']);
+        Route::apiResource('roles', RoleController::class);
+        Route::patch('roles/{id}/move', [RoleController::class, 'move']);
 
         // Jamaah
         Route::apiResource('jamaah', JamaahController::class);

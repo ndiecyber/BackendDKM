@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\User\StoreUserRequest;
 use App\Http\Requests\User\UpdateUserRequest;
+use App\Models\Role;
 use App\Models\User;
 use App\Traits\ApiResponse;
 use Dedoc\Scramble\Attributes\Group;
@@ -29,10 +30,11 @@ class UserController extends Controller
         $users = User::query()
             ->search($request->search)
             ->when($request->role, function ($query, $role) {
-                $query->role($role);
+                $query->role(Role::normalizeName($role));
             })
-            ->with('roles:id,name')
-            ->paginate($request->per_page ?? 15);
+            ->with('roles:id,name,display_name,hierarchy,modules')
+            ->paginate($request->per_page ?? 15)
+            ->through(fn (User $user) => $this->userResource($user));
 
         return $this->successResponse($users);
     }
@@ -49,15 +51,16 @@ class UserController extends Controller
 
         $user = User::create([
             'name' => $request->name,
-            'email' => $request->email,
+            'username' => $request->username,
+            'email' => $request->email ?? $this->localEmailFromUsername($request->username),
             'password' => Hash::make($request->password),
         ]);
 
         $user->assignRole($request->role);
 
-        $user->load('roles:id,name');
+        $user->load('roles:id,name,display_name,hierarchy,modules');
 
-        return $this->createdResponse($user, 'User created successfully.');
+        return $this->createdResponse($this->userResource($user), 'User created successfully.');
     }
 
     /**
@@ -67,10 +70,10 @@ class UserController extends Controller
     {
         Gate::authorize('user.view');
 
-        $user = User::with('roles:id,name')->findOrFail($id);
+        $user = User::with('roles:id,name,display_name,hierarchy,modules')->findOrFail($id);
 
         return $this->successResponse([
-            'user' => $user,
+            'user' => $this->userResource($user),
             'permissions' => $user->getAllPermissions()->pluck('name'),
         ]);
     }
@@ -96,11 +99,17 @@ class UserController extends Controller
             $user->syncRoles([$request->role]);
         }
 
-        $user->update($request->only(['name', 'email']));
+        $data = $request->only(['name', 'username', 'email']);
 
-        $user->load('roles:id,name');
+        if ($request->filled('password')) {
+            $data['password'] = Hash::make($request->password);
+        }
 
-        return $this->successResponse($user, 'User updated successfully.');
+        $user->update($data);
+
+        $user->load('roles:id,name,display_name,hierarchy,modules');
+
+        return $this->successResponse($this->userResource($user), 'User updated successfully.');
     }
 
     /**
@@ -169,5 +178,43 @@ class UserController extends Controller
         return $this->successResponse([
             'new_password' => $newPassword,
         ], 'Password reset successfully.');
+    }
+
+    private function userResource(User $user): array
+    {
+        /** @var Role|null $role */
+        $role = $user->roles->sortBy(fn (Role $role) => $role->effectiveHierarchy())->first();
+
+        return [
+            'id' => $user->id,
+            'name' => $user->name,
+            'username' => $user->username ?? Str::before($user->email, '@'),
+            'email' => $user->email,
+            'role' => $role?->frontendKey(),
+            'role_data' => $role ? [
+                'id' => $role->id,
+                'key' => $role->frontendKey(),
+                'name' => $role->displayName(),
+                'hierarchy' => $role->effectiveHierarchy(),
+                'modules' => $role->effectiveModules(),
+            ] : null,
+            'roles' => $user->roles->map(fn (Role $role) => [
+                'id' => $role->id,
+                'key' => $role->frontendKey(),
+                'name' => $role->displayName(),
+                'guard_name' => $role->guard_name,
+            ])->values(),
+            'created_at' => $user->created_at,
+            'updated_at' => $user->updated_at,
+        ];
+    }
+
+    private function localEmailFromUsername(string $username): string
+    {
+        return Str::of($username)
+            ->lower()
+            ->replaceMatches('/[^a-z0-9_.-]/', '')
+            ->append('@local.dkm')
+            ->toString();
     }
 }
