@@ -112,7 +112,7 @@ class Shohibul extends Model
      */
     public function hasPendingTransaction(): bool
     {
-        return $this->transactions()->where('status', 'pending')->exists();
+        return $this->pendingTransaction() !== null;
     }
 
     /**
@@ -120,6 +120,14 @@ class Shohibul extends Model
      */
     public function pendingTransaction()
     {
-        return $this->transactions()->where('status', 'pending')->first();
+        $pending = $this->transactions()->where('status', 'pending')->first();
+
+        if ($pending && $pending->expired_at && now()->gt($pending->expired_at)) {
+            $pending->update(['status' => 'failed']);
+
+            return null;
+        }
+
+        return $pending;
     }
 }
