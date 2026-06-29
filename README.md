@@ -218,6 +218,28 @@ Server berjalan di `http://localhost:8000`.
 
 ---
 
+## Scheduled Tasks (Cron Jobs)
+
+Untuk memastikan fitur otomatis (seperti pembatalan transaksi qurban yang kadaluarsa) berjalan dengan lancar, Anda harus menambahkan Cron Job pada server Linux atau macOS Anda.
+
+Buka terminal server dan jalankan:
+```bash
+crontab -e
+```
+
+Kemudian tambahkan baris berikut di paling bawah file:
+```bash
+* * * * * cd /path-to-your-project/BackendDKM && php artisan schedule:run >> /dev/null 2>&1
+```
+*(Ubah `/path-to-your-project` dengan path absolut menuju folder instalasi BackendDKM Anda)*
+
+Untuk development di local/Windows, Anda bisa menjalankan command ini di terminal terpisah:
+```bash
+php artisan schedule:work
+```
+
+---
+
 ## Docker Setup
 
 Untuk local development maupun deployment ke VPS, sangat disarankan menggunakan Docker.
