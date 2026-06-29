@@ -8,6 +8,7 @@ class BalanceAdjustment extends Model
 {
     protected $fillable = [
         'bank_kas_id',
+        'program_id',
         'saldo_sebelum',
         'saldo_sesudah',
         'selisih',
@@ -30,6 +31,11 @@ class BalanceAdjustment extends Model
     public function bankKas()
     {
         return $this->belongsTo(BankKas::class);
+    }
+
+    public function program()
+    {
+        return $this->belongsTo(Program::class)->withTrashed();
     }
 
     public function createdBy()

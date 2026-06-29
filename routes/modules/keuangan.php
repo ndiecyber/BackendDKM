@@ -18,6 +18,10 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+// Programs
+Route::apiResource('programs', \App\Http\Controllers\Api\V1\Keuangan\ProgramController::class);
+Route::patch('programs/{id}/restore', [\App\Http\Controllers\Api\V1\Keuangan\ProgramController::class, 'restore']);
+
 // Categories
 Route::apiResource('categories', CategoryController::class);
 Route::patch('categories/{id}/restore', [CategoryController::class, 'restore']);

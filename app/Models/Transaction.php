@@ -17,6 +17,7 @@ class Transaction extends Model
         'nominal',
         'tanggal',
         'category_id',
+        'program_id',
         'bank_kas_asal_id',
         'bank_kas_tujuan_id',
         'jamaah_id',
@@ -43,6 +44,11 @@ class Transaction extends Model
     public function category()
     {
         return $this->belongsTo(Category::class)->withTrashed();
+    }
+
+    public function program()
+    {
+        return $this->belongsTo(Program::class)->withTrashed();
     }
 
     public function bankKasAsal()
@@ -107,6 +113,11 @@ class Transaction extends Model
     public function scopeByCategory($query, ?int $categoryId)
     {
         return $query->when($categoryId, fn ($query, $id) => $query->where('category_id', $id));
+    }
+
+    public function scopeByProgram($query, ?int $programId)
+    {
+        return $query->when($programId, fn ($query, $id) => $query->where('program_id', $id));
     }
 
     public function scopeByBankKas($query, ?int $bankKasId)
