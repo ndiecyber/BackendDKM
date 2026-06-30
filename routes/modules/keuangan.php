@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\V1\Keuangan\BalanceAdjustmentController;
 use App\Http\Controllers\Api\V1\Keuangan\BankKasController;
 use App\Http\Controllers\Api\V1\Keuangan\CategoryController;
 use App\Http\Controllers\Api\V1\Keuangan\DashboardController;
+use App\Http\Controllers\Api\V1\Keuangan\ProgramController;
 use App\Http\Controllers\Api\V1\Keuangan\ReportController;
 use App\Http\Controllers\Api\V1\Keuangan\TransactionController;
 use Illuminate\Support\Facades\Route;
@@ -19,8 +20,8 @@ use Illuminate\Support\Facades\Route;
 */
 
 // Programs
-Route::apiResource('programs', \App\Http\Controllers\Api\V1\Keuangan\ProgramController::class);
-Route::patch('programs/{id}/restore', [\App\Http\Controllers\Api\V1\Keuangan\ProgramController::class, 'restore']);
+Route::apiResource('programs', ProgramController::class);
+Route::patch('programs/{id}/restore', [ProgramController::class, 'restore']);
 
 // Categories
 Route::apiResource('categories', CategoryController::class);

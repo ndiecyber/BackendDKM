@@ -13,7 +13,7 @@ class ProgramController extends Controller
 {
     /**
      * Get list of programs
-     * 
+     *
      * Retrieve all programs (kegiatan/campaign) used for fund accounting.
      */
     public function index(Request $request)
@@ -34,7 +34,7 @@ class ProgramController extends Controller
 
     /**
      * Create a new program
-     * 
+     *
      * Create a new program bucket for fund accounting.
      */
     public function store(Request $request)
@@ -54,19 +54,19 @@ class ProgramController extends Controller
 
     /**
      * Get a program
-     * 
+     *
      * Retrieve details of a specific program.
      */
     public function show($id)
     {
         $program = Program::findOrFail($id);
-        
+
         return response()->json($program);
     }
 
     /**
      * Update a program
-     * 
+     *
      * Update details of an existing program.
      */
     public function update(Request $request, $id)
@@ -88,7 +88,7 @@ class ProgramController extends Controller
 
     /**
      * Delete a program
-     * 
+     *
      * Soft delete a program.
      */
     public function destroy($id)
@@ -101,7 +101,7 @@ class ProgramController extends Controller
 
     /**
      * Restore a deleted program
-     * 
+     *
      * Restore a previously soft-deleted program.
      */
     public function restore($id)
