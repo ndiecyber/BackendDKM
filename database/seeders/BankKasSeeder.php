@@ -24,5 +24,18 @@ class BankKasSeeder extends Seeder
                 'visibilitas_publik' => false,
             ]
         );
+
+        BankKas::firstOrCreate(
+            ['nama' => 'Dompet PaKasir'],
+            [
+                'nama' => 'Dompet PaKasir',
+                'tipe' => 'digital',
+                'deskripsi' => 'Kas penampung otomatis (escrow) khusus untuk settlement donasi/pembayaran dari PaKasir',
+                'saldo_awal' => 0,
+                'saldo_terkini' => 0,
+                'status' => 'aktif',
+                'visibilitas_publik' => false,
+            ]
+        );
     }
 }

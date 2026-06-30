@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\V1\Keuangan\BalanceAdjustmentController;
 use App\Http\Controllers\Api\V1\Keuangan\BankKasController;
 use App\Http\Controllers\Api\V1\Keuangan\CategoryController;
 use App\Http\Controllers\Api\V1\Keuangan\DashboardController;
+use App\Http\Controllers\Api\V1\Keuangan\ProgramController;
 use App\Http\Controllers\Api\V1\Keuangan\ReportController;
 use App\Http\Controllers\Api\V1\Keuangan\TransactionController;
 use Illuminate\Support\Facades\Route;
@@ -17,6 +18,10 @@ use Illuminate\Support\Facades\Route;
 | and protected by auth:sanctum middleware (applied in api.php).
 |
 */
+
+// Programs
+Route::apiResource('programs', ProgramController::class);
+Route::patch('programs/{id}/restore', [ProgramController::class, 'restore']);
 
 // Categories
 Route::apiResource('categories', CategoryController::class);

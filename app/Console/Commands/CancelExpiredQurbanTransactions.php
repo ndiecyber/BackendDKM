@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Models\Qurban\QurbanTransaction;
 use Illuminate\Console\Command;
 
 class CancelExpiredQurbanTransactions extends Command
@@ -25,13 +26,14 @@ class CancelExpiredQurbanTransactions extends Command
      */
     public function handle()
     {
-        $expiredTransactions = \App\Models\Qurban\QurbanTransaction::where('status', 'pending')
+        $expiredTransactions = QurbanTransaction::where('status', 'pending')
             ->whereNotNull('expired_at')
             ->where('expired_at', '<', now())
             ->get();
 
         if ($expiredTransactions->isEmpty()) {
             $this->info('Tidak ada transaksi kadaluarsa yang perlu dibatalkan.');
+
             return;
         }
 
