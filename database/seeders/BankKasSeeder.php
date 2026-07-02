@@ -29,7 +29,7 @@ class BankKasSeeder extends Seeder
             ['nama' => 'Dompet PaKasir'],
             [
                 'nama' => 'Dompet PaKasir',
-                'tipe' => 'digital',
+                'tipe' => 'rekening',
                 'deskripsi' => 'Kas penampung otomatis (escrow) khusus untuk settlement donasi/pembayaran dari PaKasir',
                 'saldo_awal' => 0,
                 'saldo_terkini' => 0,
