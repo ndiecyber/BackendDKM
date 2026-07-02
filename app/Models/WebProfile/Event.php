@@ -26,6 +26,11 @@ class Event extends Model
         'hits',
     ];
 
+    protected $appends = [
+        'day',
+        'month',
+    ];
+
     protected function casts(): array
     {
         return [
@@ -33,6 +38,20 @@ class Event extends Model
             'is_active' => 'boolean',
             'hits' => 'integer',
         ];
+    }
+
+    protected function day(): Attribute
+    {
+        return Attribute::make(
+            get: fn (mixed $value, array $attributes) => isset($attributes['date']) ? \Carbon\Carbon::parse($attributes['date'])->format('d') : null,
+        );
+    }
+
+    protected function month(): Attribute
+    {
+        return Attribute::make(
+            get: fn (mixed $value, array $attributes) => isset($attributes['date']) ? \Carbon\Carbon::parse($attributes['date'])->locale('id')->isoFormat('MMM') : null,
+        );
     }
 
     protected function image(): Attribute
