@@ -2,6 +2,7 @@
 
 namespace App\Models\WebProfile;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -43,5 +44,24 @@ class Setting extends Model
             'tahun_berdiri' => 'integer',
             'jamaah_aktif' => 'integer',
         ];
+    }
+
+    protected function heroImages(): Attribute
+    {
+        return Attribute::make(
+            get: function ($value) {
+                if (!is_array($value)) return $value;
+                return array_map(function ($img) {
+                    return $img && str_starts_with($img, '/storage') ? asset(ltrim($img, '/')) : $img;
+                }, $value);
+            },
+        );
+    }
+
+    protected function historyImage(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $value && str_starts_with($value, '/storage') ? asset(ltrim($value, '/')) : $value,
+        );
     }
 }

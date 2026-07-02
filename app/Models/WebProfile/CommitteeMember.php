@@ -2,6 +2,7 @@
 
 namespace App\Models\WebProfile;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -39,5 +40,12 @@ class CommitteeMember extends Model
     public function scopeGroup($query, string $group)
     {
         return $query->where('group', $group);
+    }
+
+    protected function image(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $value && str_starts_with($value, '/storage') ? asset(ltrim($value, '/')) : $value,
+        );
     }
 }
