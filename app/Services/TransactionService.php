@@ -5,7 +5,9 @@ namespace App\Services;
 use App\Models\BankKas;
 use App\Models\Transaction;
 use App\Models\TransactionAttachment;
+use App\Services\Qurban\PaKasirService;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class TransactionService
 {
@@ -206,5 +208,64 @@ class TransactionService
             $bankKasTujuan = BankKas::find($transaction->bank_kas_tujuan_id);
             $bankKasTujuan?->hitungSaldoTerkini();
         }
+    }
+
+    /**
+     * Handle webhook callback from PaKasir for public donations.
+     */
+    public function handleWebhook(array $payload): bool
+    {
+        $orderId = $payload['order_id'] ?? null;
+        $status = $payload['status'] ?? null;
+
+        if (! $orderId || ! $status) {
+            Log::warning('PaKasir webhook (Keuangan): missing order_id or status', $payload);
+
+            return false;
+        }
+
+        $transaction = Transaction::where('nomor_transaksi', $orderId)->first();
+
+        if (! $transaction) {
+            Log::warning('PaKasir webhook (Keuangan): transaction not found', ['order_id' => $orderId]);
+
+            return false;
+        }
+
+        if ($transaction->status === 'approved') {
+            Log::info('PaKasir webhook (Keuangan): duplicate — already success', ['order_id' => $orderId]);
+
+            return true;
+        }
+
+        $paKasir = app(PaKasirService::class);
+        $detail = $paKasir->getTransactionDetail($orderId, (int) $transaction->nominal);
+
+        if ($detail && ($detail['status'] ?? '') !== 'completed') {
+            Log::warning('PaKasir webhook (Keuangan): double-check status mismatch', [
+                'order_id' => $orderId,
+                'webhook_status' => $status,
+                'api_status' => $detail['status'] ?? 'unknown',
+            ]);
+
+            return false;
+        }
+
+        if ($status === 'completed') {
+            $this->updateStatus($transaction, 'approved');
+            // If fee is provided, store it
+            if (isset($payload['fee']) && $payload['fee'] > 0) {
+                // update silently so we don't trigger observers again if not needed
+                $transaction->update(['biaya_admin' => $payload['fee']]);
+            }
+            Log::info('Public donation payment success', ['order_id' => $orderId]);
+
+            return true;
+        }
+
+        // If failed or expired, map to draft
+        $transaction->update(['status' => 'draft']);
+
+        return true;
     }
 }

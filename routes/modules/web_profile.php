@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\V1\Keuangan\PublicDonationController;
 use App\Http\Controllers\Api\V1\WebProfile\AnnouncementController;
 use App\Http\Controllers\Api\V1\WebProfile\CommitteeController;
 use App\Http\Controllers\Api\V1\WebProfile\CtaSettingController;
@@ -50,6 +51,8 @@ Route::get('/committee', [CommitteeController::class, 'index']);
 
 // CTA / Donasi
 Route::get('/cta', [CtaSettingController::class, 'show']);
+Route::get('/donations/programs', [PublicDonationController::class, 'getPrograms']);
+Route::post('/donations', [PublicDonationController::class, 'store']);
 
 // Master Data (kategori, label, tipe berita, status)
 Route::get('/master-categories', [MasterCategoryController::class, 'index']);
@@ -82,6 +85,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/galleries/{id}', [GalleryController::class, 'destroy']);
 
     // CRUD for Events / Kegiatan / Berita
+    Route::post('/events/upload-image', [EventController::class, 'uploadImage']);
     Route::post('/events', [EventController::class, 'store']);
     Route::put('/events/{id}', [EventController::class, 'update']);
     Route::delete('/events/{id}', [EventController::class, 'destroy']);

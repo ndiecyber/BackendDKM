@@ -4,11 +4,13 @@ namespace App\Http\Controllers\Api\V1\Qurban;
 
 use App\Http\Controllers\Controller;
 use App\Services\Qurban\QurbanTransactionService;
+use App\Services\TransactionService;
 use App\Traits\ApiResponse;
 use Dedoc\Scramble\Attributes\Group;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 #[Group('Qurban - Webhook')]
 class WebhookController extends Controller
@@ -16,7 +18,8 @@ class WebhookController extends Controller
     use ApiResponse;
 
     public function __construct(
-        private QurbanTransactionService $transactionService
+        private QurbanTransactionService $qurbanTransactionService,
+        private TransactionService $generalTransactionService
     ) {}
 
     /**
@@ -38,7 +41,11 @@ class WebhookController extends Controller
         }
 
         try {
-            $this->transactionService->handleWebhook($payload);
+            if (Str::startsWith($payload['order_id'], 'QRB-') || Str::startsWith($payload['order_id'], 'TUNAI-')) {
+                $this->qurbanTransactionService->handleWebhook($payload);
+            } else {
+                $this->generalTransactionService->handleWebhook($payload);
+            }
         } catch (\Exception $e) {
             Log::error('PaKasir webhook processing error', [
                 'order_id' => $payload['order_id'] ?? null,

@@ -138,4 +138,22 @@ class EventController extends Controller
 
         return $this->successResponse(null, 'Event deleted successfully.');
     }
+
+    /**
+     * Upload an image for rich text editor.
+     */
+    public function uploadImage(Request $request): JsonResponse
+    {
+        $request->validate([
+            'image' => 'required|image|mimes:jpeg,png,jpg,webp,gif',
+        ]);
+
+        $path = $request->file('image')->store('events/content', 'public');
+        $url = Storage::url($path);
+
+        // We return an absolute URL by combining app url and storage url
+        $fullUrl = url($url);
+
+        return $this->successResponse(['url' => $fullUrl], 'Image uploaded successfully.');
+    }
 }
