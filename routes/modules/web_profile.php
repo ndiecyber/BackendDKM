@@ -85,6 +85,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/galleries/{id}', [GalleryController::class, 'destroy']);
 
     // CRUD for Events / Kegiatan / Berita
+    Route::post('/events/upload-image', [EventController::class, 'uploadImage']);
     Route::post('/events', [EventController::class, 'store']);
     Route::put('/events/{id}', [EventController::class, 'update']);
     Route::delete('/events/{id}', [EventController::class, 'destroy']);
