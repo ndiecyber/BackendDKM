@@ -20,7 +20,7 @@ class WebProfileSeeder extends Seeder
     public function run(): void
     {
         \Illuminate\Support\Facades\Schema::disableForeignKeyConstraints();
-        
+
         MasterCategory::truncate();
         Setting::truncate();
         Event::truncate();
@@ -33,7 +33,6 @@ class WebProfileSeeder extends Seeder
 
         $this->seedMasterCategories();
         $this->seedSettings();
-        $this->seedEvents();
         $this->seedGalleries();
         $this->seedServices();
         $this->seedCommittee();
@@ -93,123 +92,25 @@ class WebProfileSeeder extends Seeder
             'floating_card_desc' => 'Pusat kegiatan ibadah dan sosial kemasyarakatan di Perumahan Arjamukti',
             'tahun_berdiri' => 2015,
             'jamaah_aktif' => 200,
-            'hero_images' => ['/storage/images/hero-mosque.webp', '/storage/images/mosque-exterior.webp', '/storage/images/community-prayer.webp', '/storage/images/mosque-interior.webp'],
-            'history_image' => '/storage/images/mosque-interior.webp',
+            'hero_images' => [],
+            'history_image' => null,
             'committee_description' => 'Mengenal lebih dekat para pelayan jamaah Masjid Jami Kassiti periode 2023-2026.',
         ]);
-    }
-
-    private function seedEvents()
-    {
-        $events = [
-            [
-                'title' => 'Kajian Akbar Bulanan',
-                'date' => '2026-06-15',
-                'time' => '09:00 - 12:00',
-                'type' => 'berita',
-                'category' => 'Kajian',
-                'badge' => 'Segera',
-                'image' => '/storage/images/pengajian-akbar.jpeg',
-                'location' => 'Aula Utama',
-                'author' => 'Tim DKM Kassiti',
-                'description' => 'Kajian ilmu agama bersama ustadz ternama membahas fiqih ibadah dan muamalah kontemporer.',
-                'content' => '<p>Masjid Jami Kassiti kembali menggelar <strong>Kajian Akbar Bulanan</strong> yang dihadiri lebih dari 300 jamaah.</p>',
-                'is_active' => true,
-                'hits' => 312,
-            ],
-            [
-                'title' => 'Wisuda Santri TPA/TPQ',
-                'date' => '2026-06-22',
-                'time' => '08:00 - 11:00',
-                'type' => 'berita',
-                'category' => 'Pendidikan',
-                'badge' => null,
-                'image' => '/storage/images/pelepasan-dan-kenaikan-kelas.jpeg',
-                'location' => 'Masjid Utama',
-                'author' => 'Pengurus TPQ',
-                'description' => 'Perayaan kelulusan para santri TPA/TPQ yang telah menyelesaikan program tahfidz dan tilawah.',
-                'content' => '<p>Sebuah momen membanggakan kembali hadir di Masjid Jami Kassiti.</p>',
-                'is_active' => true,
-                'hits' => 195,
-            ],
-            [
-                'title' => 'Bakti Sosial Ramadhan',
-                'date' => '2026-07-01',
-                'time' => '07:00 - 10:00',
-                'type' => 'berita',
-                'category' => 'Sosial',
-                'badge' => null,
-                'image' => '/storage/images/mosque-exterior.webp',
-                'location' => 'Halaman Masjid',
-                'author' => 'Divisi Sosial DKM',
-                'description' => 'Kegiatan bakti sosial pembagian sembako dan santunan untuk dhuafa dan yatim piatu.',
-                'content' => '<p>Dalam rangka memperkuat kepedulian sosial dan ukhuwah islamiyah,</p>',
-                'is_active' => true,
-                'hits' => 278,
-            ],
-            [
-                'title' => 'Kajian Muslimah',
-                'date' => '2026-07-10',
-                'time' => '13:00 - 15:00',
-                'type' => 'artikel',
-                'category' => 'Kajian',
-                'badge' => null,
-                'image' => '/storage/images/seminar-parenting.jpeg',
-                'location' => 'Aula Lt. 2',
-                'author' => 'Seksi Dakwah DKM',
-                'description' => 'Kajian khusus muslimah membahas peranan wanita dalam membangun keluarga Islami.',
-                'content' => '<p><strong>Kajian Muslimah</strong> Masjid Jami Kassiti hadir kembali dengan tema yang sangat inspiratif.</p>',
-                'is_active' => true,
-                'hits' => 156,
-            ],
-            [
-                'title' => 'Pelatihan Pengurusan Jenazah',
-                'date' => '2026-07-18',
-                'time' => '08:30 - 11:30',
-                'type' => 'artikel',
-                'category' => 'Pendidikan',
-                'badge' => null,
-                'image' => '/storage/images/quran-study.webp',
-                'location' => 'Serambi Masjid',
-                'author' => 'Divisi Pendidikan DKM',
-                'description' => 'Pelatihan tata cara memandikan, mengkafani, dan menyalatkan jenazah sesuai sunnah.',
-                'content' => '<p>DKM Masjid Jami Kassiti menyelenggarakan <strong>Pelatihan Tata Cara Pengurusan Jenazah</strong>.</p>',
-                'is_active' => true,
-                'hits' => 143,
-            ],
-            [
-                'title' => 'Mabit & Qiyamullail',
-                'date' => '2026-07-25',
-                'time' => '20:00 - 04:30',
-                'type' => 'berita',
-                'category' => 'Ibadah',
-                'badge' => 'Terbatas',
-                'image' => '/storage/images/mosque-exterior.webp',
-                'location' => 'Masjid Utama',
-                'author' => 'Panitia Mabit DKM',
-                'description' => 'Malam bina iman dan taqwa, diisi dengan kajian, muhasabah, dan shalat malam berjamaah.',
-                'content' => '<p>Salah satu program unggulan pembinaan iman dan taqwa di Masjid Jami Kassiti adalah Mabit.</p>',
-                'is_active' => true,
-                'hits' => 89,
-            ],
-        ];
-
-        Event::insert($events);
     }
 
     private function seedGalleries()
     {
         $galleries = [
-            ['image_path' => '/storage/images/tampak-masjid.jpeg', 'caption' => 'Tampak Masjid', 'subcaption' => 'Keindahan eksterior Masjid Jami Kassiti.', 'tag' => 'Arsitektur', 'icon_name' => 'Building', 'sort_order' => 1, 'is_active' => true],
-            ['image_path' => '/storage/images/gerbang-masuk-perum.jpeg', 'caption' => 'Gerbang Masuk', 'subcaption' => 'Akses masuk menuju kawasan Masjid Jami Kassiti.', 'tag' => 'Kawasan', 'icon_name' => 'MapPin', 'sort_order' => 2, 'is_active' => true],
-            ['image_path' => '/storage/images/pengajian-akbar.jpeg', 'caption' => 'Pengajian Akbar', 'subcaption' => 'Momen berharga saat pelaksanaan pengajian akbar.', 'tag' => 'Kajian', 'icon_name' => 'Users', 'sort_order' => 3, 'is_active' => true],
-            ['image_path' => '/storage/images/pesantren-ramadan.jpeg', 'caption' => 'Pesantren Ramadan', 'subcaption' => 'Kegiatan mendalam mempelajari agama selama bulan suci.', 'tag' => 'Edukasi', 'icon_name' => 'BookOpen', 'sort_order' => 4, 'is_active' => true],
-            ['image_path' => '/storage/images/samen-haflah.jpeg', 'caption' => 'Samen / Haflah', 'subcaption' => 'Perayaan dan kelulusan santri dengan penuh kegembiraan.', 'tag' => 'Pendidikan', 'icon_name' => 'BookOpen', 'sort_order' => 5, 'is_active' => true],
-            ['image_path' => '/storage/images/ujian-madrasah.jpeg', 'caption' => 'Ujian Madrasah', 'subcaption' => 'Suasana ujian para santri madrasah dengan tertib.', 'tag' => 'Pendidikan', 'icon_name' => 'BookOpen', 'sort_order' => 6, 'is_active' => true],
-            ['image_path' => '/storage/images/berita-qurban.jpeg', 'caption' => 'Kegiatan Qurban', 'subcaption' => 'Pelaksanaan penyembelihan dan distribusi hewan qurban.', 'tag' => 'Sosial', 'icon_name' => 'Users', 'sort_order' => 7, 'is_active' => true],
-            ['image_path' => '/storage/images/guru-tpq.jpeg', 'caption' => 'Guru TPQ', 'subcaption' => 'Para pengajar TPQ Masjid Jami Kassiti.', 'tag' => 'Edukasi', 'icon_name' => 'Users', 'sort_order' => 8, 'is_active' => true],
-            ['image_path' => '/storage/images/seminar-parenting.jpeg', 'caption' => 'Seminar Parenting', 'subcaption' => 'Kegiatan seminar untuk mendidik anak sesuai sunnah.', 'tag' => 'Kajian', 'icon_name' => 'BookOpen', 'sort_order' => 9, 'is_active' => true],
-            ['image_path' => '/storage/images/manasik-haji.jpeg', 'caption' => 'Manasik Haji', 'subcaption' => 'Pelatihan manasik haji untuk anak-anak dan warga.', 'tag' => 'Edukasi', 'icon_name' => 'MapPin', 'sort_order' => 10, 'is_active' => true],
+            ['image_path' => '', 'caption' => 'Tampak Masjid', 'subcaption' => 'Keindahan eksterior Masjid Jami Kassiti.', 'tag' => 'Arsitektur', 'icon_name' => 'Building', 'sort_order' => 1, 'is_active' => true],
+            ['image_path' => '', 'caption' => 'Gerbang Masuk', 'subcaption' => 'Akses masuk menuju kawasan Masjid Jami Kassiti.', 'tag' => 'Kawasan', 'icon_name' => 'MapPin', 'sort_order' => 2, 'is_active' => true],
+            ['image_path' => '', 'caption' => 'Pengajian Akbar', 'subcaption' => 'Momen berharga saat pelaksanaan pengajian akbar.', 'tag' => 'Kajian', 'icon_name' => 'Users', 'sort_order' => 3, 'is_active' => true],
+            ['image_path' => '', 'caption' => 'Pesantren Ramadan', 'subcaption' => 'Kegiatan mendalam mempelajari agama selama bulan suci.', 'tag' => 'Edukasi', 'icon_name' => 'BookOpen', 'sort_order' => 4, 'is_active' => true],
+            ['image_path' => '', 'caption' => 'Samen / Haflah', 'subcaption' => 'Perayaan dan kelulusan santri dengan penuh kegembiraan.', 'tag' => 'Pendidikan', 'icon_name' => 'BookOpen', 'sort_order' => 5, 'is_active' => true],
+            ['image_path' => '', 'caption' => 'Ujian Madrasah', 'subcaption' => 'Suasana ujian para santri madrasah dengan tertib.', 'tag' => 'Pendidikan', 'icon_name' => 'BookOpen', 'sort_order' => 6, 'is_active' => true],
+            ['image_path' => '', 'caption' => 'Kegiatan Qurban', 'subcaption' => 'Pelaksanaan penyembelihan dan distribusi hewan qurban.', 'tag' => 'Sosial', 'icon_name' => 'Users', 'sort_order' => 7, 'is_active' => true],
+            ['image_path' => '', 'caption' => 'Guru TPQ', 'subcaption' => 'Para pengajar TPQ Masjid Jami Kassiti.', 'tag' => 'Edukasi', 'icon_name' => 'Users', 'sort_order' => 8, 'is_active' => true],
+            ['image_path' => '', 'caption' => 'Seminar Parenting', 'subcaption' => 'Kegiatan seminar untuk mendidik anak sesuai sunnah.', 'tag' => 'Kajian', 'icon_name' => 'BookOpen', 'sort_order' => 9, 'is_active' => true],
+            ['image_path' => '', 'caption' => 'Manasik Haji', 'subcaption' => 'Pelatihan manasik haji untuk anak-anak dan warga.', 'tag' => 'Edukasi', 'icon_name' => 'MapPin', 'sort_order' => 10, 'is_active' => true],
         ];
 
         Gallery::insert($galleries);
@@ -222,14 +123,14 @@ class WebProfileSeeder extends Seeder
             'category' => 'Ibadah',
             'icon' => 'Sholat',
             'badge' => 'Tersedia',
-            'bg_image' => '/storage/images/tampak-masjid.jpeg',
+            'bg_image' => null,
             'description' => 'Sholat lima waktu dan sholat Jumat berjamaah dengan imam yang berpengalaman.',
             'details' => [
                 'fullDescription' => 'Masjid Jami Kassiti menyelenggarakan sholat berjamaah lima waktu secara rutin, dilengkapi dengan fasilitas tempat wudhu yang bersih, karpet yang nyaman, dan pendingin ruangan. Kami juga menyelenggarakan Sholat Jumat dengan khatib-khatib pilihan yang membawakan materi khutbah inspiratif dan aktual.',
                 'schedule' => 'Setiap Waktu Sholat & Jumat 11.30 WIB',
                 'location' => 'Ruang Utama & Lantai 2 Masjid Jami Kassiti',
                 'supervisor' => 'DKM Masjid (Bpk. H. Irvan Ruchiat)',
-                'supervisorImage' => '/storage/images/Ivan Ruchiat.webp',
+                'supervisorImage' => null,
                 'requirements' => ['Pakaian sopan dan menutup aurat', 'Menjaga ketertiban dan kebersihan']
             ],
             'is_active' => true,
@@ -241,14 +142,14 @@ class WebProfileSeeder extends Seeder
             'category' => 'Pendidikan',
             'icon' => 'BookOpen',
             'badge' => 'Terjadwal',
-            'bg_image' => '/storage/images/pengajian-akbar.jpeg',
+            'bg_image' => null,
             'description' => 'Kajian ilmu agama setiap pekan meliputi tafsir, hadits, fiqih, dan akhlak.',
             'details' => [
                 'fullDescription' => 'Program kajian rutin terbuka untuk umum (Ikhwan & Akhwat) yang diisi oleh asatidzah berkompeten. Materi kajian disusun secara terstruktur mulai dari dasar hingga lanjutan, mencakup pembahasan Tafsir Al-Quran, Hadits Arbain, Fiqih Ibadah, dan Sirah Nabawiyah.',
                 'schedule' => "Rabu (Ba'da Maghrib) & Ahad (Ba'da Subuh)",
                 'location' => 'Ruang Utama Masjid',
                 'supervisor' => 'Divisi Dakwah (Bpk. H. Irvan Ruchiat)',
-                'supervisorImage' => '/storage/images/Ivan Ruchiat.webp',
+                'supervisorImage' => null,
                 'requirements' => ['Membawa alat tulis (opsional)', 'Terbuka untuk umum']
             ],
             'is_active' => true,
@@ -260,33 +161,33 @@ class WebProfileSeeder extends Seeder
             'category' => 'Pendidikan',
             'icon' => 'GraduationCap',
             'badge' => 'Pendaftaran Buka',
-            'bg_image' => '/storage/images/guru-tpq.jpeg',
+            'bg_image' => null,
             'description' => 'Program pendidikan Al-Quran untuk anak-anak dengan metode pembelajaran modern.',
             'details' => [
                 'fullDescription' => 'Taman Pendidikan Al-Quran (TPQ) Masjid Jami Kassiti mendidik generasi muda agar cinta Al-Quran. Kurikulum mencakup baca tulis Al-Quran (Metode Iqro/Tilawati), hafalan surat pendek, doa sehari-hari, praktik ibadah, dan pembentukan akhlakul karimah.',
                 'schedule' => 'Senin - Kamis, 15.30 - 17.00 WIB',
                 'location' => 'Ruang Kelas TPA (Lantai 2)',
                 'supervisor' => 'Kepala TPA (Usth. Ai Jamaliah)',
-                'supervisorImage' => '/storage/images/Usth. Ai Jamaliah.webp',
+                'supervisorImage' => null,
                 'requirements' => ['Usia 5 - 12 Tahun', 'Mengisi formulir pendaftaran', 'Fotokopi Akta Kelahiran']
             ],
             'is_active' => true,
             'sort_order' => 3,
         ]);
-        
+
         Service::create([
             'title' => 'Zakat & Infaq',
             'category' => 'Ibadah',
             'icon' => 'HandCoins',
             'badge' => 'Aktif',
-            'bg_image' => '/storage/images/berita-qurban.jpeg',
+            'bg_image' => null,
             'description' => 'Pengelolaan dan penyaluran zakat, infaq, dan sedekah secara transparan.',
             'details' => [
                 'fullDescription' => 'Unit Pengumpul Zakat (UPZ) Masjid Jami Kassiti memfasilitasi jamaah dalam menunaikan Zakat Fitrah, Zakat Maal, Infaq, dan Sedekah. Dana yang terkumpul disalurkan kepada asnaf yang berhak dan untuk operasional kemakmuran masjid dengan laporan keuangan yang dipublikasikan rutin.',
                 'schedule' => 'Layanan 24 Jam (Transfer) / 08.00-17.00 (Offline)',
                 'location' => 'Kantor Sekretariat Masjid',
                 'supervisor' => 'Divisi ZISWAF (Bpk. ALI M Abduh)',
-                'supervisorImage' => '/storage/images/Ali M Abduh.webp',
+                'supervisorImage' => null,
                 'requirements' => ['Menerima konsultasi hitung Zakat Maal', 'Menerima jemput zakat khusus area terdekat']
             ],
             'is_active' => true,
@@ -298,18 +199,18 @@ class WebProfileSeeder extends Seeder
     {
         // Dewan Penasihat
         $membersPenasihat = [
-            ['group' => 'dewan_penasihat', 'name' => 'Ust. H. Iwa Kurniawan', 'role' => 'Dewan Penasihat', 'image' => '/storage/images/Ust. H Iwa Penasihat.webp', 'is_leader' => false, 'sort_order' => 1],
-            ['group' => 'dewan_penasihat', 'name' => 'Ust. H. Ade Karom', 'role' => 'Dewan Penasihat', 'image' => '/storage/images/Ust. H Ade Karom.webp', 'is_leader' => false, 'sort_order' => 2],
-            ['group' => 'dewan_penasihat', 'name' => 'Bpk. Sudiana Maska', 'role' => 'Dewan Penasihat', 'image' => '/storage/images/Bpk. Sudiana Maska.webp', 'is_leader' => false, 'sort_order' => 3],
-            ['group' => 'dewan_penasihat', 'name' => 'Bpk. H. Usman', 'role' => 'Dewan Penasihat', 'image' => '/storage/images/H Usman penasihat.webp', 'is_leader' => false, 'sort_order' => 4],
-            ['group' => 'dewan_penasihat', 'name' => 'Bpk. Ayi Sunarwan', 'role' => 'Ketua RW 07', 'image' => '/storage/images/Bpk. Ayi Sunarwan.webp', 'is_leader' => true, 'sort_order' => 5],
+            ['group' => 'dewan_penasihat', 'name' => 'Ust. H. Iwa Kurniawan', 'role' => 'Dewan Penasihat', 'image' => null, 'is_leader' => false, 'sort_order' => 1],
+            ['group' => 'dewan_penasihat', 'name' => 'Ust. H. Ade Karom', 'role' => 'Dewan Penasihat', 'image' => null, 'is_leader' => false, 'sort_order' => 2],
+            ['group' => 'dewan_penasihat', 'name' => 'Bpk. Sudiana Maska', 'role' => 'Dewan Penasihat', 'image' => null, 'is_leader' => false, 'sort_order' => 3],
+            ['group' => 'dewan_penasihat', 'name' => 'Bpk. H. Usman', 'role' => 'Dewan Penasihat', 'image' => null, 'is_leader' => false, 'sort_order' => 4],
+            ['group' => 'dewan_penasihat', 'name' => 'Bpk. Ayi Sunarwan', 'role' => 'Ketua RW 07', 'image' => null, 'is_leader' => true, 'sort_order' => 5],
         ];
 
         // Pengurus Harian
         $membersHarian = [
-            ['group' => 'pengurus_harian', 'name' => "Ust. H. Ahmad Nasa'i", 'role' => 'Ketua DKMJ', 'image' => '/storage/images/dkm-nasai.webp', 'is_leader' => true, 'sort_order' => 1],
-            ['group' => 'pengurus_harian', 'name' => 'Ust. H. M. Ainur Rofik', 'role' => 'Sekretaris', 'image' => '/storage/images/M Ainur Rofiq.webp', 'is_leader' => false, 'sort_order' => 2],
-            ['group' => 'pengurus_harian', 'name' => 'Ust. Randi Rizal', 'role' => 'Bendahara', 'image' => '/storage/images/dkm-randi.webp', 'is_leader' => false, 'sort_order' => 3],
+            ['group' => 'pengurus_harian', 'name' => "Ust. H. Ahmad Nasa'i", 'role' => 'Ketua DKMJ', 'image' => null, 'is_leader' => true, 'sort_order' => 1],
+            ['group' => 'pengurus_harian', 'name' => 'Ust. H. M. Ainur Rofik', 'role' => 'Sekretaris', 'image' => null, 'is_leader' => false, 'sort_order' => 2],
+            ['group' => 'pengurus_harian', 'name' => 'Ust. Randi Rizal', 'role' => 'Bendahara', 'image' => null, 'is_leader' => false, 'sort_order' => 3],
         ];
 
         CommitteeMember::insert(array_merge($membersPenasihat, $membersHarian));
@@ -322,18 +223,18 @@ class WebProfileSeeder extends Seeder
 
         $membersDivisi = [
             // Dakwah
-            ['group' => 'divisi', 'division_id' => $divisiDakwah->id, 'name' => 'Ust. H. Irvan Ruchiat', 'role' => 'Koordinator', 'image' => '/storage/images/Ivan Ruchiat.webp', 'is_leader' => true, 'sort_order' => 1],
-            ['group' => 'divisi', 'division_id' => $divisiDakwah->id, 'name' => 'Ust. H. Dani Ramdhani', 'role' => 'Anggota', 'image' => '/storage/images/Dani Ramdhani.webp', 'is_leader' => false, 'sort_order' => 2],
-            ['group' => 'divisi', 'division_id' => $divisiDakwah->id, 'name' => 'Usth. Neneng Aam Siti Marhamah', 'role' => 'Anggota', 'image' => '/storage/images/Usth. Neneng Aam.webp', 'is_leader' => false, 'sort_order' => 3],
+            ['group' => 'divisi', 'division_id' => $divisiDakwah->id, 'name' => 'Ust. H. Irvan Ruchiat', 'role' => 'Koordinator', 'image' => null, 'is_leader' => true, 'sort_order' => 1],
+            ['group' => 'divisi', 'division_id' => $divisiDakwah->id, 'name' => 'Ust. H. Dani Ramdhani', 'role' => 'Anggota', 'image' => null, 'is_leader' => false, 'sort_order' => 2],
+            ['group' => 'divisi', 'division_id' => $divisiDakwah->id, 'name' => 'Usth. Neneng Aam Siti Marhamah', 'role' => 'Anggota', 'image' => null, 'is_leader' => false, 'sort_order' => 3],
             // Ekonomi
-            ['group' => 'divisi', 'division_id' => $divisiEkonomi->id, 'name' => 'Bpk. Ali M. Abduh', 'role' => 'Koordinator', 'image' => '/storage/images/Ali M Abduh.webp', 'is_leader' => true, 'sort_order' => 1],
+            ['group' => 'divisi', 'division_id' => $divisiEkonomi->id, 'name' => 'Bpk. Ali M. Abduh', 'role' => 'Koordinator', 'image' => null, 'is_leader' => true, 'sort_order' => 1],
             ['group' => 'divisi', 'division_id' => $divisiEkonomi->id, 'name' => 'Bpk. Ujang Kurnia', 'role' => 'Anggota', 'image' => null, 'is_leader' => false, 'sort_order' => 2],
             // Logistik
-            ['group' => 'divisi', 'division_id' => $divisiLogistik->id, 'name' => 'Bpk. H. Redi Sasriandi', 'role' => 'Koordinator', 'image' => '/storage/images/H Redi Sasriandi.webp', 'is_leader' => true, 'sort_order' => 1],
-            ['group' => 'divisi', 'division_id' => $divisiLogistik->id, 'name' => 'Bpk. Aditya Astra Prayudha', 'role' => 'Anggota', 'image' => '/storage/images/Bpk. Aditya Astra P.webp', 'is_leader' => false, 'sort_order' => 2],
+            ['group' => 'divisi', 'division_id' => $divisiLogistik->id, 'name' => 'Bpk. H. Redi Sasriandi', 'role' => 'Koordinator', 'image' => null, 'is_leader' => true, 'sort_order' => 1],
+            ['group' => 'divisi', 'division_id' => $divisiLogistik->id, 'name' => 'Bpk. Aditya Astra Prayudha', 'role' => 'Anggota', 'image' => null, 'is_leader' => false, 'sort_order' => 2],
             // Remaja
-            ['group' => 'divisi', 'division_id' => $divisiRemaja->id, 'name' => "Bpk. Gojali Abdul Syafi'i", 'role' => 'Koordinator', 'image' => '/storage/images/Gojali Abdul S.webp', 'is_leader' => true, 'sort_order' => 1],
-            ['group' => 'divisi', 'division_id' => $divisiRemaja->id, 'name' => 'Usth. Rani Rahmayati', 'role' => 'Anggota', 'image' => '/storage/images/Usth. Rani Rahmayati.webp', 'is_leader' => false, 'sort_order' => 2],
+            ['group' => 'divisi', 'division_id' => $divisiRemaja->id, 'name' => "Bpk. Gojali Abdul Syafi'i", 'role' => 'Koordinator', 'image' => null, 'is_leader' => true, 'sort_order' => 1],
+            ['group' => 'divisi', 'division_id' => $divisiRemaja->id, 'name' => 'Usth. Rani Rahmayati', 'role' => 'Anggota', 'image' => null, 'is_leader' => false, 'sort_order' => 2],
         ];
 
         CommitteeMember::insert($membersDivisi);
