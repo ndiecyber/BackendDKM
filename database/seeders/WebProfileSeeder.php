@@ -10,7 +10,11 @@ use App\Models\WebProfile\Gallery;
 use App\Models\WebProfile\Service;
 use App\Models\WebProfile\CommitteeDivision;
 use App\Models\WebProfile\CommitteeMember;
+use App\Models\WebProfile\WhatsappContact;
+use App\Models\WebProfile\CtaSetting;
+use App\Models\WebProfile\CtaProgram;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class WebProfileSeeder extends Seeder
 {
@@ -19,8 +23,8 @@ class WebProfileSeeder extends Seeder
      */
     public function run(): void
     {
-        \Illuminate\Support\Facades\Schema::disableForeignKeyConstraints();
-
+        Schema::disableForeignKeyConstraints();
+        
         MasterCategory::truncate();
         Setting::truncate();
         Event::truncate();
@@ -28,14 +32,19 @@ class WebProfileSeeder extends Seeder
         Service::truncate();
         CommitteeDivision::truncate();
         CommitteeMember::truncate();
+        WhatsappContact::truncate();
+        CtaSetting::truncate();
+        CtaProgram::truncate();
 
-        \Illuminate\Support\Facades\Schema::enableForeignKeyConstraints();
+        Schema::enableForeignKeyConstraints();
 
         $this->seedMasterCategories();
         $this->seedSettings();
-        $this->seedGalleries();
+        // $this->seedEvents(); // Di-skip sesuai request tidak memasukkan data events
+        // $this->seedGalleries(); // Di-skip sesuai request tidak memasukkan data gambar
         $this->seedServices();
         $this->seedCommittee();
+        $this->seedCtaSettings();
     }
 
     private function seedMasterCategories()
@@ -96,24 +105,27 @@ class WebProfileSeeder extends Seeder
             'history_image' => null,
             'committee_description' => 'Mengenal lebih dekat para pelayan jamaah Masjid Jami Kassiti periode 2023-2026.',
         ]);
+
+        WhatsappContact::insert([
+            ['name' => 'Bpk. Randi Rizal', 'number' => '6285320132014', 'sort_order' => 1]
+        ]);
     }
 
-    private function seedGalleries()
+    private function seedCtaSettings()
     {
-        $galleries = [
-            ['image_path' => '', 'caption' => 'Tampak Masjid', 'subcaption' => 'Keindahan eksterior Masjid Jami Kassiti.', 'tag' => 'Arsitektur', 'icon_name' => 'Building', 'sort_order' => 1, 'is_active' => true],
-            ['image_path' => '', 'caption' => 'Gerbang Masuk', 'subcaption' => 'Akses masuk menuju kawasan Masjid Jami Kassiti.', 'tag' => 'Kawasan', 'icon_name' => 'MapPin', 'sort_order' => 2, 'is_active' => true],
-            ['image_path' => '', 'caption' => 'Pengajian Akbar', 'subcaption' => 'Momen berharga saat pelaksanaan pengajian akbar.', 'tag' => 'Kajian', 'icon_name' => 'Users', 'sort_order' => 3, 'is_active' => true],
-            ['image_path' => '', 'caption' => 'Pesantren Ramadan', 'subcaption' => 'Kegiatan mendalam mempelajari agama selama bulan suci.', 'tag' => 'Edukasi', 'icon_name' => 'BookOpen', 'sort_order' => 4, 'is_active' => true],
-            ['image_path' => '', 'caption' => 'Samen / Haflah', 'subcaption' => 'Perayaan dan kelulusan santri dengan penuh kegembiraan.', 'tag' => 'Pendidikan', 'icon_name' => 'BookOpen', 'sort_order' => 5, 'is_active' => true],
-            ['image_path' => '', 'caption' => 'Ujian Madrasah', 'subcaption' => 'Suasana ujian para santri madrasah dengan tertib.', 'tag' => 'Pendidikan', 'icon_name' => 'BookOpen', 'sort_order' => 6, 'is_active' => true],
-            ['image_path' => '', 'caption' => 'Kegiatan Qurban', 'subcaption' => 'Pelaksanaan penyembelihan dan distribusi hewan qurban.', 'tag' => 'Sosial', 'icon_name' => 'Users', 'sort_order' => 7, 'is_active' => true],
-            ['image_path' => '', 'caption' => 'Guru TPQ', 'subcaption' => 'Para pengajar TPQ Masjid Jami Kassiti.', 'tag' => 'Edukasi', 'icon_name' => 'Users', 'sort_order' => 8, 'is_active' => true],
-            ['image_path' => '', 'caption' => 'Seminar Parenting', 'subcaption' => 'Kegiatan seminar untuk mendidik anak sesuai sunnah.', 'tag' => 'Kajian', 'icon_name' => 'BookOpen', 'sort_order' => 9, 'is_active' => true],
-            ['image_path' => '', 'caption' => 'Manasik Haji', 'subcaption' => 'Pelatihan manasik haji untuk anak-anak dan warga.', 'tag' => 'Edukasi', 'icon_name' => 'MapPin', 'sort_order' => 10, 'is_active' => true],
-        ];
+        $cta = CtaSetting::create([
+            'title' => 'Investasi Terbaik Untuk Akhirat',
+            'subtitle' => 'Setiap rupiah yang Anda sedekahkan tidak hanya memakmurkan masjid, tapi juga mengalirkan pahala yang tak terputus bagi Anda dan keluarga.',
+            'quote' => '"Barang siapa yang membangun masjid karena Allah, maka Allah akan membangunkan baginya rumah di surga."',
+            'quote_source' => 'HR. Bukhari & Muslim',
+            'total_donors' => 128,
+            'slider_images' => []
+        ]);
 
-        Gallery::insert($galleries);
+        CtaProgram::insert([
+            ['cta_setting_id' => $cta->id, 'name' => 'Renovasi Aula Utama', 'progress' => 75, 'sort_order' => 1],
+            ['cta_setting_id' => $cta->id, 'name' => 'Sarana Pendidikan TPQ', 'progress' => 60, 'sort_order' => 2]
+        ]);
     }
 
     private function seedServices()
@@ -169,12 +181,43 @@ class WebProfileSeeder extends Seeder
                 'location' => 'Ruang Kelas TPA (Lantai 2)',
                 'supervisor' => 'Kepala TPA (Usth. Ai Jamaliah)',
                 'supervisorImage' => null,
-                'requirements' => ['Usia 5 - 12 Tahun', 'Mengisi formulir pendaftaran', 'Fotokopi Akta Kelahiran']
+                'requirements' => ['Usia 5 - 12 Tahun', 'Mengisi formulir pendaftaran', 'Fotokopi Akta Kelahiran'],
+                'staff' => [
+                    ['name' => 'Usth. Ai Jamaliah', 'role' => 'Kepala Sekolah', 'image' => null],
+                    ['name' => 'Usth. Rini Dewi Anggiani', 'role' => 'Guru', 'image' => null],
+                    ['name' => 'Usth. Dede Asiah', 'role' => 'Guru', 'image' => null],
+                    ['name' => 'Usth. Rani Rahmayati', 'role' => 'Guru', 'image' => null]
+                ]
             ],
             'is_active' => true,
             'sort_order' => 3,
         ]);
 
+        Service::create([
+            'title' => 'DTA (Diniyah Takmiliyah Awaliyah)',
+            'category' => 'Pendidikan',
+            'icon' => 'GraduationCap',
+            'badge' => 'Pendaftaran Buka',
+            'bg_image' => null,
+            'description' => 'Program pendidikan keagamaan Islam non-formal sebagai pelengkap pendidikan formal anak.',
+            'details' => [
+                'fullDescription' => 'Diniyah Takmiliyah Awaliyah (DTA) Masjid Jami Kassiti menyelenggarakan pendidikan keagamaan Islam bagi anak-anak usia sekolah dasar. Program ini dirancang untuk memperkuat pemahaman agama anak di luar jam sekolah formal dengan kurikulum terpadu meliputi Aqidah, Akhlak, Fiqih Ibadah, Tarikh (Sejarah Islam), Hadits, serta praktik ibadah sehari-hari.',
+                'schedule' => 'Senin - Sabtu, 15.30 - 17.00 WIB',
+                'location' => 'Ruang Kelas Lantai 2 Masjid Jami Kassiti',
+                'supervisor' => 'Kepala DTA (Usth. Neneng Aam S.M)',
+                'supervisorImage' => null,
+                'requirements' => ['Mengisi formulir pendaftaran', 'Fotokopi Akta Kelahiran & Kartu Keluarga', 'Membayar biaya administrasi pendaftaran'],
+                'staff' => [
+                    ['name' => 'Usth. Neneng Aam Siti Marhamah', 'role' => 'Kepala DTA', 'image' => null],
+                    ['name' => 'Usth. Raya', 'role' => 'Guru', 'image' => null],
+                    ['name' => 'Usth. Sani', 'role' => 'Guru', 'image' => null],
+                    ['name' => 'Bpk. Dani R', 'role' => 'Guru', 'image' => null]
+                ]
+            ],
+            'is_active' => true,
+            'sort_order' => 4,
+        ]);
+        
         Service::create([
             'title' => 'Zakat & Infaq',
             'category' => 'Ibadah',
@@ -191,7 +234,31 @@ class WebProfileSeeder extends Seeder
                 'requirements' => ['Menerima konsultasi hitung Zakat Maal', 'Menerima jemput zakat khusus area terdekat']
             ],
             'is_active' => true,
-            'sort_order' => 4,
+            'sort_order' => 5,
+        ]);
+
+        Service::create([
+            'title' => 'Remaja Masjid',
+            'category' => 'Sosial',
+            'icon' => 'Users',
+            'badge' => 'Aktif',
+            'bg_image' => null,
+            'description' => 'Wadah kegiatan dan kreativitas pemuda-pemudi muslim Masjid Jami Kassiti.',
+            'details' => [
+                'fullDescription' => 'Remaja Masjid Jami Kassiti (IRMAS) merupakan wadah pembinaan, kreativitas, dan kolaborasi pemuda-pemudi muslim dalam memakmurkan masjid. Kegiatan meliputi kajian kepemudaan, pelatihan skill, olahraga, bakti sosial, dan pengembangan seni budaya Islami.',
+                'schedule' => 'Setiap Akhir Pekan (Sabtu & Ahad)',
+                'location' => 'Masjid Jami Kassiti & Lingkungan Sekitar',
+                'supervisor' => 'Koordinator IRMAS (Sdr. Gojali)',
+                'supervisorImage' => null,
+                'requirements' => ['Pemuda/pemudi usia 13 - 25 tahun', 'Memiliki semangat belajar dan berorganisasi', 'Mengisi form keanggotaan'],
+                'staff' => [
+                    ['name' => "Bpk. Gojali Abdul Syafi'i", 'role' => 'Koordinator', 'image' => null],
+                    ['name' => 'Usth. Rani Rahmayati', 'role' => 'Anggota', 'image' => null],
+                    ['name' => 'Usth. Rayanthi', 'role' => 'Anggota', 'image' => null]
+                ]
+            ],
+            'is_active' => true,
+            'sort_order' => 6,
         ]);
     }
 
@@ -226,15 +293,26 @@ class WebProfileSeeder extends Seeder
             ['group' => 'divisi', 'division_id' => $divisiDakwah->id, 'name' => 'Ust. H. Irvan Ruchiat', 'role' => 'Koordinator', 'image' => null, 'is_leader' => true, 'sort_order' => 1],
             ['group' => 'divisi', 'division_id' => $divisiDakwah->id, 'name' => 'Ust. H. Dani Ramdhani', 'role' => 'Anggota', 'image' => null, 'is_leader' => false, 'sort_order' => 2],
             ['group' => 'divisi', 'division_id' => $divisiDakwah->id, 'name' => 'Usth. Neneng Aam Siti Marhamah', 'role' => 'Anggota', 'image' => null, 'is_leader' => false, 'sort_order' => 3],
+            ['group' => 'divisi', 'division_id' => $divisiDakwah->id, 'name' => 'Usth. Ai Jamaliah', 'role' => 'Anggota', 'image' => null, 'is_leader' => false, 'sort_order' => 4],
+            ['group' => 'divisi', 'division_id' => $divisiDakwah->id, 'name' => 'Usth. Rini Dewi Anggiani', 'role' => 'Anggota', 'image' => null, 'is_leader' => false, 'sort_order' => 5],
+            ['group' => 'divisi', 'division_id' => $divisiDakwah->id, 'name' => 'Usth. Dede Asiah', 'role' => 'Anggota', 'image' => null, 'is_leader' => false, 'sort_order' => 6],
+            
             // Ekonomi
             ['group' => 'divisi', 'division_id' => $divisiEkonomi->id, 'name' => 'Bpk. Ali M. Abduh', 'role' => 'Koordinator', 'image' => null, 'is_leader' => true, 'sort_order' => 1],
             ['group' => 'divisi', 'division_id' => $divisiEkonomi->id, 'name' => 'Bpk. Ujang Kurnia', 'role' => 'Anggota', 'image' => null, 'is_leader' => false, 'sort_order' => 2],
+            ['group' => 'divisi', 'division_id' => $divisiEkonomi->id, 'name' => 'Bpk. Erwin Darmawan', 'role' => 'Anggota', 'image' => null, 'is_leader' => false, 'sort_order' => 3],
+            ['group' => 'divisi', 'division_id' => $divisiEkonomi->id, 'name' => 'Bpk. Ade Ramdhani', 'role' => 'Anggota', 'image' => null, 'is_leader' => false, 'sort_order' => 4],
+            
             // Logistik
             ['group' => 'divisi', 'division_id' => $divisiLogistik->id, 'name' => 'Bpk. H. Redi Sasriandi', 'role' => 'Koordinator', 'image' => null, 'is_leader' => true, 'sort_order' => 1],
             ['group' => 'divisi', 'division_id' => $divisiLogistik->id, 'name' => 'Bpk. Aditya Astra Prayudha', 'role' => 'Anggota', 'image' => null, 'is_leader' => false, 'sort_order' => 2],
+            ['group' => 'divisi', 'division_id' => $divisiLogistik->id, 'name' => 'Bpk. Sukardi', 'role' => 'Anggota', 'image' => null, 'is_leader' => false, 'sort_order' => 3],
+            ['group' => 'divisi', 'division_id' => $divisiLogistik->id, 'name' => 'Bpk. Nanang Barkah', 'role' => 'Anggota', 'image' => null, 'is_leader' => false, 'sort_order' => 4],
+            
             // Remaja
             ['group' => 'divisi', 'division_id' => $divisiRemaja->id, 'name' => "Bpk. Gojali Abdul Syafi'i", 'role' => 'Koordinator', 'image' => null, 'is_leader' => true, 'sort_order' => 1],
             ['group' => 'divisi', 'division_id' => $divisiRemaja->id, 'name' => 'Usth. Rani Rahmayati', 'role' => 'Anggota', 'image' => null, 'is_leader' => false, 'sort_order' => 2],
+            ['group' => 'divisi', 'division_id' => $divisiRemaja->id, 'name' => 'Usth. Rayanthi', 'role' => 'Anggota', 'image' => null, 'is_leader' => false, 'sort_order' => 3],
         ];
 
         CommitteeMember::insert($membersDivisi);
