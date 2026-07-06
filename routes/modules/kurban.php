@@ -60,6 +60,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('admin/groups/move-member', [AnimalGroupController::class, 'moveMember']);
     Route::delete('admin/groups/{id}', [AnimalGroupController::class, 'destroy']);
 
+    // Settings
+    Route::get('admin/settings', [App\Http\Controllers\Api\V1\Qurban\QurbanSettingController::class, 'index']);
+    Route::put('admin/settings', [App\Http\Controllers\Api\V1\Qurban\QurbanSettingController::class, 'update']);
+
     // Transactions
     Route::post('admin/transactions/manual', [QurbanTransactionController::class, 'manualDeposit']);
     Route::post('admin/transactions/{id}/verify', [QurbanTransactionController::class, 'verify']);

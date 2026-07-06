@@ -81,6 +81,10 @@ class DashboardController extends Controller
                 'sapi_groups' => $countSapiGroups,
                 'estimated_sapi' => $countSapiGroups, // Each full group = 1 sapi
             ],
+            'settings' => [
+                'sapi_price_per_slot' => $period->sapi_price_per_slot,
+                'kambing_price' => $period->kambing_price,
+            ],
             'pending_transactions' => $pendingCount,
             'recent_transactions' => $recentTransactions,
         ]);
