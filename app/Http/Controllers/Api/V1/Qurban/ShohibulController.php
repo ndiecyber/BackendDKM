@@ -88,6 +88,11 @@ class ShohibulController extends Controller
 
         $data = $request->validated();
 
+        // Prevent public users from using manual payment methods
+        if (in_array($data['payment_method'], ['tunai', 'transfer']) && !auth('sanctum')->check()) {
+            return $this->errorResponse('Metode pembayaran manual (tunai/transfer) hanya dapat dilakukan oleh pengurus/admin.', 403);
+        }
+
         // Check for duplicate (name + phone)
         $existing = Shohibul::where('period_id', $period->id)
             ->where('name', $data['name'])

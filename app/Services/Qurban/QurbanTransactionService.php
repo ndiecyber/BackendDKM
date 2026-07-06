@@ -34,15 +34,25 @@ class QurbanTransactionService
                 'payment_method' => $paymentMethod,
             ]);
 
-            // Request payment from PaKasir
-            $payment = $this->paKasir->createTransaction($paymentMethod, $orderId, $amount);
+            if (in_array($paymentMethod, ['tunai', 'transfer'])) {
+                // Skip PaKasir for manual methods, admin will verify later
+                $payment = [
+                    'payment_number' => strtoupper($paymentMethod),
+                    'total_payment' => $amount,
+                    'expired_at' => now()->addDays(7)->toDateTimeString(),
+                    'payment_method' => $paymentMethod,
+                ];
+            } else {
+                // Request payment from PaKasir
+                $payment = $this->paKasir->createTransaction($paymentMethod, $orderId, $amount);
 
-            // Update transaction with PaKasir response
-            $transaction->update([
-                'payment_number' => $payment['payment_number'],
-                'total_payment' => $payment['total_payment'],
-                'expired_at' => $payment['expired_at'],
-            ]);
+                // Update transaction with PaKasir response
+                $transaction->update([
+                    'payment_number' => $payment['payment_number'],
+                    'total_payment' => $payment['total_payment'],
+                    'expired_at' => $payment['expired_at'],
+                ]);
+            }
 
             return [
                 'transaction' => $transaction->fresh(),
