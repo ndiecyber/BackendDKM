@@ -97,6 +97,21 @@ class PeriodController extends Controller
         Gate::authorize('qurban.periode.view');
 
         $periods = QurbanPeriod::orderByDesc('created_at')->get();
+        
+        $periods->map(function ($period) {
+            $shohibuls = \App\Models\Qurban\Shohibul::where('period_id', $period->id)->get();
+            $period->totalSapi = $shohibuls->where('target_type', 'sapi')->count();
+            $period->sapiLunas = $shohibuls->where('target_type', 'sapi')->filter(fn($s) => $s->collected_amount >= $s->target_amount)->count();
+            $period->sapiBelumLunas = $period->totalSapi - $period->sapiLunas;
+            
+            $period->totalKambing = $shohibuls->where('target_type', 'kambing')->count();
+            $period->kambingLunas = $shohibuls->where('target_type', 'kambing')->filter(fn($s) => $s->collected_amount >= $s->target_amount)->count();
+            $period->kambingBelumLunas = $period->totalKambing - $period->kambingLunas;
+            
+            $period->totalShohibul = $shohibuls->count();
+            $period->totalDana = $shohibuls->sum('collected_amount');
+            return $period;
+        });
 
         return $this->successResponse($periods);
     }

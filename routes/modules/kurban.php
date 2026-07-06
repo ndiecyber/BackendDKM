@@ -58,6 +58,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Groups
     Route::post('admin/groups', [AnimalGroupController::class, 'store']);
     Route::post('admin/groups/move-member', [AnimalGroupController::class, 'moveMember']);
+    Route::delete('admin/groups/{id}', [AnimalGroupController::class, 'destroy']);
 
     // Transactions
     Route::post('admin/transactions/manual', [QurbanTransactionController::class, 'manualDeposit']);

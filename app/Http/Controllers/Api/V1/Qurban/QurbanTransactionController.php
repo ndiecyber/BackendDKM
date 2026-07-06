@@ -32,6 +32,10 @@ class QurbanTransactionController extends Controller
             ->when($request->period_id, function ($q, $periodId) {
                 $q->whereHas('shohibul', fn ($sq) => $sq->where('period_id', $periodId));
             })
+            ->when($request->search, function ($q, $search) {
+                $q->where('id', 'like', "%{$search}%")
+                  ->orWhereHas('shohibul', fn ($sq) => $sq->where('name', 'ilike', "%{$search}%"));
+            })
             ->byStatus($request->status)
             ->byMethod($request->payment_method)
             ->byDateRange($request->date_from, $request->date_to)

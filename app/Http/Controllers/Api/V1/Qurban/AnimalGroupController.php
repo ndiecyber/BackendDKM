@@ -97,4 +97,22 @@ class AnimalGroupController extends Controller
             'Shohibul berhasil dipindahkan ke kelompok '.$newGroup->name.'.'
         );
     }
+
+    /**
+     * Delete an empty group (admin).
+     */
+    public function destroy(string $id): JsonResponse
+    {
+        Gate::authorize('qurban.kelompok.delete');
+
+        $group = AnimalGroup::withCount('shohibuls')->findOrFail($id);
+
+        if ($group->shohibuls_count > 0) {
+            return $this->errorResponse('Tidak dapat menghapus kelompok yang masih memiliki anggota.', 422);
+        }
+
+        $group->delete();
+
+        return $this->successResponse(null, 'Kelompok berhasil dihapus.');
+    }
 }
