@@ -33,7 +33,7 @@ class AnimalGroupController extends Controller
         }
 
         $groups = AnimalGroup::where('period_id', $period->id)
-            ->with(['shohibuls:id,animal_group_id,name,phone,collected_amount,target_amount'])
+            ->with(['shohibuls:id,animal_group_id,name,phone,address,collected_amount,target_amount'])
             ->withCount('shohibuls')
             ->orderBy('target_type')
             ->orderBy('name')

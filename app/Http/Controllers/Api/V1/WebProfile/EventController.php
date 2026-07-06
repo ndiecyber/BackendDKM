@@ -175,12 +175,14 @@ class EventController extends Controller
      */
     private function extractImagePaths(?string $content): array
     {
-        if (!$content) return [];
-        
+        if (! $content) {
+            return [];
+        }
+
         $paths = [];
         preg_match_all('/<img[^>]+src="([^">]+)"/i', $content, $matches);
-        
-        if (!empty($matches[1])) {
+
+        if (! empty($matches[1])) {
             foreach ($matches[1] as $url) {
                 // Example URL: http://localhost:8000/storage/events/content/file.jpg
                 $path = parse_url($url, PHP_URL_PATH);
@@ -190,7 +192,7 @@ class EventController extends Controller
                 }
             }
         }
-        
+
         return $paths;
     }
 

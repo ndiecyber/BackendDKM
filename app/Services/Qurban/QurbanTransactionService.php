@@ -174,4 +174,18 @@ class QurbanTransactionService
 
         return $transaction;
     }
+
+    /**
+     * Admin: manually verify a pending transaction.
+     */
+    public function verifyTransaction(QurbanTransaction $transaction): QurbanTransaction
+    {
+        if ($transaction->status !== 'pending') {
+            throw new \Exception('Hanya transaksi pending yang bisa diverifikasi.');
+        }
+
+        $this->markSuccess($transaction, now());
+
+        return $transaction;
+    }
 }

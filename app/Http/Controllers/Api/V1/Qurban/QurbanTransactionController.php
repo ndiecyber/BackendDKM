@@ -29,10 +29,13 @@ class QurbanTransactionController extends Controller
     public function index(Request $request): JsonResponse
     {
         $transactions = QurbanTransaction::query()
+            ->when($request->period_id, function ($q, $periodId) {
+                $q->whereHas('shohibul', fn ($sq) => $sq->where('period_id', $periodId));
+            })
             ->byStatus($request->status)
             ->byMethod($request->payment_method)
             ->byDateRange($request->date_from, $request->date_to)
-            ->with('shohibul:id,name,phone,target_type')
+            ->with('shohibul:id,name,phone,address,target_type')
             ->orderByDesc('created_at')
             ->paginate($request->per_page ?? 20);
 
@@ -134,5 +137,24 @@ class QurbanTransactionController extends Controller
         }
 
         return $this->successResponse($transaction, 'Transaksi berhasil dibatalkan.');
+    }
+
+    /**
+     * Admin: manually verify a pending transaction.
+     */
+    public function verify(string $id): JsonResponse
+    {
+        // Using same authorize gate prefix
+        Gate::authorize('qurban.transaksi.verify');
+
+        $transaction = QurbanTransaction::findOrFail($id);
+
+        try {
+            $transaction = $this->transactionService->verifyTransaction($transaction);
+        } catch (\Exception $e) {
+            return $this->errorResponse($e->getMessage(), 422);
+        }
+
+        return $this->successResponse($transaction, 'Transaksi berhasil diverifikasi.');
     }
 }

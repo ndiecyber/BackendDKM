@@ -61,6 +61,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Transactions
     Route::post('admin/transactions/manual', [QurbanTransactionController::class, 'manualDeposit']);
+    Route::post('admin/transactions/{id}/verify', [QurbanTransactionController::class, 'verify']);
     Route::post('admin/transactions/{id}/cancel', [QurbanTransactionController::class, 'cancel']);
 
     // Rollover (Tutup Buku)

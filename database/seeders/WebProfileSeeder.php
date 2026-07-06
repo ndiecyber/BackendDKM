@@ -2,18 +2,17 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
-use App\Models\WebProfile\MasterCategory;
-use App\Models\WebProfile\Setting;
-use App\Models\WebProfile\Event;
-use App\Models\WebProfile\Gallery;
-use App\Models\WebProfile\Service;
 use App\Models\WebProfile\CommitteeDivision;
 use App\Models\WebProfile\CommitteeMember;
-use App\Models\WebProfile\WhatsappContact;
-use App\Models\WebProfile\CtaSetting;
 use App\Models\WebProfile\CtaProgram;
-use Illuminate\Support\Facades\DB;
+use App\Models\WebProfile\CtaSetting;
+use App\Models\WebProfile\Event;
+use App\Models\WebProfile\Gallery;
+use App\Models\WebProfile\MasterCategory;
+use App\Models\WebProfile\Service;
+use App\Models\WebProfile\Setting;
+use App\Models\WebProfile\WhatsappContact;
+use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Schema;
 
 class WebProfileSeeder extends Seeder
@@ -24,7 +23,7 @@ class WebProfileSeeder extends Seeder
     public function run(): void
     {
         Schema::disableForeignKeyConstraints();
-        
+
         MasterCategory::truncate();
         Setting::truncate();
         Event::truncate();
@@ -107,7 +106,7 @@ class WebProfileSeeder extends Seeder
         ]);
 
         WhatsappContact::insert([
-            ['name' => 'Bpk. Randi Rizal', 'number' => '6285320132014', 'sort_order' => 1]
+            ['name' => 'Bpk. Randi Rizal', 'number' => '6285320132014', 'sort_order' => 1],
         ]);
     }
 
@@ -119,12 +118,12 @@ class WebProfileSeeder extends Seeder
             'quote' => '"Barang siapa yang membangun masjid karena Allah, maka Allah akan membangunkan baginya rumah di surga."',
             'quote_source' => 'HR. Bukhari & Muslim',
             'total_donors' => 128,
-            'slider_images' => []
+            'slider_images' => [],
         ]);
 
         CtaProgram::insert([
             ['cta_setting_id' => $cta->id, 'name' => 'Renovasi Aula Utama', 'progress' => 75, 'sort_order' => 1],
-            ['cta_setting_id' => $cta->id, 'name' => 'Sarana Pendidikan TPQ', 'progress' => 60, 'sort_order' => 2]
+            ['cta_setting_id' => $cta->id, 'name' => 'Sarana Pendidikan TPQ', 'progress' => 60, 'sort_order' => 2],
         ]);
     }
 
@@ -143,7 +142,7 @@ class WebProfileSeeder extends Seeder
                 'location' => 'Ruang Utama & Lantai 2 Masjid Jami Kassiti',
                 'supervisor' => 'DKM Masjid (Bpk. H. Irvan Ruchiat)',
                 'supervisorImage' => null,
-                'requirements' => ['Pakaian sopan dan menutup aurat', 'Menjaga ketertiban dan kebersihan']
+                'requirements' => ['Pakaian sopan dan menutup aurat', 'Menjaga ketertiban dan kebersihan'],
             ],
             'is_active' => true,
             'sort_order' => 1,
@@ -162,7 +161,7 @@ class WebProfileSeeder extends Seeder
                 'location' => 'Ruang Utama Masjid',
                 'supervisor' => 'Divisi Dakwah (Bpk. H. Irvan Ruchiat)',
                 'supervisorImage' => null,
-                'requirements' => ['Membawa alat tulis (opsional)', 'Terbuka untuk umum']
+                'requirements' => ['Membawa alat tulis (opsional)', 'Terbuka untuk umum'],
             ],
             'is_active' => true,
             'sort_order' => 2,
@@ -186,8 +185,8 @@ class WebProfileSeeder extends Seeder
                     ['name' => 'Usth. Ai Jamaliah', 'role' => 'Kepala Sekolah', 'image' => null],
                     ['name' => 'Usth. Rini Dewi Anggiani', 'role' => 'Guru', 'image' => null],
                     ['name' => 'Usth. Dede Asiah', 'role' => 'Guru', 'image' => null],
-                    ['name' => 'Usth. Rani Rahmayati', 'role' => 'Guru', 'image' => null]
-                ]
+                    ['name' => 'Usth. Rani Rahmayati', 'role' => 'Guru', 'image' => null],
+                ],
             ],
             'is_active' => true,
             'sort_order' => 3,
@@ -211,13 +210,13 @@ class WebProfileSeeder extends Seeder
                     ['name' => 'Usth. Neneng Aam Siti Marhamah', 'role' => 'Kepala DTA', 'image' => null],
                     ['name' => 'Usth. Raya', 'role' => 'Guru', 'image' => null],
                     ['name' => 'Usth. Sani', 'role' => 'Guru', 'image' => null],
-                    ['name' => 'Bpk. Dani R', 'role' => 'Guru', 'image' => null]
-                ]
+                    ['name' => 'Bpk. Dani R', 'role' => 'Guru', 'image' => null],
+                ],
             ],
             'is_active' => true,
             'sort_order' => 4,
         ]);
-        
+
         Service::create([
             'title' => 'Zakat & Infaq',
             'category' => 'Ibadah',
@@ -231,7 +230,7 @@ class WebProfileSeeder extends Seeder
                 'location' => 'Kantor Sekretariat Masjid',
                 'supervisor' => 'Divisi ZISWAF (Bpk. ALI M Abduh)',
                 'supervisorImage' => null,
-                'requirements' => ['Menerima konsultasi hitung Zakat Maal', 'Menerima jemput zakat khusus area terdekat']
+                'requirements' => ['Menerima konsultasi hitung Zakat Maal', 'Menerima jemput zakat khusus area terdekat'],
             ],
             'is_active' => true,
             'sort_order' => 5,
@@ -254,8 +253,8 @@ class WebProfileSeeder extends Seeder
                 'staff' => [
                     ['name' => "Bpk. Gojali Abdul Syafi'i", 'role' => 'Koordinator', 'image' => null],
                     ['name' => 'Usth. Rani Rahmayati', 'role' => 'Anggota', 'image' => null],
-                    ['name' => 'Usth. Rayanthi', 'role' => 'Anggota', 'image' => null]
-                ]
+                    ['name' => 'Usth. Rayanthi', 'role' => 'Anggota', 'image' => null],
+                ],
             ],
             'is_active' => true,
             'sort_order' => 6,
@@ -296,19 +295,19 @@ class WebProfileSeeder extends Seeder
             ['group' => 'divisi', 'division_id' => $divisiDakwah->id, 'name' => 'Usth. Ai Jamaliah', 'role' => 'Anggota', 'image' => null, 'is_leader' => false, 'sort_order' => 4],
             ['group' => 'divisi', 'division_id' => $divisiDakwah->id, 'name' => 'Usth. Rini Dewi Anggiani', 'role' => 'Anggota', 'image' => null, 'is_leader' => false, 'sort_order' => 5],
             ['group' => 'divisi', 'division_id' => $divisiDakwah->id, 'name' => 'Usth. Dede Asiah', 'role' => 'Anggota', 'image' => null, 'is_leader' => false, 'sort_order' => 6],
-            
+
             // Ekonomi
             ['group' => 'divisi', 'division_id' => $divisiEkonomi->id, 'name' => 'Bpk. Ali M. Abduh', 'role' => 'Koordinator', 'image' => null, 'is_leader' => true, 'sort_order' => 1],
             ['group' => 'divisi', 'division_id' => $divisiEkonomi->id, 'name' => 'Bpk. Ujang Kurnia', 'role' => 'Anggota', 'image' => null, 'is_leader' => false, 'sort_order' => 2],
             ['group' => 'divisi', 'division_id' => $divisiEkonomi->id, 'name' => 'Bpk. Erwin Darmawan', 'role' => 'Anggota', 'image' => null, 'is_leader' => false, 'sort_order' => 3],
             ['group' => 'divisi', 'division_id' => $divisiEkonomi->id, 'name' => 'Bpk. Ade Ramdhani', 'role' => 'Anggota', 'image' => null, 'is_leader' => false, 'sort_order' => 4],
-            
+
             // Logistik
             ['group' => 'divisi', 'division_id' => $divisiLogistik->id, 'name' => 'Bpk. H. Redi Sasriandi', 'role' => 'Koordinator', 'image' => null, 'is_leader' => true, 'sort_order' => 1],
             ['group' => 'divisi', 'division_id' => $divisiLogistik->id, 'name' => 'Bpk. Aditya Astra Prayudha', 'role' => 'Anggota', 'image' => null, 'is_leader' => false, 'sort_order' => 2],
             ['group' => 'divisi', 'division_id' => $divisiLogistik->id, 'name' => 'Bpk. Sukardi', 'role' => 'Anggota', 'image' => null, 'is_leader' => false, 'sort_order' => 3],
             ['group' => 'divisi', 'division_id' => $divisiLogistik->id, 'name' => 'Bpk. Nanang Barkah', 'role' => 'Anggota', 'image' => null, 'is_leader' => false, 'sort_order' => 4],
-            
+
             // Remaja
             ['group' => 'divisi', 'division_id' => $divisiRemaja->id, 'name' => "Bpk. Gojali Abdul Syafi'i", 'role' => 'Koordinator', 'image' => null, 'is_leader' => true, 'sort_order' => 1],
             ['group' => 'divisi', 'division_id' => $divisiRemaja->id, 'name' => 'Usth. Rani Rahmayati', 'role' => 'Anggota', 'image' => null, 'is_leader' => false, 'sort_order' => 2],

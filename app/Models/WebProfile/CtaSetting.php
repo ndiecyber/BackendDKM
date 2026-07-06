@@ -37,7 +37,10 @@ class CtaSetting extends Model
     {
         return Attribute::make(
             get: function ($value) {
-                if (!is_array($value)) return $value;
+                if (! is_array($value)) {
+                    return $value;
+                }
+
                 return array_map(function ($img) {
                     return $img && str_starts_with($img, '/storage') ? asset(ltrim($img, '/')) : $img;
                 }, $value);

@@ -45,6 +45,7 @@ class Service extends Model
                 if (is_array($value) && isset($value['supervisorImage']) && str_starts_with($value['supervisorImage'], '/storage')) {
                     $value['supervisorImage'] = asset(ltrim($value['supervisorImage'], '/'));
                 }
+
                 return $value;
             },
         );
