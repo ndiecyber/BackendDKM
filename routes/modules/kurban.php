@@ -54,6 +54,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Shohibuls
     Route::put('admin/shohibuls/{id}', [ShohibulController::class, 'update']);
     Route::delete('admin/shohibuls/{id}', [ShohibulController::class, 'destroy']);
+    Route::post('admin/shohibuls/{id}/refund', [QurbanTransactionController::class, 'refund']);
 
     // Groups
     Route::post('admin/groups', [AnimalGroupController::class, 'store']);

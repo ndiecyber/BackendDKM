@@ -178,7 +178,19 @@ class ShohibulController extends Controller
         Gate::authorize('qurban.shohibul.update');
 
         $shohibul = Shohibul::findOrFail($id);
-        $shohibul->update($request->validated());
+        $data = $request->validated();
+        
+        if (isset($data['target_type']) && $data['target_type'] !== $shohibul->target_type) {
+            $period = \App\Models\Qurban\QurbanPeriod::findOrFail($shohibul->period_id);
+            $data['target_amount'] = $data['target_type'] === 'sapi' 
+                ? $period->sapi_price_per_slot 
+                : $period->kambing_price;
+                
+            // Jika pindah tipe, keluarkan dari kelompok hewan lama
+            $data['animal_group_id'] = null;
+        }
+
+        $shohibul->update($data);
 
         return $this->successResponse($shohibul, 'Data shohibul berhasil diperbarui.');
     }

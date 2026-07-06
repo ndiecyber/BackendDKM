@@ -18,6 +18,10 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::prefix('v1')->group(function () {
+    Route::get('/migrate', function() {
+        return response()->json(\Illuminate\Support\Facades\DB::table('migrations')->get());
+    });
+    
     /*
     |----------------------------------------------------------------------
     | Public Routes

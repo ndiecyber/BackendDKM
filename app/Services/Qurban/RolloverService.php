@@ -2,6 +2,7 @@
 
 namespace App\Services\Qurban;
 
+use App\Models\Qurban\AnimalGroup;
 use App\Models\Qurban\QurbanPeriod;
 use App\Models\Qurban\QurbanTransaction;
 use App\Models\Qurban\Shohibul;
@@ -61,27 +62,40 @@ class RolloverService
 
             Log::info('Rollover: created new period', ['period_id' => $newPeriod->id, 'name' => $newPeriod->name]);
 
+            // 3. Clone animal groups
+            $oldGroups = AnimalGroup::where('period_id', $oldPeriod->id)->get();
+            $groupIdMap = [];
+            foreach ($oldGroups as $oldGroup) {
+                $newGroup = AnimalGroup::create([
+                    'period_id' => $newPeriod->id,
+                    'name' => $oldGroup->name,
+                    'target_type' => $oldGroup->target_type,
+                ]);
+                $groupIdMap[$oldGroup->id] = $newGroup->id;
+            }
+
             // 3. Clone shohibuls from old period
             $shohibuls = Shohibul::where('period_id', $oldPeriod->id)->get();
             $cloned = 0;
 
             foreach ($shohibuls as $shohibul) {
                 $isLunas = $shohibul->collected_amount >= $shohibul->target_amount;
+                $excess = max(0, $shohibul->collected_amount - $shohibul->target_amount);
 
                 // Determine new target based on type
-                $newTarget = $shohibul->target_type === 'sapi'
+                $newTarget = $isLunas ? 0 : ($shohibul->target_type === 'sapi'
                     ? $newPeriod->sapi_price_per_slot
-                    : $newPeriod->kambing_price;
+                    : $newPeriod->kambing_price);
 
                 Shohibul::create([
                     'period_id' => $newPeriod->id,
-                    'animal_group_id' => null, // Reset group assignment
+                    'animal_group_id' => $isLunas ? null : ($shohibul->animal_group_id ? ($groupIdMap[$shohibul->animal_group_id] ?? null) : null),
                     'name' => $shohibul->name,
                     'phone' => $shohibul->phone,
                     'address' => $shohibul->address,
-                    'target_type' => $shohibul->target_type,
+                    'target_type' => $isLunas ? null : $shohibul->target_type,
                     'target_amount' => $newTarget,
-                    'collected_amount' => $isLunas ? 0 : $shohibul->collected_amount,
+                    'collected_amount' => $isLunas ? $excess : $shohibul->collected_amount,
                     'last_payment_month' => $isLunas ? null : $shohibul->last_payment_month,
                 ]);
 
