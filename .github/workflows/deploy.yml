@@ -9,6 +9,9 @@ jobs:
   deploy:
     name: Deploy Application
     runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: https://api.masjidkassiti.id
     
     steps:
       - name: Deploy via SSH
