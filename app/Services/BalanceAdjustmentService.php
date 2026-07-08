@@ -47,6 +47,7 @@ class BalanceAdjustmentService
                     'nominal' => $nominal,
                     'tanggal' => $tanggal->format('Y-m-d'),
                     'category_id' => null, // Kategori akan dianggap sebagai null ("Penyesuaian Saldo" di ReportService)
+                    'program_id' => $data['program_id'] ?? null,
                     'status' => 'approved',
                     'created_by' => $userId,
                 ];

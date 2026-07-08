@@ -146,4 +146,112 @@ class ProgramController extends Controller
 
         return $this->successResponse(null, 'Program berhasil dipulihkan.');
     }
+
+    /**
+     * Get physical balances of a program across bank/kas.
+     */
+    public function physicalBalances($id): JsonResponse
+    {
+        Gate::authorize('keuangan.program.view');
+        $program = Program::findOrFail($id);
+        
+        $transactions = \App\Models\Transaction::where('program_id', $id)
+            ->where('status', 'approved')
+            ->get();
+            
+        $balances = [];
+        foreach($transactions as $trx) {
+            if ($trx->tipe === 'pemasukan') {
+                $kasId = $trx->bank_kas_tujuan_id;
+                if (!isset($balances[$kasId])) $balances[$kasId] = 0;
+                $balances[$kasId] += $trx->nominal;
+            } elseif ($trx->tipe === 'pengeluaran') {
+                $kasId = $trx->bank_kas_asal_id;
+                if (!isset($balances[$kasId])) $balances[$kasId] = 0;
+                $balances[$kasId] -= $trx->nominal;
+            } elseif ($trx->tipe === 'transfer') {
+                $kasAsal = $trx->bank_kas_asal_id;
+                $kasTujuan = $trx->bank_kas_tujuan_id;
+                if (!isset($balances[$kasAsal])) $balances[$kasAsal] = 0;
+                if (!isset($balances[$kasTujuan])) $balances[$kasTujuan] = 0;
+                $balances[$kasAsal] -= $trx->nominal;
+                $balances[$kasTujuan] += $trx->nominal;
+            }
+        }
+        
+        $bankKasIds = array_keys($balances);
+        $bankKas = \App\Models\BankKas::whereIn('id', $bankKasIds)->get()->keyBy('id');
+        
+        $result = [];
+        foreach($balances as $kasId => $amount) {
+            if ($amount != 0) {
+                $kas = $bankKas->get($kasId);
+                $result[] = [
+                    'bank_kas_id' => $kasId,
+                    'nama_kas' => $kas ? $kas->nama : 'Unknown',
+                    'tipe_kas' => $kas ? $kas->tipe : 'Unknown',
+                    'saldo' => $amount
+                ];
+            }
+        }
+        
+        return $this->successResponse($result);
+    }
+
+    /**
+     * Rollover remaining funds from a program.
+     */
+    public function rollover(Request $request, $id): JsonResponse
+    {
+        Gate::authorize('keuangan.program.update');
+        $sourceProgram = Program::findOrFail($id);
+        
+        $validated = $request->validate([
+            'target_program_id' => 'nullable|exists:programs,id',
+            'sources' => 'required|array',
+            'sources.*.bank_kas_id' => 'required|exists:bank_kas,id',
+            'sources.*.amount' => 'required|numeric|min:1',
+            'deskripsi' => 'nullable|string'
+        ]);
+        
+        $targetProgramId = $validated['target_program_id'] ?? null;
+        $targetProgram = $targetProgramId ? Program::find($targetProgramId) : null;
+        
+        \Illuminate\Support\Facades\DB::transaction(function () use ($sourceProgram, $targetProgram, $targetProgramId, $validated) {
+            $transactionService = app(\App\Services\TransactionService::class);
+            
+            $targetName = $targetProgram ? $targetProgram->nama : 'Kas Umum';
+            $desc = $validated['deskripsi'] ?? "Rollover sisa dana dari {$sourceProgram->nama} ke {$targetName}";
+            
+            foreach($validated['sources'] as $source) {
+                // 1. Outflow from source program
+                $transactionService->createTransaction([
+                    'nama' => 'Rollover Keluar',
+                    'deskripsi' => $desc,
+                    'tipe' => 'pengeluaran',
+                    'bank_kas_asal_id' => $source['bank_kas_id'],
+                    'nominal' => $source['amount'],
+                    'program_id' => $sourceProgram->id,
+                    'status' => 'approved',
+                    'tanggal' => now()->toDateString(),
+                ]);
+                
+                // 2. Inflow to target program
+                $transactionService->createTransaction([
+                    'nama' => 'Rollover Masuk',
+                    'deskripsi' => $desc,
+                    'tipe' => 'pemasukan',
+                    'bank_kas_tujuan_id' => $source['bank_kas_id'],
+                    'nominal' => $source['amount'],
+                    'program_id' => $targetProgramId,
+                    'status' => 'approved',
+                    'tanggal' => now()->toDateString(),
+                ]);
+            }
+            
+            $sourceProgram->update(['status' => 'selesai']);
+        });
+        
+        return $this->successResponse(null, 'Sisa dana berhasil disalurkan.');
+    }
 }
