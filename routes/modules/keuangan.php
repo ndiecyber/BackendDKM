@@ -42,6 +42,7 @@ Route::get('bank-kas/{bank_kas}/adjustments', [BalanceAdjustmentController::clas
 Route::post('bank-kas/{bank_kas}/adjustments', [BalanceAdjustmentController::class, 'store']);
 Route::get('bank-kas/{id}/activities', [BankKasController::class, 'activities']);
 Route::get('bank-kas/{id}/program-balances', [BankKasController::class, 'programBalances']);
+Route::post('bank-kas/{id}/transfer-all', [BankKasController::class, 'transferAll']);
 Route::delete('bank-kas/{id}/force', [BankKasController::class, 'forceDelete']);
 
 // Transactions

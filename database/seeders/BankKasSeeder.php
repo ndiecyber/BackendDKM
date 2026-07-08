@@ -31,7 +31,7 @@ class BankKasSeeder extends Seeder
             [
                 'nama' => 'Dompet PaKasir',
                 'tipe' => 'rekening',
-                'deskripsi' => 'Kas penampung otomatis ke PaKasir',
+                'deskripsi' => 'Kas penampung otomatis ke PaKasir (Tidak termasuk Tabungan Qurban)',
                 'saldo_awal' => 0,
                 'saldo_terkini' => 0,
                 'status' => 'aktif',

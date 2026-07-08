@@ -217,16 +217,19 @@ class ProgramController extends Controller
         $targetProgramId = $validated['target_program_id'] ?? null;
         $targetProgram = $targetProgramId ? Program::find($targetProgramId) : null;
         
-        \Illuminate\Support\Facades\DB::transaction(function () use ($sourceProgram, $targetProgram, $targetProgramId, $validated) {
+        \Illuminate\Support\Facades\DB::transaction(function () use ($sourceProgram, $targetProgram, $targetProgramId, $validated, $request) {
             $transactionService = app(\App\Services\TransactionService::class);
             
             $targetName = $targetProgram ? $targetProgram->nama : 'Kas Umum';
             $desc = $validated['deskripsi'] ?? "Rollover sisa dana dari {$sourceProgram->nama} ke {$targetName}";
             
             foreach($validated['sources'] as $source) {
+                $kas = \App\Models\BankKas::find($source['bank_kas_id']);
+                $namaKas = $kas ? $kas->nama : 'Kas Unknown';
+                
                 // 1. Outflow from source program
-                $transactionService->createTransaction([
-                    'nama' => 'Rollover Keluar',
+                $transactionService->createExpense([
+                    'nama' => "Rollover Keluar - {$namaKas} (Auto)",
                     'deskripsi' => $desc,
                     'tipe' => 'pengeluaran',
                     'bank_kas_asal_id' => $source['bank_kas_id'],
@@ -234,11 +237,12 @@ class ProgramController extends Controller
                     'program_id' => $sourceProgram->id,
                     'status' => 'approved',
                     'tanggal' => now()->toDateString(),
+                    'created_by' => $request->user()->id,
                 ]);
                 
                 // 2. Inflow to target program
-                $transactionService->createTransaction([
-                    'nama' => 'Rollover Masuk',
+                $transactionService->createIncome([
+                    'nama' => "Rollover Masuk - {$namaKas} (Auto)",
                     'deskripsi' => $desc,
                     'tipe' => 'pemasukan',
                     'bank_kas_tujuan_id' => $source['bank_kas_id'],
@@ -246,6 +250,7 @@ class ProgramController extends Controller
                     'program_id' => $targetProgramId,
                     'status' => 'approved',
                     'tanggal' => now()->toDateString(),
+                    'created_by' => $request->user()->id,
                 ]);
             }
             
