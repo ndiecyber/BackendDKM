@@ -254,4 +254,31 @@ class BankKasController extends Controller
         
         return $this->successResponse($result);
     }
+
+    /**
+     * Display a listing of soft-deleted bank/kas.
+     */
+    public function trashed(Request $request): JsonResponse
+    {
+        Gate::authorize('keuangan.bank_kas.view');
+
+        $bankKas = BankKas::onlyTrashed()
+            ->search($request->search)
+            ->paginate($request->per_page ?? 15);
+
+        return $this->successResponse($bankKas);
+    }
+
+    /**
+     * Force delete a soft-deleted bank/kas permanently.
+     */
+    public function forceDelete(string $id): JsonResponse
+    {
+        Gate::authorize('keuangan.bank_kas.delete');
+
+        $bankKas = BankKas::onlyTrashed()->findOrFail($id);
+        $bankKas->forceDelete();
+
+        return $this->successResponse(null, 'Rekening / Kas berhasil dihapus permanen.');
+    }
 }

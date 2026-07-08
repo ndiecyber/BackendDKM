@@ -162,4 +162,32 @@ class TransactionController extends Controller
 
         return $this->successResponse($transaction, 'Status transaksi berhasil diperbarui.');
     }
+
+    /**
+     * Display a listing of soft-deleted transactions.
+     */
+    public function trashed(Request $request): JsonResponse
+    {
+        Gate::authorize('keuangan.transaksi.view');
+
+        $transactions = Transaction::onlyTrashed()
+            ->with(['category:id,nama', 'bankKasAsal:id,nama', 'bankKasTujuan:id,nama', 'program:id,nama'])
+            ->orderBy('deleted_at', 'desc')
+            ->paginate($request->per_page ?? 15);
+
+        return $this->successResponse($transactions);
+    }
+
+    /**
+     * Force delete a soft-deleted transaction permanently.
+     */
+    public function forceDelete(string $id): JsonResponse
+    {
+        Gate::authorize('keuangan.transaksi.delete');
+
+        $transaction = Transaction::onlyTrashed()->findOrFail($id);
+        $transaction->forceDelete();
+
+        return $this->successResponse(null, 'Transaksi berhasil dihapus permanen.');
+    }
 }

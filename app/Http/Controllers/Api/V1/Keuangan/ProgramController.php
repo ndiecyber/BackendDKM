@@ -254,4 +254,31 @@ class ProgramController extends Controller
         
         return $this->successResponse(null, 'Sisa dana berhasil disalurkan.');
     }
+
+    /**
+     * Display a listing of soft-deleted programs.
+     */
+    public function trashed(Request $request): JsonResponse
+    {
+        Gate::authorize('keuangan.program.view');
+
+        $programs = Program::onlyTrashed()
+            ->search($request->search)
+            ->paginate($request->per_page ?? 15);
+
+        return $this->successResponse($programs);
+    }
+
+    /**
+     * Force delete a soft-deleted program permanently.
+     */
+    public function forceDelete(string $id): JsonResponse
+    {
+        Gate::authorize('keuangan.program.delete');
+
+        $program = Program::onlyTrashed()->findOrFail($id);
+        $program->forceDelete();
+
+        return $this->successResponse(null, 'Program berhasil dihapus permanen.');
+    }
 }
