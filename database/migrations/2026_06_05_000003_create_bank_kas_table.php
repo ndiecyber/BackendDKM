@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('bank_kas', function (Blueprint $table) {
             $table->id();
             $table->string('nama');
-            $table->enum('tipe', ['tunai', 'rekening']);
+            $table->enum('tipe', ['tunai', 'rekening', 'digital']);
             $table->string('nomor_rekening')->nullable();
             $table->string('atas_nama')->nullable();
             $table->text('deskripsi')->nullable();
