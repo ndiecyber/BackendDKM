@@ -28,6 +28,7 @@ class UpdateTransactionRequest extends FormRequest
             'nominal' => ['sometimes', 'numeric', 'min:1'],
             'tanggal' => ['sometimes', 'date'],
             'category_id' => ['nullable', 'exists:categories,id'],
+            'program_id' => ['nullable', 'exists:programs,id'],
             'bank_kas_asal_id' => ['nullable', 'exists:bank_kas,id'],
             'bank_kas_tujuan_id' => ['nullable', 'exists:bank_kas,id'],
             'jamaah_id' => ['nullable', 'exists:jamaah,id'],

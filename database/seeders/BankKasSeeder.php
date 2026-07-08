@@ -22,6 +22,7 @@ class BankKasSeeder extends Seeder
                 'saldo_terkini' => 0,
                 'status' => 'aktif',
                 'visibilitas_publik' => false,
+                'color' => 'blue',
             ]
         );
 
@@ -30,11 +31,12 @@ class BankKasSeeder extends Seeder
             [
                 'nama' => 'Dompet PaKasir',
                 'tipe' => 'rekening',
-                'deskripsi' => 'Kas penampung otomatis (escrow) khusus untuk settlement donasi/pembayaran dari PaKasir',
+                'deskripsi' => 'Kas penampung otomatis ke PaKasir',
                 'saldo_awal' => 0,
                 'saldo_terkini' => 0,
                 'status' => 'aktif',
                 'visibilitas_publik' => false,
+                'color' => 'amber',
             ]
         );
     }

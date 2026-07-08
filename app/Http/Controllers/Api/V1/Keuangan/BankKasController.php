@@ -241,6 +241,7 @@ class BankKasController extends Controller
         $programs = \App\Models\Program::whereIn('id', $programIds)->get()->keyBy('id');
         
         $result = [];
+        $totalProgramSaldo = 0;
         foreach($balances as $progId => $amount) {
             if ($amount != 0) {
                 $program = $programs->get($progId);
@@ -249,7 +250,18 @@ class BankKasController extends Controller
                     'nama_program' => $program ? $program->nama : 'Unknown',
                     'saldo' => $amount
                 ];
+                $totalProgramSaldo += $amount;
             }
+        }
+        
+        // Calculate remaining non-program balance (Umum)
+        $saldoUmum = $bankKas->saldo_terkini - $totalProgramSaldo;
+        if ($saldoUmum != 0 || empty($result)) {
+            $result[] = [
+                'program_id' => null,
+                'nama_program' => 'Umum / Tanpa Program',
+                'saldo' => $saldoUmum
+            ];
         }
         
         return $this->successResponse($result);
