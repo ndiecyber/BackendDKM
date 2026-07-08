@@ -38,9 +38,13 @@ class DashboardController extends Controller
             ->limit(10)
             ->get();
 
-        // Summary for current month
-        $startOfMonth = Carbon::now()->startOfMonth()->toDateString();
-        $endOfMonth = Carbon::now()->endOfMonth()->toDateString();
+        // Summary for requested month (default: current month)
+        $bulan = (int) ($request->bulan ?? Carbon::now()->month);
+        $tahun = (int) ($request->tahun ?? Carbon::now()->year);
+
+        $targetDate = Carbon::createFromDate($tahun, $bulan, 1);
+        $startOfMonth = $targetDate->copy()->startOfMonth()->toDateString();
+        $endOfMonth = $targetDate->copy()->endOfMonth()->toDateString();
 
         $pemasukanBulanIni = Transaction::where('status', 'approved')
             ->where('tipe', 'pemasukan')
@@ -59,6 +63,10 @@ class DashboardController extends Controller
             'pengeluaran_bulan_ini' => (float) $pengeluaranBulanIni,
             'selisih_bulan_ini' => (float) ($pemasukanBulanIni - $pengeluaranBulanIni),
             'transaksi_terbaru' => $latestTransactions,
+            'periode' => [
+                'bulan' => $bulan,
+                'tahun' => $tahun,
+            ],
         ]);
     }
 

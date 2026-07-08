@@ -24,12 +24,14 @@ class UpdateBankKasRequest extends FormRequest
     {
         return [
             'nama' => ['sometimes', 'string', 'max:255'],
-            'tipe' => ['sometimes', 'in:tunai,rekening'],
+            'tipe' => ['sometimes', 'in:tunai,rekening,dompet_digital'],
             'nomor_rekening' => ['nullable', 'string', 'max:50'],
             'atas_nama' => ['nullable', 'string', 'max:255'],
             'deskripsi' => ['nullable', 'string', 'max:1000'],
             'qr_image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
             'status' => ['sometimes', 'in:aktif,non_aktif'],
+            'color' => ['nullable', 'string', 'max:20'],
+            'is_pinned' => ['sometimes', 'boolean'],
             'visibilitas_publik' => ['sometimes', 'boolean'],
         ];
     }

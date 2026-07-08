@@ -36,8 +36,9 @@ class TransactionController extends Controller
             ->byStatus($request->status)
             ->byCategory($request->category_id)
             ->byBankKas($request->bank_kas_id)
+            ->byProgram($request->program_id)
             ->byDateRange($request->tanggal_mulai, $request->tanggal_akhir)
-            ->with(['category:id,nama', 'bankKasAsal:id,nama', 'bankKasTujuan:id,nama', 'jamaah:id,nama_lengkap', 'createdBy:id,name'])
+            ->with(['category:id,nama', 'program:id,nama', 'bankKasAsal:id,nama', 'bankKasTujuan:id,nama', 'jamaah:id,nama_lengkap', 'createdBy:id,name'])
             ->orderByDesc('tanggal')
             ->orderByDesc('id')
             ->paginate($request->per_page ?? 15);
