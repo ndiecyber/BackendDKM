@@ -94,6 +94,9 @@ jobs:
           if [ -L "${APP_LINK}" ]; then
             PREVIOUS_RELEASE=$(readlink -f "${APP_LINK}")
             echo "    Previous: ${PREVIOUS_RELEASE}"
+          elif [ -d "${APP_LINK}" ]; then
+            echo "==> Removing existing directory ${APP_LINK} to make way for symlink"
+            rm -rf "${APP_LINK}"
           fi
 
           echo "==> Swapping symlink"
