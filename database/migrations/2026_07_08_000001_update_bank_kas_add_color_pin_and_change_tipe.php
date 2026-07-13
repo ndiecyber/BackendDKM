@@ -24,7 +24,13 @@ return new class extends Migration
         });
 
         // Step 2: Copy data
-        DB::table('bank_kas')->update(['tipe_new' => DB::raw('tipe::text')]);
+        $driver = Schema::getConnection()->getDriverName();
+
+        if ($driver === 'pgsql') {
+            DB::table('bank_kas')->update(['tipe_new' => DB::raw('tipe::varchar')]);
+        } else {
+            DB::table('bank_kas')->update(['tipe_new' => DB::raw('tipe')]);
+        }
 
         // Step 3: Drop old enum column and rename new column
         Schema::table('bank_kas', function (Blueprint $table) {
