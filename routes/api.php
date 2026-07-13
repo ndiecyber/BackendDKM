@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\V1\JamaahController;
 use App\Http\Controllers\Api\V1\ProfileController;
 use App\Http\Controllers\Api\V1\RoleController;
 use App\Http\Controllers\Api\V1\UserController;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -18,10 +19,10 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::prefix('v1')->group(function () {
-    Route::get('/migrate', function() {
-        return response()->json(\Illuminate\Support\Facades\DB::table('migrations')->get());
+    Route::get('/migrate', function () {
+        return response()->json(DB::table('migrations')->get());
     });
-    
+
     /*
     |----------------------------------------------------------------------
     | Public Routes

@@ -5,10 +5,12 @@ namespace App\Http\Controllers\Api\V1\Keuangan;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Keuangan\AdjustBalanceRequest;
 use App\Http\Requests\Keuangan\StoreBankKasRequest;
-use App\Http\Requests\Keuangan\UpdateBankKasRequest;
 use App\Http\Requests\Keuangan\TransferAllRequest;
+use App\Http\Requests\Keuangan\UpdateBankKasRequest;
 use App\Models\BalanceAdjustment;
 use App\Models\BankKas;
+use App\Models\Program;
+use App\Models\Transaction;
 use App\Services\TransactionService;
 use App\Traits\ApiResponse;
 use Dedoc\Scramble\Attributes\Group;
@@ -162,11 +164,11 @@ class BankKasController extends Controller
     {
         Gate::authorize('keuangan.bank_kas.view');
         $bankKas = BankKas::findOrFail($id);
-        
-        $activities = \App\Models\Transaction::where('status', 'approved')
+
+        $activities = Transaction::where('status', 'approved')
             ->where(function ($query) use ($id) {
                 $query->where('bank_kas_asal_id', $id)
-                      ->orWhere('bank_kas_tujuan_id', $id);
+                    ->orWhere('bank_kas_tujuan_id', $id);
             })
             ->latest('tanggal')
             ->latest('id')
@@ -174,8 +176,9 @@ class BankKasController extends Controller
             ->get()
             ->map(function ($item) use ($id) {
                 $isPemasukan = $item->bank_kas_tujuan_id == $id;
+
                 return [
-                    'id' => 'trx_' . $item->id,
+                    'id' => 'trx_'.$item->id,
                     'type' => $item->tipe,
                     'tanggal' => $item->tanggal,
                     'deskripsi' => $item->deskripsi ?: $item->nama,
@@ -184,7 +187,7 @@ class BankKasController extends Controller
                     'is_pemasukan' => $isPemasukan,
                 ];
             });
-            
+
         return $this->successResponse($activities);
     }
 
@@ -195,62 +198,66 @@ class BankKasController extends Controller
     {
         Gate::authorize('keuangan.bank_kas.view');
         $bankKas = BankKas::findOrFail($id);
-        
+
         // Find all transactions affecting this bank_kas that have a program_id
-        $transactions = \App\Models\Transaction::where('status', 'approved')
+        $transactions = Transaction::where('status', 'approved')
             ->whereNotNull('program_id')
-            ->where(function($query) use ($id) {
+            ->where(function ($query) use ($id) {
                 $query->where('bank_kas_asal_id', $id)
-                      ->orWhere('bank_kas_tujuan_id', $id);
+                    ->orWhere('bank_kas_tujuan_id', $id);
             })->get();
-            
+
         $balances = [];
-        foreach($transactions as $trx) {
+        foreach ($transactions as $trx) {
             $programId = $trx->program_id;
-            if (!isset($balances[$programId])) {
+            if (! isset($balances[$programId])) {
                 $balances[$programId] = 0;
             }
-            
+
             if ($trx->tipe === 'pemasukan' && $trx->bank_kas_tujuan_id == $id) {
                 $balances[$programId] += $trx->nominal;
             } elseif ($trx->tipe === 'pengeluaran' && $trx->bank_kas_asal_id == $id) {
                 $balances[$programId] -= $trx->nominal;
             } elseif ($trx->tipe === 'transfer') {
-                if ($trx->bank_kas_tujuan_id == $id) $balances[$programId] += $trx->nominal;
+                if ($trx->bank_kas_tujuan_id == $id) {
+                    $balances[$programId] += $trx->nominal;
+                }
                 if ($trx->bank_kas_asal_id == $id) {
                     $balances[$programId] -= $trx->nominal;
-                    if ($trx->biaya_admin) $balances[$programId] -= $trx->biaya_admin;
+                    if ($trx->biaya_admin) {
+                        $balances[$programId] -= $trx->biaya_admin;
+                    }
                 }
             }
         }
-        
+
         $programIds = array_keys($balances);
-        $programs = \App\Models\Program::whereIn('id', $programIds)->get()->keyBy('id');
-        
+        $programs = Program::whereIn('id', $programIds)->get()->keyBy('id');
+
         $result = [];
         $totalProgramSaldo = 0;
-        foreach($balances as $progId => $amount) {
+        foreach ($balances as $progId => $amount) {
             if ($amount != 0) {
                 $program = $programs->get($progId);
                 $result[] = [
                     'program_id' => $progId,
                     'nama_program' => $program ? $program->nama : 'Unknown',
-                    'saldo' => $amount
+                    'saldo' => $amount,
                 ];
                 $totalProgramSaldo += $amount;
             }
         }
-        
+
         // Calculate remaining non-program balance (Umum)
         $saldoUmum = $bankKas->saldo_terkini - $totalProgramSaldo;
         if ($saldoUmum != 0 || empty($result)) {
             $result[] = [
                 'program_id' => null,
                 'nama_program' => 'Umum / Tanpa Program',
-                'saldo' => $saldoUmum
+                'saldo' => $saldoUmum,
             ];
         }
-        
+
         return $this->successResponse($result);
     }
 
@@ -266,17 +273,17 @@ class BankKasController extends Controller
         $deskripsi = $request->validated('deskripsi');
 
         // Calculate balances (duplicate logic from programBalances for internal use)
-        $transactions = \App\Models\Transaction::where('status', 'approved')
+        $transactions = Transaction::where('status', 'approved')
             ->whereNotNull('program_id')
-            ->where(function($query) use ($id) {
+            ->where(function ($query) use ($id) {
                 $query->where('bank_kas_asal_id', $id)
-                      ->orWhere('bank_kas_tujuan_id', $id);
+                    ->orWhere('bank_kas_tujuan_id', $id);
             })->get();
-            
+
         $balances = [];
-        foreach($transactions as $trx) {
+        foreach ($transactions as $trx) {
             $programId = $trx->program_id;
-            if (!isset($balances[$programId])) {
+            if (! isset($balances[$programId])) {
                 $balances[$programId] = 0;
             }
             if ($trx->tipe === 'pemasukan' && $trx->bank_kas_tujuan_id == $id) {
@@ -284,17 +291,21 @@ class BankKasController extends Controller
             } elseif ($trx->tipe === 'pengeluaran' && $trx->bank_kas_asal_id == $id) {
                 $balances[$programId] -= $trx->nominal;
             } elseif ($trx->tipe === 'transfer') {
-                if ($trx->bank_kas_tujuan_id == $id) $balances[$programId] += $trx->nominal;
+                if ($trx->bank_kas_tujuan_id == $id) {
+                    $balances[$programId] += $trx->nominal;
+                }
                 if ($trx->bank_kas_asal_id == $id) {
                     $balances[$programId] -= $trx->nominal;
-                    if ($trx->biaya_admin) $balances[$programId] -= $trx->biaya_admin;
+                    if ($trx->biaya_admin) {
+                        $balances[$programId] -= $trx->biaya_admin;
+                    }
                 }
             }
         }
 
         $totalProgramSaldo = 0;
         $activePrograms = [];
-        foreach($balances as $progId => $amount) {
+        foreach ($balances as $progId => $amount) {
             if ($amount > 0) {
                 $activePrograms[$progId] = $amount;
                 $totalProgramSaldo += $amount;
@@ -321,7 +332,7 @@ class BankKasController extends Controller
                 // Find largest program
                 arsort($activePrograms);
                 $largestProgramId = array_key_first($activePrograms);
-                
+
                 if ($largestProgramId && $activePrograms[$largestProgramId] >= $remainingFee) {
                     $adminFeeProgram[$largestProgramId] = $remainingFee;
                 } else {
@@ -330,7 +341,7 @@ class BankKasController extends Controller
             }
         }
 
-        \Illuminate\Support\Facades\DB::transaction(function () use ($id, $tujuanId, $tanggal, $deskripsi, $saldoUmum, $adminFeeUmum, $activePrograms, $adminFeeProgram, $transactionService) {
+        DB::transaction(function () use ($id, $tujuanId, $tanggal, $deskripsi, $saldoUmum, $adminFeeUmum, $activePrograms, $adminFeeProgram, $transactionService) {
             // 1. Transfer Kas Umum
             if ($saldoUmum > 0) {
                 $transactionService->createTransfer([
@@ -342,7 +353,7 @@ class BankKasController extends Controller
                     'bank_kas_tujuan_id' => $tujuanId,
                     'program_id' => null,
                     'tanggal' => $tanggal,
-                    'status' => 'approved'
+                    'status' => 'approved',
                 ]);
             }
 
@@ -358,7 +369,7 @@ class BankKasController extends Controller
                     'bank_kas_tujuan_id' => $tujuanId,
                     'program_id' => $progId,
                     'tanggal' => $tanggal,
-                    'status' => 'approved'
+                    'status' => 'approved',
                 ]);
             }
         });

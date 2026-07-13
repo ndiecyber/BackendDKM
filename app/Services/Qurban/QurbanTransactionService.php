@@ -189,7 +189,7 @@ class QurbanTransactionService
 
             // Decrement the collected amount
             $shohibul->decrement('collected_amount', $amount);
-            
+
             Log::info('Qurban overpayment refunded', [
                 'order_id' => $orderId,
                 'shohibul_id' => $shohibul->id,
@@ -215,7 +215,7 @@ class QurbanTransactionService
             if ($transaction->status === 'success') {
                 $shohibul = $transaction->shohibul;
                 $shohibul->decrement('collected_amount', $transaction->amount);
-                
+
                 // Tambahkan catatan log
                 Log::info('Qurban payment voided (cancelled after success)', [
                     'order_id' => $transaction->order_id,
@@ -226,11 +226,11 @@ class QurbanTransactionService
             }
 
             // Jika status pending dan bukan manual/tunai/transfer, batalkan di PaKasir
-            if ($transaction->status === 'pending' && !in_array($transaction->payment_method, ['tunai', 'transfer'])) {
+            if ($transaction->status === 'pending' && ! in_array($transaction->payment_method, ['tunai', 'transfer'])) {
                 try {
                     $this->paKasir->cancelTransaction($transaction->order_id, (int) $transaction->amount);
                 } catch (\Exception $e) {
-                    Log::warning('Gagal membatalkan transaksi di PaKasir: ' . $e->getMessage());
+                    Log::warning('Gagal membatalkan transaksi di PaKasir: '.$e->getMessage());
                 }
             }
 

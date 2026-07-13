@@ -34,7 +34,7 @@ class QurbanTransactionController extends Controller
             })
             ->when($request->search, function ($q, $search) {
                 $q->where('id', 'like', "%{$search}%")
-                  ->orWhereHas('shohibul', fn ($sq) => $sq->where('name', 'ilike', "%{$search}%"));
+                    ->orWhereHas('shohibul', fn ($sq) => $sq->where('name', 'ilike', "%{$search}%"));
             })
             ->byStatus($request->status)
             ->byMethod($request->payment_method)
@@ -158,6 +158,7 @@ class QurbanTransactionController extends Controller
 
         return $this->successResponse($transaction, 'Transaksi berhasil diverifikasi.');
     }
+
     /**
      * Admin: Refund kelebihan bayar shohibul
      */
@@ -166,13 +167,13 @@ class QurbanTransactionController extends Controller
         Gate::authorize('qurban.transaksi.manage');
 
         $shohibul = Shohibul::findOrFail($id);
-        
+
         $request->validate([
-            'amount' => 'required|numeric|min:1'
+            'amount' => 'required|numeric|min:1',
         ]);
 
         $excess = $shohibul->collected_amount - $shohibul->target_amount;
-        
+
         if ($excess <= 0) {
             return $this->errorResponse('Shohibul tidak memiliki kelebihan bayar.', 422);
         }
@@ -183,7 +184,7 @@ class QurbanTransactionController extends Controller
 
         try {
             $transaction = $this->transactionService->refund($shohibul, $request->amount);
-            
+
             return $this->successResponse($transaction, 'Kelebihan dana berhasil ditarik/direfund.');
         } catch (\Exception $e) {
             return $this->errorResponse($e->getMessage(), 500);

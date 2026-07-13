@@ -89,7 +89,7 @@ class ShohibulController extends Controller
         $data = $request->validated();
 
         // Prevent public users from using manual payment methods
-        if (in_array($data['payment_method'], ['tunai', 'transfer']) && !auth('sanctum')->check()) {
+        if (in_array($data['payment_method'], ['tunai', 'transfer']) && ! auth('sanctum')->check()) {
             return $this->errorResponse('Metode pembayaran manual (tunai/transfer) hanya dapat dilakukan oleh pengurus/admin.', 403);
         }
 
@@ -179,13 +179,13 @@ class ShohibulController extends Controller
 
         $shohibul = Shohibul::findOrFail($id);
         $data = $request->validated();
-        
+
         if (isset($data['target_type']) && $data['target_type'] !== $shohibul->target_type) {
-            $period = \App\Models\Qurban\QurbanPeriod::findOrFail($shohibul->period_id);
-            $data['target_amount'] = $data['target_type'] === 'sapi' 
-                ? $period->sapi_price_per_slot 
+            $period = QurbanPeriod::findOrFail($shohibul->period_id);
+            $data['target_amount'] = $data['target_type'] === 'sapi'
+                ? $period->sapi_price_per_slot
                 : $period->kambing_price;
-                
+
             // Jika pindah tipe, keluarkan dari kelompok hewan lama
             $data['animal_group_id'] = null;
         }

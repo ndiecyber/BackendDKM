@@ -103,7 +103,7 @@ class CategoryController extends Controller
     public function batchUpdate(Request $request): JsonResponse
     {
         Gate::authorize('keuangan.category.update');
-        
+
         $request->validate([
             'categories' => 'required|array',
             'categories.*.id' => 'nullable|exists:categories,id',

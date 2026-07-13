@@ -3,12 +3,13 @@
 namespace App\Providers;
 
 use App\Models\User;
-use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Str;
 use Dedoc\Scramble\Scramble;
 use Dedoc\Scramble\Support\Generator\OpenApi;
 use Illuminate\Routing\Route;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Str;
+
 class AppServiceProvider extends ServiceProvider
 {
     /**
@@ -37,7 +38,8 @@ class AppServiceProvider extends ServiceProvider
         // Konfigurasi Scramble
         Scramble::routes(function (Route $route) {
             $uri = $route->uri();
-            return Str::startsWith($uri, 'v1/') && !Str::is('v1/migrate', $uri);
+
+            return Str::startsWith($uri, 'v1/') && ! Str::is('v1/migrate', $uri);
         });
 
         Scramble::extendOpenApi(function (OpenApi $openApi) {

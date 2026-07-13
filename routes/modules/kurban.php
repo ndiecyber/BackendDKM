@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\V1\Qurban\AnimalGroupController;
 use App\Http\Controllers\Api\V1\Qurban\DashboardController;
 use App\Http\Controllers\Api\V1\Qurban\PeriodController;
+use App\Http\Controllers\Api\V1\Qurban\QurbanSettingController;
 use App\Http\Controllers\Api\V1\Qurban\QurbanTransactionController;
 use App\Http\Controllers\Api\V1\Qurban\ShohibulController;
 use App\Http\Controllers\Api\V1\Qurban\WebhookController;
@@ -62,8 +63,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('admin/groups/{id}', [AnimalGroupController::class, 'destroy']);
 
     // Settings
-    Route::get('admin/settings', [App\Http\Controllers\Api\V1\Qurban\QurbanSettingController::class, 'index']);
-    Route::put('admin/settings', [App\Http\Controllers\Api\V1\Qurban\QurbanSettingController::class, 'update']);
+    Route::get('admin/settings', [QurbanSettingController::class, 'index']);
+    Route::put('admin/settings', [QurbanSettingController::class, 'update']);
 
     // Transactions
     Route::post('admin/transactions/manual', [QurbanTransactionController::class, 'manualDeposit']);

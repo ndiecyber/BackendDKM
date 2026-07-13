@@ -42,8 +42,13 @@ class Shohibul extends Model
 
     public function getPaymentStatusAttribute(): string
     {
-        if ($this->collected_amount > $this->target_amount) return 'lebih';
-        if ($this->collected_amount == $this->target_amount) return 'lunas';
+        if ($this->collected_amount > $this->target_amount) {
+            return 'lebih';
+        }
+        if ($this->collected_amount == $this->target_amount) {
+            return 'lunas';
+        }
+
         return 'proses';
     }
 

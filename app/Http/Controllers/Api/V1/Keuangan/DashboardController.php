@@ -60,17 +60,17 @@ class DashboardController extends Controller
         $prevTargetDate = $targetDate->copy()->subMonth();
         $startOfPrevMonth = $prevTargetDate->copy()->startOfMonth()->toDateString();
         $endOfPrevMonth = $prevTargetDate->copy()->endOfMonth()->toDateString();
-        
+
         $pemasukanBulanLalu = Transaction::where('status', 'approved')
             ->where('tipe', 'pemasukan')
             ->whereBetween('tanggal', [$startOfPrevMonth, $endOfPrevMonth])
             ->sum('nominal');
-            
+
         $pengeluaranBulanLalu = Transaction::where('status', 'approved')
             ->where('tipe', 'pengeluaran')
             ->whereBetween('tanggal', [$startOfPrevMonth, $endOfPrevMonth])
             ->sum('nominal');
-            
+
         $persentasePemasukan = $pemasukanBulanLalu > 0 ? (($pemasukanBulanIni - $pemasukanBulanLalu) / $pemasukanBulanLalu) * 100 : ($pemasukanBulanIni > 0 ? 100 : 0);
         $persentasePengeluaran = $pengeluaranBulanLalu > 0 ? (($pengeluaranBulanIni - $pengeluaranBulanLalu) / $pengeluaranBulanLalu) * 100 : ($pengeluaranBulanIni > 0 ? 100 : 0);
 
@@ -82,7 +82,7 @@ class DashboardController extends Controller
             'selisih_bulan_ini' => (float) ($pemasukanBulanIni - $pengeluaranBulanIni),
             'persentase_perubahan' => [
                 'pemasukan' => round($persentasePemasukan, 1),
-                'pengeluaran' => round($persentasePengeluaran, 1)
+                'pengeluaran' => round($persentasePengeluaran, 1),
             ],
             'transaksi_terbaru' => $latestTransactions,
             'periode' => [
