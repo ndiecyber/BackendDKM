@@ -1,44 +1,136 @@
-name: Deploy to VPS
+name: Build & Deploy to VPS
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
+
+env:
+  PHP_VERSION: "8.2"
+  STAGING_DIR: /opt/lexa/backenddkm-staging
+  RELEASES_DIR: /opt/lexa/backenddkm-releases
+  APP_LINK: /opt/lexa/apps/backenddkm
+  KEEP_RELEASES: 2
 
 jobs:
-  deploy:
-    name: Deploy Application
+  build-and-deploy:
     runs-on: ubuntu-latest
-    
+    environment:
+      name: production
+      url: https://api.masjidkassiti.id
+
     steps:
-      - name: Deploy via SSH
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USERNAME }}
-          key: ${{ secrets.VPS_SSH_KEY }}
-          port: ${{ secrets.VPS_PORT }}
-          script: |
-            sudo chown -R $USER:$USER /var/www/backend-dkm
-            cd /var/www/backend-dkm 
-            
-            git config --global --add safe.directory /var/www/backend-dkm
-            
-            git fetch origin
-            git reset --hard origin/main
-            
-            # Install PHP dependencies
-            composer install --no-interaction --prefer-dist --optimize-autoloader
-            
-            # Run migrations
-            php artisan migrate --force
-            
-            # Optimize Laravel
-            php artisan optimize:clear
-            php artisan optimize
-            
-            # Reload PM2 Process (Octane via FrankenPHP)
-            # If the process doesn't exist yet, it will be started using the ecosystem.config.cjs file
-            pm2 startOrReload ecosystem.config.cjs
-            
-            echo "Deployment Completed Successfully!"
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: ${{ env.PHP_VERSION }}
+        extensions: pdo_mysql, pdo_pgsql, pgsql, mbstring, exif, pcntl, bcmath, gd, intl
+
+    - name: Install Composer dependencies
+      run: composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev
+
+    - name: Assemble deployment package
+      run: |
+        mkdir -p deploy-pkg
+        
+        # Copy everything except unneeded files/folders
+        rsync -a --exclude='.git' \
+                 --exclude='.github' \
+                 --exclude='tests' \
+                 --exclude='deploy-pkg' \
+                 ./ deploy-pkg/
+
+        echo "📦 Package size: $(du -sh deploy-pkg | cut -f1)"
+        echo "📊 Breakdown:"
+        du -sh deploy-pkg/vendor 2>/dev/null || true
+        du -sh deploy-pkg/app 2>/dev/null || true
+        du -sh deploy-pkg/public 2>/dev/null || true
+
+    - name: Setup SSH
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.VPS_SSH_KEY }}" > ~/.ssh/deploy_key
+        chmod 600 ~/.ssh/deploy_key
+        ssh-keyscan -H ${{ secrets.VPS_IP }} >> ~/.ssh/known_hosts 2>/dev/null
+
+    - name: Rsync to staging
+      run: |
+        rsync -az --no-o --no-g --delete \
+          -e "ssh -i ~/.ssh/deploy_key" \
+          deploy-pkg/ \
+          ${{ secrets.VPS_USERNAME }}@${{ secrets.VPS_IP }}:${{ env.STAGING_DIR }}/
+
+    - name: Deploy with atomic swap
+      uses: appleboy/ssh-action@v1.2.0
+      env:
+        STAGING_DIR: ${{ env.STAGING_DIR }}
+        RELEASES_DIR: ${{ env.RELEASES_DIR }}
+        APP_LINK: ${{ env.APP_LINK }}
+        KEEP_RELEASES: ${{ env.KEEP_RELEASES }}
+      with:
+        host: ${{ secrets.VPS_IP }}
+        username: ${{ secrets.VPS_USERNAME }}
+        key: ${{ secrets.VPS_SSH_KEY }}
+        envs: STAGING_DIR,RELEASES_DIR,APP_LINK,KEEP_RELEASES
+        script: |
+          set -euo pipefail
+
+          # 1. Release Swapping
+          RELEASE_ID=$(date +%Y%m%d_%H%M%S)
+          RELEASE_DIR="${RELEASES_DIR}/${RELEASE_ID}"
+
+          echo "==> Creating release ${RELEASE_ID} (hardlink copy)"
+          mkdir -p "${RELEASES_DIR}"
+          cp -al "${STAGING_DIR}" "${RELEASE_DIR}"
+
+          echo "==> Ensuring proper permissions for Laravel"
+          chmod -R a+rX "${RELEASE_DIR}"
+          # Pastikan folder storage dapat ditulis jika ada di dalam release (biasanya di-mount dari volume terpisah, tapi amannya kita beri akses)
+          chmod -R 775 "${RELEASE_DIR}/storage" "${RELEASE_DIR}/bootstrap/cache" || true
+
+          PREVIOUS_RELEASE=""
+          if [ -L "${APP_LINK}" ]; then
+            PREVIOUS_RELEASE=$(readlink -f "${APP_LINK}")
+            echo "    Previous: ${PREVIOUS_RELEASE}"
+          elif [ -d "${APP_LINK}" ]; then
+            echo "==> Removing existing directory ${APP_LINK} to make way for symlink"
+            rm -rf "${APP_LINK}"
+          fi
+
+          echo "==> Swapping symlink"
+          ln -sfn "${RELEASE_DIR}" "${APP_LINK}.tmp"
+          mv -Tf "${APP_LINK}.tmp" "${APP_LINK}"
+
+          # 2. Restart Container (dan build Dockerfile jika ada perubahan dependensi sistem)
+          echo "==> Recreating container"
+          cd /opt/lexa
+          docker compose up -d --build --force-recreate backenddkm
+          
+          # 3. Post-deploy Commands
+          echo "==> Ensuring Laravel storage directories exist"
+          docker compose exec -T backenddkm mkdir -p storage/framework/cache/data storage/framework/sessions storage/framework/testing storage/framework/views storage/app/public storage/logs
+          docker compose exec -T backenddkm chmod -R 777 storage bootstrap/cache
+
+          echo "==> Running Migrations & Optimization"
+          docker compose exec -T backenddkm php artisan migrate --force
+          docker compose exec -T backenddkm php artisan optimize
+
+          # 4. Cleanup Old Releases
+          echo "==> Cleanup (keep ${KEEP_RELEASES})"
+          CURRENT=$(readlink -f "${APP_LINK}")
+          cd "${RELEASES_DIR}"
+          for dir in $(ls -1dt */ 2>/dev/null | tail -n +$((KEEP_RELEASES + 1))); do
+            FULL="${RELEASES_DIR}/${dir%/}"
+            if [ "${FULL}" != "${CURRENT}" ]; then
+              echo "    🗑️ ${dir}"
+              rm -rf "${dir}"
+            fi
+          done
+
+          echo "==> ✅ Deploy done! Release: ${RELEASE_ID}"
+
+    - name: Cleanup SSH key
+      if: always()
+      run: rm -f ~/.ssh/deploy_key
