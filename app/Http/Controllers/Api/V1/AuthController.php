@@ -53,7 +53,7 @@ class AuthController extends Controller
      */
     public function login(LoginRequest $request): JsonResponse
     {
-        $throttleKey = 'login:'.$request->ip();
+        $throttleKey = 'login:' . $request->ip();
 
         if (RateLimiter::tooManyAttempts($throttleKey, 5)) {
             $seconds = RateLimiter::availableIn($throttleKey);
@@ -64,14 +64,14 @@ class AuthController extends Controller
             );
         }
 
-        $login = $request->input('login', $request->input('email', $request->input('username')));
+        $login = strtolower(trim($request->input('login', $request->input('email', $request->input('username')))));
 
         $user = User::query()
-            ->where('email', $login)
-            ->orWhere('username', $login)
+            ->whereRaw('LOWER(email) = ?', [$login])
+            ->orWhereRaw('LOWER(username) = ?', [$login])
             ->first();
 
-        if (! $user || ! Hash::check($request->password, $user->password)) {
+        if (!$user || !Hash::check($request->password, $user->password)) {
             RateLimiter::hit($throttleKey, 60);
 
             return $this->errorResponse('Invalid credentials', 401);
@@ -142,7 +142,7 @@ class AuthController extends Controller
     private function primaryRole(User $user): ?Role
     {
         /** @var Role|null $role */
-        $role = $user->roles->sortBy(fn (Role $role) => $role->effectiveHierarchy())->first();
+        $role = $user->roles->sortBy(fn(Role $role) => $role->effectiveHierarchy())->first();
 
         return $role;
     }
@@ -151,7 +151,7 @@ class AuthController extends Controller
     {
         $role = $this->primaryRole($user);
 
-        if (! $role) {
+        if (!$role) {
             return null;
         }
 
