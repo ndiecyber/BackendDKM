@@ -100,14 +100,16 @@ class Role extends SpatieRole
                     'keuangan.transaksi.delete', 'keuangan.transaksi.approve',
                     'keuangan.laporan.view', 'keuangan.laporan.export',
                     'keuangan.rekonsiliasi.create',
+                    'keuangan.program.view', 'keuangan.program.create', 'keuangan.program.update', 'keuangan.program.delete',
                 ],
                 'qurban' => [
                     'kurban.view', 'kurban.create', 'kurban.update', 'kurban.delete',
                     'qurban.periode.view', 'qurban.periode.create', 'qurban.periode.update',
                     'qurban.shohibul.view', 'qurban.shohibul.create', 'qurban.shohibul.update', 'qurban.shohibul.delete',
-                    'qurban.transaksi.view', 'qurban.transaksi.create', 'qurban.transaksi.cancel',
-                    'qurban.kelompok.view', 'qurban.kelompok.create', 'qurban.kelompok.update',
+                    'qurban.transaksi.view', 'qurban.transaksi.create', 'qurban.transaksi.cancel', 'qurban.transaksi.verify', 'qurban.transaksi.manage',
+                    'qurban.kelompok.view', 'qurban.kelompok.create', 'qurban.kelompok.update', 'qurban.kelompok.delete',
                     'qurban.rollover.execute',
+                    'qurban.settings.view', 'qurban.settings.update',
                 ],
                 'sistem' => [
                     'user.view', 'user.create', 'user.update', 'user.delete',
