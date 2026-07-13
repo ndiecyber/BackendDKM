@@ -109,6 +109,10 @@ jobs:
           docker compose up -d --build --force-recreate backenddkm
           
           # 3. Post-deploy Commands
+          echo "==> Ensuring Laravel storage directories exist"
+          docker compose exec -T backenddkm mkdir -p storage/framework/cache/data storage/framework/sessions storage/framework/testing storage/framework/views storage/app/public storage/logs
+          docker compose exec -T backenddkm chmod -R 777 storage bootstrap/cache
+
           echo "==> Running Migrations & Optimization"
           docker compose exec -T backenddkm php artisan migrate --force
           docker compose exec -T backenddkm php artisan optimize
