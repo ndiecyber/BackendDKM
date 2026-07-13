@@ -20,23 +20,37 @@ use Illuminate\Support\Facades\Route;
 */
 
 // Programs
+Route::get('programs/trashed', [ProgramController::class, 'trashed']);
 Route::apiResource('programs', ProgramController::class);
 Route::patch('programs/{id}/restore', [ProgramController::class, 'restore']);
+Route::get('programs/{id}/physical-balances', [ProgramController::class, 'physicalBalances']);
+Route::post('programs/{id}/rollover', [ProgramController::class, 'rollover']);
+Route::delete('programs/{id}/force', [ProgramController::class, 'forceDelete']);
 
 // Categories
+Route::post('categories/batch', [CategoryController::class, 'batchUpdate']);
+Route::get('categories/trashed', [CategoryController::class, 'trashed']);
 Route::apiResource('categories', CategoryController::class);
 Route::patch('categories/{id}/restore', [CategoryController::class, 'restore']);
+Route::delete('categories/{id}/force', [CategoryController::class, 'forceDelete']);
 
 // Bank/Kas
+Route::get('bank-kas/trashed', [BankKasController::class, 'trashed']);
 Route::apiResource('bank-kas', BankKasController::class);
 Route::patch('bank-kas/{id}/restore', [BankKasController::class, 'restore']);
 Route::get('bank-kas/{bank_kas}/adjustments', [BalanceAdjustmentController::class, 'index']);
 Route::post('bank-kas/{bank_kas}/adjustments', [BalanceAdjustmentController::class, 'store']);
+Route::get('bank-kas/{id}/activities', [BankKasController::class, 'activities']);
+Route::get('bank-kas/{id}/program-balances', [BankKasController::class, 'programBalances']);
+Route::post('bank-kas/{id}/transfer-all', [BankKasController::class, 'transferAll']);
+Route::delete('bank-kas/{id}/force', [BankKasController::class, 'forceDelete']);
 
 // Transactions
+Route::get('transactions/trashed', [TransactionController::class, 'trashed']);
 Route::apiResource('transactions', TransactionController::class);
 Route::patch('transactions/{id}/restore', [TransactionController::class, 'restore']);
 Route::patch('transactions/{id}/status', [TransactionController::class, 'updateStatus']);
+Route::delete('transactions/{id}/force', [TransactionController::class, 'forceDelete']);
 
 // Dashboard
 Route::prefix('dashboard')->group(function () {

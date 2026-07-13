@@ -29,6 +29,7 @@ class StoreTransactionRequest extends FormRequest
             'nominal' => ['required', 'numeric', 'min:1'],
             'tanggal' => ['nullable', 'date'],
             'category_id' => ['nullable', 'exists:categories,id'],
+            'program_id' => ['nullable', 'exists:programs,id'],
             'jamaah_id' => ['nullable', 'exists:jamaah,id'],
             'status' => ['sometimes', 'in:draft,pending,approved'],
             'attachments' => ['nullable', 'array', 'max:5'],

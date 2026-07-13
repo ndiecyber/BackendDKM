@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\V1\Qurban\AnimalGroupController;
 use App\Http\Controllers\Api\V1\Qurban\DashboardController;
 use App\Http\Controllers\Api\V1\Qurban\PeriodController;
+use App\Http\Controllers\Api\V1\Qurban\QurbanSettingController;
 use App\Http\Controllers\Api\V1\Qurban\QurbanTransactionController;
 use App\Http\Controllers\Api\V1\Qurban\ShohibulController;
 use App\Http\Controllers\Api\V1\Qurban\WebhookController;
@@ -54,13 +55,20 @@ Route::middleware('auth:sanctum')->group(function () {
     // Shohibuls
     Route::put('admin/shohibuls/{id}', [ShohibulController::class, 'update']);
     Route::delete('admin/shohibuls/{id}', [ShohibulController::class, 'destroy']);
+    Route::post('admin/shohibuls/{id}/refund', [QurbanTransactionController::class, 'refund']);
 
     // Groups
     Route::post('admin/groups', [AnimalGroupController::class, 'store']);
     Route::post('admin/groups/move-member', [AnimalGroupController::class, 'moveMember']);
+    Route::delete('admin/groups/{id}', [AnimalGroupController::class, 'destroy']);
+
+    // Settings
+    Route::get('admin/settings', [QurbanSettingController::class, 'index']);
+    Route::put('admin/settings', [QurbanSettingController::class, 'update']);
 
     // Transactions
     Route::post('admin/transactions/manual', [QurbanTransactionController::class, 'manualDeposit']);
+    Route::post('admin/transactions/{id}/verify', [QurbanTransactionController::class, 'verify']);
     Route::post('admin/transactions/{id}/cancel', [QurbanTransactionController::class, 'cancel']);
 
     // Rollover (Tutup Buku)

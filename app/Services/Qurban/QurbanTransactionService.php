@@ -34,15 +34,25 @@ class QurbanTransactionService
                 'payment_method' => $paymentMethod,
             ]);
 
-            // Request payment from PaKasir
-            $payment = $this->paKasir->createTransaction($paymentMethod, $orderId, $amount);
+            if (in_array($paymentMethod, ['tunai', 'transfer'])) {
+                // Skip PaKasir for manual methods, admin will verify later
+                $payment = [
+                    'payment_number' => strtoupper($paymentMethod),
+                    'total_payment' => $amount,
+                    'expired_at' => now()->addDays(7)->toDateTimeString(),
+                    'payment_method' => $paymentMethod,
+                ];
+            } else {
+                // Request payment from PaKasir
+                $payment = $this->paKasir->createTransaction($paymentMethod, $orderId, $amount);
 
-            // Update transaction with PaKasir response
-            $transaction->update([
-                'payment_number' => $payment['payment_number'],
-                'total_payment' => $payment['total_payment'],
-                'expired_at' => $payment['expired_at'],
-            ]);
+                // Update transaction with PaKasir response
+                $transaction->update([
+                    'payment_number' => $payment['payment_number'],
+                    'total_payment' => $payment['total_payment'],
+                    'expired_at' => $payment['expired_at'],
+                ]);
+            }
 
             return [
                 'transaction' => $transaction->fresh(),
@@ -159,18 +169,87 @@ class QurbanTransactionService
     }
 
     /**
-     * Admin: cancel a pending transaction.
+     * Admin: Refund/Tarik Kelebihan Dana.
+     */
+    public function refund(Shohibul $shohibul, int $amount): QurbanTransaction
+    {
+        $orderId = 'REFUND-'.now()->format('ymd').'-'.strtoupper(Str::random(6));
+
+        return DB::transaction(function () use ($shohibul, $amount, $orderId) {
+            // Kita simpan amount sebagai nilai negatif
+            $transaction = QurbanTransaction::create([
+                'shohibul_id' => $shohibul->id,
+                'order_id' => $orderId,
+                'amount' => -$amount,
+                'status' => 'success',
+                'payment_method' => 'refund',
+                'total_payment' => -$amount,
+                'completed_at' => now(),
+            ]);
+
+            // Decrement the collected amount
+            $shohibul->decrement('collected_amount', $amount);
+
+            Log::info('Qurban overpayment refunded', [
+                'order_id' => $orderId,
+                'shohibul_id' => $shohibul->id,
+                'refund_amount' => $amount,
+                'new_balance' => $shohibul->fresh()->collected_amount,
+            ]);
+
+            return $transaction;
+        });
+    }
+
+    /**
+     * Admin: cancel a transaction.
      */
     public function cancelTransaction(QurbanTransaction $transaction): QurbanTransaction
     {
-        if ($transaction->status !== 'pending') {
-            throw new \Exception('Hanya transaksi pending yang bisa dibatalkan.');
+        if ($transaction->status === 'cancelled') {
+            throw new \Exception('Transaksi ini sudah dibatalkan sebelumnya.');
         }
 
-        // Cancel at PaKasir too
-        $this->paKasir->cancelTransaction($transaction->order_id, (int) $transaction->amount);
+        return DB::transaction(function () use ($transaction) {
+            // Jika transaksi sukses, kurangi saldo shohibul
+            if ($transaction->status === 'success') {
+                $shohibul = $transaction->shohibul;
+                $shohibul->decrement('collected_amount', $transaction->amount);
 
-        $transaction->update(['status' => 'cancelled']);
+                // Tambahkan catatan log
+                Log::info('Qurban payment voided (cancelled after success)', [
+                    'order_id' => $transaction->order_id,
+                    'shohibul_id' => $shohibul->id,
+                    'amount' => $transaction->amount,
+                    'new_balance' => $shohibul->fresh()->collected_amount,
+                ]);
+            }
+
+            // Jika status pending dan bukan manual/tunai/transfer, batalkan di PaKasir
+            if ($transaction->status === 'pending' && ! in_array($transaction->payment_method, ['tunai', 'transfer'])) {
+                try {
+                    $this->paKasir->cancelTransaction($transaction->order_id, (int) $transaction->amount);
+                } catch (\Exception $e) {
+                    Log::warning('Gagal membatalkan transaksi di PaKasir: '.$e->getMessage());
+                }
+            }
+
+            $transaction->update(['status' => 'cancelled']);
+
+            return $transaction;
+        });
+    }
+
+    /**
+     * Admin: manually verify a pending transaction.
+     */
+    public function verifyTransaction(QurbanTransaction $transaction): QurbanTransaction
+    {
+        if ($transaction->status !== 'pending') {
+            throw new \Exception('Hanya transaksi pending yang bisa diverifikasi.');
+        }
+
+        $this->markSuccess($transaction, now());
 
         return $transaction;
     }

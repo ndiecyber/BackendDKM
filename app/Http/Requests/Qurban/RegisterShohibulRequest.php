@@ -19,7 +19,7 @@ class RegisterShohibulRequest extends FormRequest
             'address' => ['required', 'string', 'max:500'],
             'target_type' => ['required', 'in:sapi,kambing'],
             'initial_amount' => ['required', 'integer', 'min:50000', 'multiple_of:50000'],
-            'payment_method' => ['required', 'string', 'in:qris,bri_va,bni_va,cimb_niaga_va,permata_va,maybank_va,sampoerna_va,bnc_va,artha_graha_va,atm_bersama_va'],
+            'payment_method' => ['required', 'string', 'in:tunai,transfer,qris,bri_va,bni_va,cimb_niaga_va,permata_va,maybank_va,sampoerna_va,bnc_va,artha_graha_va,atm_bersama_va'],
         ];
     }
 

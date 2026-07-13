@@ -38,7 +38,19 @@ class Shohibul extends Model
     |----------------------------------------------------------------------
     */
 
-    protected $appends = ['is_lunas', 'remaining_amount'];
+    protected $appends = ['is_lunas', 'remaining_amount', 'payment_status'];
+
+    public function getPaymentStatusAttribute(): string
+    {
+        if ($this->collected_amount > $this->target_amount) {
+            return 'lebih';
+        }
+        if ($this->collected_amount == $this->target_amount) {
+            return 'lunas';
+        }
+
+        return 'proses';
+    }
 
     public function getIsLunasAttribute(): bool
     {

@@ -58,6 +58,11 @@ class RolePermissionSeeder extends Seeder
             'keuangan.laporan.view',
             'keuangan.laporan.export',
 
+            'keuangan.program.view',
+            'keuangan.program.create',
+            'keuangan.program.update',
+            'keuangan.program.delete',
+
             'keuangan.rekonsiliasi.create',
 
             // Kurban module (legacy — kept for backward compatibility)
@@ -79,12 +84,18 @@ class RolePermissionSeeder extends Seeder
             'qurban.transaksi.view',
             'qurban.transaksi.create',
             'qurban.transaksi.cancel',
+            'qurban.transaksi.verify',
+            'qurban.transaksi.manage',
 
             'qurban.kelompok.view',
             'qurban.kelompok.create',
             'qurban.kelompok.update',
+            'qurban.kelompok.delete',
 
             'qurban.rollover.execute',
+
+            'qurban.settings.view',
+            'qurban.settings.update',
 
             // Profile module
             'profile.view',
@@ -121,12 +132,14 @@ class RolePermissionSeeder extends Seeder
             'keuangan.transaksi.view', 'keuangan.transaksi.create', 'keuangan.transaksi.update', 'keuangan.transaksi.delete', 'keuangan.transaksi.approve',
             'keuangan.laporan.view', 'keuangan.laporan.export',
             'keuangan.rekonsiliasi.create',
+            'keuangan.program.view', 'keuangan.program.create', 'keuangan.program.update', 'keuangan.program.delete',
             'kurban.view', 'kurban.create', 'kurban.update', 'kurban.delete',
             'qurban.periode.view', 'qurban.periode.create', 'qurban.periode.update',
             'qurban.shohibul.view', 'qurban.shohibul.create', 'qurban.shohibul.update', 'qurban.shohibul.delete',
-            'qurban.transaksi.view', 'qurban.transaksi.create', 'qurban.transaksi.cancel',
-            'qurban.kelompok.view', 'qurban.kelompok.create', 'qurban.kelompok.update',
+            'qurban.transaksi.view', 'qurban.transaksi.create', 'qurban.transaksi.cancel', 'qurban.transaksi.verify', 'qurban.transaksi.manage',
+            'qurban.kelompok.view', 'qurban.kelompok.create', 'qurban.kelompok.update', 'qurban.kelompok.delete',
             'qurban.rollover.execute',
+            'qurban.settings.view', 'qurban.settings.update',
             'profile.view', 'profile.create', 'profile.update', 'profile.delete',
         ]);
 

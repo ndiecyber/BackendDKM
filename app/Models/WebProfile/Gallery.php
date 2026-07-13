@@ -2,6 +2,7 @@
 
 namespace App\Models\WebProfile;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -26,5 +27,12 @@ class Gallery extends Model
             'is_active' => 'boolean',
             'sort_order' => 'integer',
         ];
+    }
+
+    protected function imagePath(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => $value && str_starts_with($value, '/storage') ? asset(ltrim($value, '/')) : $value,
+        );
     }
 }

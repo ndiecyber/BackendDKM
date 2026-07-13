@@ -21,6 +21,8 @@ class BankKas extends Model
         'saldo_awal',
         'saldo_terkini',
         'status',
+        'color',
+        'is_pinned',
         'visibilitas_publik',
     ];
 
@@ -29,6 +31,7 @@ class BankKas extends Model
         return [
             'saldo_awal' => 'decimal:2',
             'saldo_terkini' => 'decimal:2',
+            'is_pinned' => 'boolean',
             'visibilitas_publik' => 'boolean',
         ];
     }

@@ -19,6 +19,7 @@ class StorePeriodRequest extends FormRequest
             'kambing_price' => ['required', 'numeric', 'min:0'],
             'deadline_date' => ['required', 'date', 'after:today'],
             'is_active' => ['sometimes', 'boolean'],
+            'is_registration_open' => ['sometimes', 'boolean'],
         ];
     }
 

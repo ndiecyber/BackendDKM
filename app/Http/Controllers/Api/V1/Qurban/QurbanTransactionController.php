@@ -29,10 +29,17 @@ class QurbanTransactionController extends Controller
     public function index(Request $request): JsonResponse
     {
         $transactions = QurbanTransaction::query()
+            ->when($request->period_id, function ($q, $periodId) {
+                $q->whereHas('shohibul', fn ($sq) => $sq->where('period_id', $periodId));
+            })
+            ->when($request->search, function ($q, $search) {
+                $q->where('id', 'like', "%{$search}%")
+                    ->orWhereHas('shohibul', fn ($sq) => $sq->where('name', 'ilike', "%{$search}%"));
+            })
             ->byStatus($request->status)
             ->byMethod($request->payment_method)
             ->byDateRange($request->date_from, $request->date_to)
-            ->with('shohibul:id,name,phone,target_type')
+            ->with('shohibul:id,name,phone,address,target_type')
             ->orderByDesc('created_at')
             ->paginate($request->per_page ?? 20);
 
@@ -118,9 +125,6 @@ class QurbanTransactionController extends Controller
         return $this->createdResponse($transaction, 'Setoran tunai berhasil dicatat.');
     }
 
-    /**
-     * Admin: cancel a pending transaction.
-     */
     public function cancel(string $id): JsonResponse
     {
         Gate::authorize('qurban.transaksi.cancel');
@@ -133,6 +137,57 @@ class QurbanTransactionController extends Controller
             return $this->errorResponse($e->getMessage(), 422);
         }
 
-        return $this->successResponse($transaction, 'Transaksi berhasil dibatalkan.');
+        return $this->successResponse(null, 'Transaksi berhasil dibatalkan.');
+    }
+
+    /**
+     * Admin: manually verify a pending transaction.
+     */
+    public function verify(string $id): JsonResponse
+    {
+        // Using same authorize gate prefix
+        Gate::authorize('qurban.transaksi.verify');
+
+        $transaction = QurbanTransaction::findOrFail($id);
+
+        try {
+            $transaction = $this->transactionService->verifyTransaction($transaction);
+        } catch (\Exception $e) {
+            return $this->errorResponse($e->getMessage(), 422);
+        }
+
+        return $this->successResponse($transaction, 'Transaksi berhasil diverifikasi.');
+    }
+
+    /**
+     * Admin: Refund kelebihan bayar shohibul
+     */
+    public function refund(Request $request, int $id): JsonResponse
+    {
+        Gate::authorize('qurban.transaksi.manage');
+
+        $shohibul = Shohibul::findOrFail($id);
+
+        $request->validate([
+            'amount' => 'required|numeric|min:1',
+        ]);
+
+        $excess = $shohibul->collected_amount - $shohibul->target_amount;
+
+        if ($excess <= 0) {
+            return $this->errorResponse('Shohibul tidak memiliki kelebihan bayar.', 422);
+        }
+
+        if ($request->amount > $excess) {
+            return $this->errorResponse('Nominal penarikan melebihi jumlah kelebihan bayar (Rp '.number_format($excess, 0, ',', '.').').', 422);
+        }
+
+        try {
+            $transaction = $this->transactionService->refund($shohibul, $request->amount);
+
+            return $this->successResponse($transaction, 'Kelebihan dana berhasil ditarik/direfund.');
+        } catch (\Exception $e) {
+            return $this->errorResponse($e->getMessage(), 500);
+        }
     }
 }

@@ -23,9 +23,54 @@ class UserSeeder extends Seeder
         );
 
         $superAdmin->forceFill([
-            'username' => $superAdmin->username ?? 'admin',
+            'username' => 'superadmin',
         ])->save();
 
         $superAdmin->assignRole('super-admin');
+
+        // Create Admin user
+        $admin = User::firstOrCreate(
+            ['email' => 'admin_biasa@dkm.local'],
+            [
+                'name' => 'Admin',
+                'password' => Hash::make('password'),
+            ]
+        );
+
+        $admin->forceFill([
+            'username' => 'admin',
+        ])->save();
+
+        $admin->assignRole('admin');
+
+        // Create Bendahara user
+        $bendahara = User::firstOrCreate(
+            ['email' => 'bendahara@dkm.local'],
+            [
+                'name' => 'Bendahara',
+                'password' => Hash::make('password'),
+            ]
+        );
+
+        $bendahara->forceFill([
+            'username' => 'bendahara',
+        ])->save();
+
+        $bendahara->assignRole('bendahara');
+
+        // Create Sekretaris user
+        $sekretaris = User::firstOrCreate(
+            ['email' => 'sekretaris@dkm.local'],
+            [
+                'name' => 'Sekretaris',
+                'password' => Hash::make('password'),
+            ]
+        );
+
+        $sekretaris->forceFill([
+            'username' => 'sekretaris',
+        ])->save();
+
+        $sekretaris->assignRole('sekretaris');
     }
 }

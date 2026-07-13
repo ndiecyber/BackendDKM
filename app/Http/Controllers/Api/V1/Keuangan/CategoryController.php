@@ -96,4 +96,65 @@ class CategoryController extends Controller
 
         return $this->successResponse(null, 'Kategori berhasil dipulihkan.');
     }
+
+    /**
+     * Batch update or create categories.
+     */
+    public function batchUpdate(Request $request): JsonResponse
+    {
+        Gate::authorize('keuangan.category.update');
+
+        $request->validate([
+            'categories' => 'required|array',
+            'categories.*.id' => 'nullable|exists:categories,id',
+            'categories.*.nama' => 'required|string|max:100',
+            'categories.*.tipe' => 'required|in:pemasukan,pengeluaran',
+            'categories.*.status' => 'required|in:aktif,non_aktif',
+        ]);
+
+        foreach ($request->categories as $cat) {
+            if (isset($cat['id'])) {
+                Category::where('id', $cat['id'])->update([
+                    'nama' => $cat['nama'],
+                    'tipe' => $cat['tipe'],
+                    'status' => $cat['status'],
+                ]);
+            } else {
+                Category::create([
+                    'nama' => $cat['nama'],
+                    'tipe' => $cat['tipe'],
+                    'status' => $cat['status'],
+                ]);
+            }
+        }
+
+        return $this->successResponse(null, 'Kategori berhasil diperbarui secara massal.');
+    }
+
+    /**
+     * Display a listing of soft-deleted categories.
+     */
+    public function trashed(Request $request): JsonResponse
+    {
+        Gate::authorize('keuangan.category.view');
+
+        $categories = Category::onlyTrashed()
+            ->search($request->search)
+            ->paginate($request->per_page ?? 15);
+
+        return $this->successResponse($categories);
+    }
+
+    /**
+     * Force delete a soft-deleted category permanently.
+     */
+    public function forceDelete(string $id): JsonResponse
+    {
+        Gate::authorize('keuangan.category.delete');
+
+        $category = Category::onlyTrashed()->findOrFail($id);
+        $category->forceDelete();
+
+        return $this->successResponse(null, 'Kategori berhasil dihapus permanen.');
+    }
 }

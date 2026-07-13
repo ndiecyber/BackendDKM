@@ -46,6 +46,7 @@ class BalanceAdjustmentController extends Controller
             'tanggal' => 'required|date',
             'target_saldo' => 'required|numeric|min:0',
             'deskripsi' => 'nullable|string|max:1000',
+            'program_id' => 'nullable|exists:programs,id',
         ]);
 
         try {

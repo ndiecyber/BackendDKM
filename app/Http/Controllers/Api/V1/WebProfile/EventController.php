@@ -114,6 +114,16 @@ class EventController extends Controller
             $validated['image'] = Storage::url($path);
         }
 
+        // Handle RTE content images
+        $oldImages = $this->extractImagePaths($event->content);
+        $newImages = $this->extractImagePaths($validated['content'] ?? '');
+        $imagesToDelete = array_diff($oldImages, $newImages);
+        foreach ($imagesToDelete as $imagePath) {
+            if (Storage::disk('public')->exists($imagePath)) {
+                Storage::disk('public')->delete($imagePath);
+            }
+        }
+
         $event->update($validated);
 
         return $this->successResponse($event, 'Event updated successfully.');
@@ -133,6 +143,9 @@ class EventController extends Controller
                 Storage::disk('public')->delete($path);
             }
         }
+
+        // Delete all images in the content
+        $this->deleteContentImages($event->content);
 
         $event->delete();
 
@@ -155,5 +168,44 @@ class EventController extends Controller
         $fullUrl = url($url);
 
         return $this->successResponse(['url' => $fullUrl], 'Image uploaded successfully.');
+    }
+
+    /**
+     * Extract relative image paths from HTML content.
+     */
+    private function extractImagePaths(?string $content): array
+    {
+        if (! $content) {
+            return [];
+        }
+
+        $paths = [];
+        preg_match_all('/<img[^>]+src="([^">]+)"/i', $content, $matches);
+
+        if (! empty($matches[1])) {
+            foreach ($matches[1] as $url) {
+                // Example URL: http://localhost:8000/storage/events/content/file.jpg
+                $path = parse_url($url, PHP_URL_PATH);
+                // After parse_url: /storage/events/content/file.jpg
+                if (str_starts_with($path, '/storage/')) {
+                    $paths[] = substr($path, 9); // Remove '/storage/' to get relative path
+                }
+            }
+        }
+
+        return $paths;
+    }
+
+    /**
+     * Delete all images found in the HTML content.
+     */
+    private function deleteContentImages(?string $content): void
+    {
+        $paths = $this->extractImagePaths($content);
+        foreach ($paths as $path) {
+            if (Storage::disk('public')->exists($path)) {
+                Storage::disk('public')->delete($path);
+            }
+        }
     }
 }

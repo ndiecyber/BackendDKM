@@ -24,13 +24,15 @@ class StoreBankKasRequest extends FormRequest
     {
         return [
             'nama' => ['required', 'string', 'max:255'],
-            'tipe' => ['required', 'in:tunai,rekening'],
+            'tipe' => ['required', 'in:tunai,rekening,dompet_digital'],
             'nomor_rekening' => ['nullable', 'string', 'max:50'],
             'atas_nama' => ['nullable', 'string', 'max:255'],
             'deskripsi' => ['nullable', 'string', 'max:1000'],
             'qr_image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
             'saldo_awal' => ['required', 'numeric', 'min:0'],
             'status' => ['sometimes', 'in:aktif,non_aktif'],
+            'color' => ['nullable', 'string', 'max:20'],
+            'is_pinned' => ['sometimes', 'boolean'],
             'visibilitas_publik' => ['sometimes', 'boolean'],
         ];
     }

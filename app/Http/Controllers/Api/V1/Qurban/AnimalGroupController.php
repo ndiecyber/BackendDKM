@@ -33,7 +33,7 @@ class AnimalGroupController extends Controller
         }
 
         $groups = AnimalGroup::where('period_id', $period->id)
-            ->with(['shohibuls:id,animal_group_id,name,phone,collected_amount,target_amount'])
+            ->with(['shohibuls:id,animal_group_id,name,phone,address,collected_amount,target_amount'])
             ->withCount('shohibuls')
             ->orderBy('target_type')
             ->orderBy('name')
@@ -96,5 +96,23 @@ class AnimalGroupController extends Controller
             $shohibul->load('animalGroup:id,name,target_type'),
             'Shohibul berhasil dipindahkan ke kelompok '.$newGroup->name.'.'
         );
+    }
+
+    /**
+     * Delete an empty group (admin).
+     */
+    public function destroy(string $id): JsonResponse
+    {
+        Gate::authorize('qurban.kelompok.delete');
+
+        $group = AnimalGroup::withCount('shohibuls')->findOrFail($id);
+
+        if ($group->shohibuls_count > 0) {
+            return $this->errorResponse('Tidak dapat menghapus kelompok yang masih memiliki anggota.', 422);
+        }
+
+        $group->delete();
+
+        return $this->successResponse(null, 'Kelompok berhasil dihapus.');
     }
 }

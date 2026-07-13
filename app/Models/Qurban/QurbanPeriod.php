@@ -18,6 +18,7 @@ class QurbanPeriod extends Model
         'kambing_price',
         'deadline_date',
         'is_active',
+        'is_registration_open',
     ];
 
     protected function casts(): array
@@ -27,6 +28,7 @@ class QurbanPeriod extends Model
             'kambing_price' => 'decimal:2',
             'deadline_date' => 'date',
             'is_active' => 'boolean',
+            'is_registration_open' => 'boolean',
         ];
     }
 

@@ -38,9 +38,13 @@ class DashboardController extends Controller
             ->limit(10)
             ->get();
 
-        // Summary for current month
-        $startOfMonth = Carbon::now()->startOfMonth()->toDateString();
-        $endOfMonth = Carbon::now()->endOfMonth()->toDateString();
+        // Summary for requested month (default: current month)
+        $bulan = (int) ($request->bulan ?? Carbon::now()->month);
+        $tahun = (int) ($request->tahun ?? Carbon::now()->year);
+
+        $targetDate = Carbon::createFromDate($tahun, $bulan, 1);
+        $startOfMonth = $targetDate->copy()->startOfMonth()->toDateString();
+        $endOfMonth = $targetDate->copy()->endOfMonth()->toDateString();
 
         $pemasukanBulanIni = Transaction::where('status', 'approved')
             ->where('tipe', 'pemasukan')
@@ -52,13 +56,39 @@ class DashboardController extends Controller
             ->whereBetween('tanggal', [$startOfMonth, $endOfMonth])
             ->sum('nominal');
 
+        // Kalkulasi bulan lalu
+        $prevTargetDate = $targetDate->copy()->subMonth();
+        $startOfPrevMonth = $prevTargetDate->copy()->startOfMonth()->toDateString();
+        $endOfPrevMonth = $prevTargetDate->copy()->endOfMonth()->toDateString();
+
+        $pemasukanBulanLalu = Transaction::where('status', 'approved')
+            ->where('tipe', 'pemasukan')
+            ->whereBetween('tanggal', [$startOfPrevMonth, $endOfPrevMonth])
+            ->sum('nominal');
+
+        $pengeluaranBulanLalu = Transaction::where('status', 'approved')
+            ->where('tipe', 'pengeluaran')
+            ->whereBetween('tanggal', [$startOfPrevMonth, $endOfPrevMonth])
+            ->sum('nominal');
+
+        $persentasePemasukan = $pemasukanBulanLalu > 0 ? (($pemasukanBulanIni - $pemasukanBulanLalu) / $pemasukanBulanLalu) * 100 : ($pemasukanBulanIni > 0 ? 100 : 0);
+        $persentasePengeluaran = $pengeluaranBulanLalu > 0 ? (($pengeluaranBulanIni - $pengeluaranBulanLalu) / $pengeluaranBulanLalu) * 100 : ($pengeluaranBulanIni > 0 ? 100 : 0);
+
         return $this->successResponse([
             'total_saldo' => (float) $totalSaldo,
             'ringkasan_bank_kas' => $bankKasList,
             'pemasukan_bulan_ini' => (float) $pemasukanBulanIni,
             'pengeluaran_bulan_ini' => (float) $pengeluaranBulanIni,
             'selisih_bulan_ini' => (float) ($pemasukanBulanIni - $pengeluaranBulanIni),
+            'persentase_perubahan' => [
+                'pemasukan' => round($persentasePemasukan, 1),
+                'pengeluaran' => round($persentasePengeluaran, 1),
+            ],
             'transaksi_terbaru' => $latestTransactions,
+            'periode' => [
+                'bulan' => $bulan,
+                'tahun' => $tahun,
+            ],
         ]);
     }
 
