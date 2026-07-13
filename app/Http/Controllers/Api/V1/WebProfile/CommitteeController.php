@@ -11,6 +11,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use App\Services\ImageUploadService;
 use Illuminate\Support\Str;
 
 #[Group('Profil Web - Pengurus DKM')]
@@ -109,7 +110,7 @@ class CommitteeController extends Controller
             'image' => 'required|image|mimes:jpeg,png,jpg,webp|max:5120',
         ]);
 
-        $path = $request->file('image')->store('committee', 'public');
+        $path = ImageUploadService::storeAsWebp($request->file('image'), 'committee', 'public');
 
         return $this->successResponse([
             'image_path' => Storage::url($path),

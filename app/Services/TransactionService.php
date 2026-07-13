@@ -8,6 +8,7 @@ use App\Models\TransactionAttachment;
 use App\Services\Qurban\PaKasirService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use App\Services\ImageUploadService;
 
 class TransactionService
 {
@@ -176,7 +177,7 @@ class TransactionService
     private function storeAttachments(Transaction $transaction, array $files): void
     {
         foreach ($files as $file) {
-            $path = $file->store('transactions/attachments', 'public');
+            $path = ImageUploadService::storeAsWebp($file, 'transactions/attachments', 'public');
 
             TransactionAttachment::create([
                 'transaction_id' => $transaction->id,

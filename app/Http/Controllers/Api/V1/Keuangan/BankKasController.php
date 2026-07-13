@@ -19,6 +19,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
+use App\Services\ImageUploadService;
 
 #[Group('Keuangan - Bank & Kas')]
 class BankKasController extends Controller
@@ -49,7 +50,7 @@ class BankKasController extends Controller
         $data = $request->validated();
 
         if ($request->hasFile('qr_image')) {
-            $data['qr_image_path'] = $request->file('qr_image')->store('bank-kas/qr', 'public');
+            $data['qr_image_path'] = ImageUploadService::storeAsWebp($request->file('qr_image'), 'bank-kas/qr', 'public');
         }
 
         $data['saldo_terkini'] = $data['saldo_awal'] ?? 0;
@@ -84,7 +85,7 @@ class BankKasController extends Controller
             if ($bankKas->qr_image_path) {
                 Storage::disk('public')->delete($bankKas->qr_image_path);
             }
-            $data['qr_image_path'] = $request->file('qr_image')->store('bank-kas/qr', 'public');
+            $data['qr_image_path'] = ImageUploadService::storeAsWebp($request->file('qr_image'), 'bank-kas/qr', 'public');
         }
 
         $bankKas->update($data);

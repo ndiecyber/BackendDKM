@@ -9,6 +9,7 @@ use Dedoc\Scramble\Attributes\Group;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use App\Services\ImageUploadService;
 
 #[Group('Profil Web - Kegiatan')]
 class EventController extends Controller
@@ -55,7 +56,7 @@ class EventController extends Controller
 
         // Handle image upload
         if ($request->hasFile('image')) {
-            $path = $request->file('image')->store('events', 'public');
+            $path = ImageUploadService::storeAsWebp($request->file('image'), 'events', 'public');
             $validated['image'] = Storage::url($path);
         }
 
@@ -110,7 +111,7 @@ class EventController extends Controller
                     Storage::disk('public')->delete($oldPath);
                 }
             }
-            $path = $request->file('image')->store('events', 'public');
+            $path = ImageUploadService::storeAsWebp($request->file('image'), 'events', 'public');
             $validated['image'] = Storage::url($path);
         }
 
@@ -161,7 +162,7 @@ class EventController extends Controller
             'image' => 'required|image|mimes:jpeg,png,jpg,webp,gif',
         ]);
 
-        $path = $request->file('image')->store('events/content', 'public');
+        $path = ImageUploadService::storeAsWebp($request->file('image'), 'events/content', 'public');
         $url = Storage::url($path);
 
         // We return an absolute URL by combining app url and storage url

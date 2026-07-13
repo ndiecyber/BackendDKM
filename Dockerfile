@@ -6,6 +6,9 @@ RUN apk add --no-cache \
     supervisor \
     curl \
     libpng-dev \
+    libjpeg-turbo-dev \
+    libwebp-dev \
+    freetype-dev \
     libxml2-dev \
     zip \
     unzip \
@@ -15,7 +18,8 @@ RUN apk add --no-cache \
     postgresql-dev
 
 # Install PHP extensions
-RUN docker-php-ext-install pdo_mysql pdo_pgsql pgsql mbstring exif pcntl bcmath gd intl
+RUN docker-php-ext-configure gd --with-jpeg --with-webp --with-freetype \
+    && docker-php-ext-install pdo_mysql pdo_pgsql pgsql mbstring exif pcntl bcmath gd intl
 
 # Set working directory
 WORKDIR /var/www/html

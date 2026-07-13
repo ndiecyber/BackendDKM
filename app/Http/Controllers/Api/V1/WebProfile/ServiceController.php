@@ -9,6 +9,7 @@ use Dedoc\Scramble\Attributes\Group;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use App\Services\ImageUploadService;
 
 #[Group('Profil Web - Layanan')]
 class ServiceController extends Controller
@@ -62,7 +63,7 @@ class ServiceController extends Controller
 
         // Handle bg_image upload
         if ($request->hasFile('bg_image')) {
-            $path = $request->file('bg_image')->store('services', 'public');
+            $path = ImageUploadService::storeAsWebp($request->file('bg_image'), 'services', 'public');
             $validated['bg_image'] = Storage::url($path);
         }
 
@@ -123,7 +124,7 @@ class ServiceController extends Controller
                     Storage::disk('public')->delete($oldPath);
                 }
             }
-            $path = $request->file('bg_image')->store('services', 'public');
+            $path = ImageUploadService::storeAsWebp($request->file('bg_image'), 'services', 'public');
             $validated['bg_image'] = Storage::url($path);
         }
 

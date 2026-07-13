@@ -9,6 +9,7 @@ use Dedoc\Scramble\Attributes\Group;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use App\Services\ImageUploadService;
 
 #[Group('Profil Web - Galeri')]
 class GalleryController extends Controller
@@ -48,7 +49,7 @@ class GalleryController extends Controller
             'is_active' => 'boolean',
         ]);
 
-        $path = $request->file('image')->store('galleries', 'public');
+        $path = ImageUploadService::storeAsWebp($request->file('image'), 'galleries', 'public');
 
         $gallery = Gallery::create([
             'image_path' => Storage::url($path),
@@ -100,7 +101,7 @@ class GalleryController extends Controller
                 Storage::disk('public')->delete($oldPath);
             }
 
-            $path = $request->file('image')->store('galleries', 'public');
+            $path = ImageUploadService::storeAsWebp($request->file('image'), 'galleries', 'public');
             $validated['image_path'] = Storage::url($path);
         }
         unset($validated['image']);
