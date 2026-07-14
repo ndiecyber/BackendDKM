@@ -16,7 +16,7 @@ class ImageUploadService
     public static function storeAsWebp(UploadedFile $file, string $directory, string $disk = 'public'): string
     {
         // Jika ekstensi PHP GD tidak ada, langsung fallback ke upload normal agar tidak error (crash)
-        if (! extension_loaded('gd') || ! function_exists('imagecreatefromjpeg')) {
+        if (! extension_loaded('gd') || ! function_exists('imagecreatefromjpeg') || ! function_exists('imagecreatefrompng') || ! function_exists('imagewebp')) {
             return $file->store($directory, $disk);
         }
 
