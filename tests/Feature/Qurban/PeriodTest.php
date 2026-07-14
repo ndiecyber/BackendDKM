@@ -32,8 +32,8 @@ class PeriodTest extends TestCase
 
         $r = $this->getJson('/v1/qurban/config/active');
         $r->assertOk()
-            ->assertJsonPath('data.name', 'Qurban 1448 H')
-            ->assertJsonPath('data.sapi_price_per_slot', '4000000.00');
+            ->assertJsonPath('data.period.name', 'Qurban 1448 H')
+            ->assertJsonPath('data.period.sapi_price_per_slot', '4000000.00');
     }
 
     public function test_get_active_period_returns_404_when_none(): void
