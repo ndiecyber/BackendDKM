@@ -215,7 +215,7 @@ class ShohibulTest extends TestCase
         ]);
 
         $this->deleteJson("/v1/qurban/admin/shohibuls/{$shohibul->id}")->assertOk();
-        $this->assertSoftDeleted('shohibuls', ['id' => $shohibul->id]);
+        $this->assertDatabaseMissing('shohibuls', ['id' => $shohibul->id]);
     }
 
     public function test_delete_blocked_if_has_balance(): void

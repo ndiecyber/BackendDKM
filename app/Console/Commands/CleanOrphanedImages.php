@@ -2,16 +2,17 @@
 
 namespace App\Console\Commands;
 
+use App\Models\BankKas;
+use App\Models\TransactionAttachment;
+use App\Models\WebProfile\Article;
+use App\Models\WebProfile\CommitteeMember;
+use App\Models\WebProfile\CtaSetting;
+use App\Models\WebProfile\Event;
+use App\Models\WebProfile\Gallery;
+use App\Models\WebProfile\Service;
+use App\Models\WebProfile\Setting;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Storage;
-use App\Models\TransactionAttachment;
-use App\Models\BankKas;
-use App\Models\WebProfile\Setting;
-use App\Models\WebProfile\Service;
-use App\Models\WebProfile\Gallery;
-use App\Models\WebProfile\CtaSetting;
-use App\Models\WebProfile\CommitteeMember;
-use App\Models\WebProfile\Event;
 
 class CleanOrphanedImages extends Command
 {
@@ -35,9 +36,9 @@ class CleanOrphanedImages extends Command
     public function handle()
     {
         $this->info('Memulai pengecekan gambar orphaned (tidak terpakai)...');
-        
+
         $isDryRun = $this->option('dry-run');
-        
+
         if ($isDryRun) {
             $this->warn('DRY RUN MODE: Tidak ada file yang akan benar-benar dihapus, hanya menampilkan daftar.');
         }
@@ -47,22 +48,22 @@ class CleanOrphanedImages extends Command
 
         // Bank Kas (QR Code)
         $usedPaths = array_merge($usedPaths, BankKas::whereNotNull('qr_image_path')->pluck('qr_image_path')->toArray());
-        
+
         // Bukti Transfer (Transaction Attachments)
         $usedPaths = array_merge($usedPaths, TransactionAttachment::whereNotNull('file_path')->pluck('file_path')->toArray());
-        
+
         // WebProfile Gallery
         $usedPaths = array_merge($usedPaths, Gallery::whereNotNull('image_path')->pluck('image_path')->toArray());
-        
+
         // WebProfile Committee
         $usedPaths = array_merge($usedPaths, CommitteeMember::whereNotNull('image')->pluck('image')->toArray());
-        
+
         // WebProfile Event
         $usedPaths = array_merge($usedPaths, Event::whereNotNull('image')->pluck('image')->toArray());
-        
+
         // Jika ada model Article
         if (class_exists('App\Models\WebProfile\Article')) {
-            $usedPaths = array_merge($usedPaths, \App\Models\WebProfile\Article::whereNotNull('image')->pluck('image')->toArray());
+            $usedPaths = array_merge($usedPaths, Article::whereNotNull('image')->pluck('image')->toArray());
         }
 
         // Services (bg_image dan supervisorImage di JSON details)
@@ -105,54 +106,57 @@ class CleanOrphanedImages extends Command
         // Normalisasi path agar cocok dengan format dari Storage::disk('public')->allFiles()
         $normalizedUsedPaths = [];
         foreach ($usedPaths as $path) {
-            if (empty($path)) continue;
-            
+            if (empty($path)) {
+                continue;
+            }
+
             // Jika tersimpan sebagai URL lengkap, ambil path-nya saja
             if (str_starts_with($path, 'http')) {
                 $path = parse_url($path, PHP_URL_PATH);
             }
-            
+
             // Hapus awalan '/storage/' atau 'storage/' agar path-nya relatif terhadap disk 'public'
             $path = preg_replace('/^\/?storage\//', '', $path);
             $path = ltrim($path, '/');
-            
+
             $normalizedUsedPaths[] = $path;
         }
-        
+
         // Buat agar tidak ada duplikasi
         $normalizedUsedPaths = array_unique($normalizedUsedPaths);
 
         // 2. Ambil semua file yang ada di folder storage/app/public
         $allFiles = Storage::disk('public')->allFiles();
-        
+
         $orphanedFiles = [];
-        
+
         foreach ($allFiles as $file) {
             // Abaikan file sistem / tersembunyi
             if (str_starts_with(basename($file), '.')) {
                 continue;
             }
-            
+
             // Jika file di storage TIDAK ADA di daftar database, masukkan ke daftar orphaned
-            if (!in_array($file, $normalizedUsedPaths)) {
+            if (! in_array($file, $normalizedUsedPaths)) {
                 $orphanedFiles[] = $file;
             }
         }
 
         if (empty($orphanedFiles)) {
             $this->info('Selamat! Tidak ada file sampah (orphaned images). Storage Anda bersih.');
+
             return;
         }
 
-        $this->warn('Ditemukan ' . count($orphanedFiles) . ' file sampah (tidak terpakai di DB).');
-        
+        $this->warn('Ditemukan '.count($orphanedFiles).' file sampah (tidak terpakai di DB).');
+
         if ($this->confirm('Apakah Anda ingin melihat daftar file sampah tersebut?')) {
             foreach ($orphanedFiles as $file) {
                 $this->line($file);
             }
         }
 
-        if (!$isDryRun) {
+        if (! $isDryRun) {
             if ($this->confirm('Apakah Anda YAKIN ingin menghapus file-file ini secara PERMANEN?')) {
                 $deletedCount = 0;
                 foreach ($orphanedFiles as $file) {

@@ -5,13 +5,13 @@ namespace App\Http\Controllers\Api\V1\WebProfile;
 use App\Http\Controllers\Controller;
 use App\Models\WebProfile\CommitteeDivision;
 use App\Models\WebProfile\CommitteeMember;
+use App\Services\ImageUploadService;
 use App\Traits\ApiResponse;
 use Dedoc\Scramble\Attributes\Group;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
-use App\Services\ImageUploadService;
 use Illuminate\Support\Str;
 
 #[Group('Profil Web - Pengurus DKM')]

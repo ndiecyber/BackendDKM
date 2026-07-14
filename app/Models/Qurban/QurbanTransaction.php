@@ -18,6 +18,7 @@ class QurbanTransaction extends Model
         'payment_method',
         'payment_number',
         'total_payment',
+        'payment_proof_path',
         'expired_at',
         'completed_at',
     ];
