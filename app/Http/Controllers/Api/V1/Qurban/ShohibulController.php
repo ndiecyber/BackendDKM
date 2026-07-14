@@ -213,8 +213,14 @@ class ShohibulController extends Controller
             );
         }
 
-        $shohibul->delete();
+        // Hapus gambar bukti pembayaran dari storage sebelum hard delete
+        $proofs = $shohibul->transactions()->whereNotNull('payment_proof_path')->pluck('payment_proof_path');
+        if ($proofs->isNotEmpty()) {
+            \Illuminate\Support\Facades\Storage::disk('public')->delete($proofs->toArray());
+        }
 
-        return $this->successResponse(null, 'Shohibul berhasil dihapus.');
+        $shohibul->forceDelete();
+
+        return $this->successResponse(null, 'Shohibul berhasil dihapus permanen beserta data transaksinya.');
     }
 }
