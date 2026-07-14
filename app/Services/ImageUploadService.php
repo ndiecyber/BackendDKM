@@ -16,48 +16,55 @@ class ImageUploadService
     public static function storeAsWebp(UploadedFile $file, string $directory, string $disk = 'public'): string
     {
         // Jika ekstensi PHP GD tidak ada, langsung fallback ke upload normal agar tidak error (crash)
-        if (! extension_loaded('gd') || ! function_exists('imagecreatefromjpeg') || ! function_exists('imagecreatefrompng') || ! function_exists('imagewebp')) {
+        if (!extension_loaded('gd') || !function_exists('imagecreatefromjpeg') || !function_exists('imagecreatefrompng') || !function_exists('imagewebp')) {
             return $file->store($directory, $disk);
         }
 
         $extension = strtolower($file->getClientOriginalExtension());
         $isImage = in_array($extension, ['jpg', 'jpeg', 'png']);
 
-        if (! $isImage) {
+        if (!$isImage) {
             // Biarkan file non-gambar diupload secara normal
             return $file->store($directory, $disk);
         }
 
         // Buat nama file unik
-        $filename = Str::random(40).'.webp';
-        $fullPath = rtrim($directory, '/').'/'.$filename;
+        $filename = Str::random(40) . '.webp';
+        $fullPath = rtrim($directory, '/') . '/' . $filename;
 
         $img = null;
-        if (in_array($extension, ['jpg', 'jpeg'])) {
-            $img = @imagecreatefromjpeg($file->getRealPath());
-        } elseif ($extension === 'png') {
-            $img = @imagecreatefrompng($file->getRealPath());
+        try {
+            if (in_array($extension, ['jpg', 'jpeg'])) {
+                $img = @imagecreatefromjpeg($file->getRealPath());
+            } elseif ($extension === 'png') {
+                $img = @imagecreatefrompng($file->getRealPath());
+                if ($img) {
+                    imagepalettetotruecolor($img);
+                    imagealphablending($img, true);
+                    imagesavealpha($img, true);
+                }
+            }
+
             if ($img) {
-                imagepalettetotruecolor($img);
-                imagealphablending($img, true);
-                imagesavealpha($img, true);
+                ob_start();
+                imagewebp($img, null, 85);
+                $imageContent = ob_get_clean();
+                imagedestroy($img);
+
+                if (!empty($imageContent)) {
+                    Storage::disk($disk)->put($fullPath, $imageContent);
+                    return $fullPath;
+                }
+            }
+        } catch (\Throwable $e) {
+            if (isset($img) && (is_resource($img) || $img instanceof \GdImage)) {
+                @imagedestroy($img);
+            }
+            if (ob_get_level() > 0) {
+                ob_end_clean();
             }
         }
 
-        if ($img) {
-            // Simpan gambar ke temporary path terlebih dahulu karena imagewebp() butuh path file lokal
-            $tempPath = tempnam(sys_get_temp_dir(), 'webp_');
-            imagewebp($img, $tempPath, 85);
-            imagedestroy($img);
-
-            // Pindahkan dari temporary ke storage Laravel
-            Storage::disk($disk)->put($fullPath, file_get_contents($tempPath));
-            unlink($tempPath);
-
-            return $fullPath;
-        }
-
-        // Jika karena suatu hal fungsi PHP GD gagal, fallback ke upload standar Laravel
         return $file->store($directory, $disk);
     }
 }
