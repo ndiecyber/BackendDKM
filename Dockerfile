@@ -11,6 +11,11 @@ RUN apk add --no-cache \
 
 RUN install-php-extensions pdo_mysql pdo_pgsql pgsql mbstring exif pcntl bcmath gd intl
 
+# Berikan hak akses kepada www-data untuk folder temporary Nginx
+RUN mkdir -p /var/lib/nginx/tmp/client_body && \
+    chown -R www-data:www-data /var/lib/nginx && \
+    chmod -R 777 /var/lib/nginx/tmp
+
 WORKDIR /var/www/html
 
 EXPOSE 80

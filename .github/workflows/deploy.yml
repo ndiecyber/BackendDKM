@@ -117,6 +117,9 @@ jobs:
           docker compose exec -T backenddkm php artisan migrate --force
           docker compose exec -T backenddkm php artisan optimize
 
+          echo "==> Linking Storage"
+          docker compose exec -T backenddkm php artisan storage:link
+
           # 4. Cleanup Old Releases
           echo "==> Cleanup (keep ${KEEP_RELEASES})"
           CURRENT=$(readlink -f "${APP_LINK}")
