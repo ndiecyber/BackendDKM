@@ -47,7 +47,7 @@ class KeuanganSettingController extends Controller
         if ($request->hasFile('qris_image')) {
             // Retrieve old image path
             $oldImageSetting = KeuanganSetting::where('key', 'donation_qris_image_path')->first();
-            
+
             if ($oldImageSetting && $oldImageSetting->value) {
                 Storage::disk('public')->delete($oldImageSetting->value);
             }

@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\V1\Keuangan\BalanceAdjustmentController;
 use App\Http\Controllers\Api\V1\Keuangan\BankKasController;
 use App\Http\Controllers\Api\V1\Keuangan\CategoryController;
 use App\Http\Controllers\Api\V1\Keuangan\DashboardController;
+use App\Http\Controllers\Api\V1\Keuangan\KeuanganSettingController;
 use App\Http\Controllers\Api\V1\Keuangan\ProgramController;
 use App\Http\Controllers\Api\V1\Keuangan\ReportController;
 use App\Http\Controllers\Api\V1\Keuangan\TransactionController;
@@ -69,5 +70,5 @@ Route::prefix('reports')->group(function () {
 });
 
 // Settings
-Route::get('settings', [\App\Http\Controllers\Api\V1\Keuangan\KeuanganSettingController::class, 'index']);
-Route::post('settings', [\App\Http\Controllers\Api\V1\Keuangan\KeuanganSettingController::class, 'update']);
+Route::get('settings', [KeuanganSettingController::class, 'index']);
+Route::post('settings', [KeuanganSettingController::class, 'update']);

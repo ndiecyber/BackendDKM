@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\JamaahController;
+use App\Http\Controllers\Api\V1\Keuangan\KeuanganSettingController;
 use App\Http\Controllers\Api\V1\ProfileController;
 use App\Http\Controllers\Api\V1\RoleController;
 use App\Http\Controllers\Api\V1\UserController;
@@ -33,7 +34,7 @@ Route::prefix('v1')->group(function () {
         Route::post('/login', [AuthController::class, 'login']);
     });
 
-    Route::get('/keuangan/public/settings', [\App\Http\Controllers\Api\V1\Keuangan\KeuanganSettingController::class, 'publicSettings']);
+    Route::get('/keuangan/public/settings', [KeuanganSettingController::class, 'publicSettings']);
 
     // Qurban Module (contains both public and admin routes inside)
     Route::prefix('qurban')->group(base_path('routes/modules/kurban.php'));
