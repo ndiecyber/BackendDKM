@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\V1\Keuangan\BalanceAdjustmentController;
 use App\Http\Controllers\Api\V1\Keuangan\BankKasController;
 use App\Http\Controllers\Api\V1\Keuangan\CategoryController;
 use App\Http\Controllers\Api\V1\Keuangan\DashboardController;
+use App\Http\Controllers\Api\V1\Keuangan\KeuanganSettingController;
 use App\Http\Controllers\Api\V1\Keuangan\ProgramController;
 use App\Http\Controllers\Api\V1\Keuangan\ReportController;
 use App\Http\Controllers\Api\V1\Keuangan\TransactionController;
@@ -67,3 +68,7 @@ Route::prefix('reports')->group(function () {
     Route::get('/export/csv', [ReportController::class, 'exportCsv']);
     Route::get('/export/pdf', [ReportController::class, 'exportPdf']);
 });
+
+// Settings
+Route::get('settings', [KeuanganSettingController::class, 'index']);
+Route::post('settings', [KeuanganSettingController::class, 'update']);
