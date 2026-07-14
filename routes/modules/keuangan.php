@@ -67,3 +67,7 @@ Route::prefix('reports')->group(function () {
     Route::get('/export/csv', [ReportController::class, 'exportCsv']);
     Route::get('/export/pdf', [ReportController::class, 'exportPdf']);
 });
+
+// Settings
+Route::get('settings', [\App\Http\Controllers\Api\V1\Keuangan\KeuanganSettingController::class, 'index']);
+Route::post('settings', [\App\Http\Controllers\Api\V1\Keuangan\KeuanganSettingController::class, 'update']);
