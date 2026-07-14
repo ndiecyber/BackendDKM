@@ -4,12 +4,12 @@ namespace App\Http\Controllers\Api\V1\WebProfile;
 
 use App\Http\Controllers\Controller;
 use App\Models\WebProfile\Event;
+use App\Services\ImageUploadService;
 use App\Traits\ApiResponse;
 use Dedoc\Scramble\Attributes\Group;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use App\Services\ImageUploadService;
 
 #[Group('Profil Web - Kegiatan')]
 class EventController extends Controller

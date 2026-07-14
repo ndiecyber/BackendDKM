@@ -2,16 +2,17 @@
 
 namespace App\Console\Commands;
 
+use App\Models\BankKas;
+use App\Models\TransactionAttachment;
+use App\Models\WebProfile\Article;
+use App\Models\WebProfile\CommitteeMember;
+use App\Models\WebProfile\CtaSetting;
+use App\Models\WebProfile\Event;
+use App\Models\WebProfile\Gallery;
+use App\Models\WebProfile\Service;
+use App\Models\WebProfile\Setting;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Storage;
-use App\Models\TransactionAttachment;
-use App\Models\BankKas;
-use App\Models\WebProfile\Setting;
-use App\Models\WebProfile\Service;
-use App\Models\WebProfile\Gallery;
-use App\Models\WebProfile\CtaSetting;
-use App\Models\WebProfile\CommitteeMember;
-use App\Models\WebProfile\Event;
 
 class ConvertImagesToWebp extends Command
 {
@@ -34,12 +35,14 @@ class ConvertImagesToWebp extends Command
      */
     public function handle()
     {
-        if (!extension_loaded('gd')) {
+        if (! extension_loaded('gd')) {
             $this->error('Ekstensi PHP GD tidak aktif. Dibutuhkan untuk konversi WebP.');
+
             return;
         }
-        if (!function_exists('imagewebp')) {
+        if (! function_exists('imagewebp')) {
             $this->error('Fungsi imagewebp() tidak tersedia di server ini.');
+
             return;
         }
 
@@ -118,7 +121,7 @@ class ConvertImagesToWebp extends Command
 
         // 6. WebProfile Article (jika ada)
         if (class_exists('App\Models\WebProfile\Article')) {
-            foreach (\App\Models\WebProfile\Article::whereNotNull('image')->get() as $item) {
+            foreach (Article::whereNotNull('image')->get() as $item) {
                 $path = $this->extractRelativePath($item->getRawOriginal('image'));
                 $newPath = $this->processImage($path, $deleteOriginal);
                 if ($newPath && $newPath !== $path) {
@@ -133,7 +136,7 @@ class ConvertImagesToWebp extends Command
         // 7. Services (JSON)
         foreach (Service::all() as $item) {
             $updated = false;
-            
+
             // bg_image
             if ($item->getRawOriginal('bg_image')) {
                 $path = $this->extractRelativePath($item->getRawOriginal('bg_image'));
@@ -236,11 +239,14 @@ class ConvertImagesToWebp extends Command
      */
     private function extractRelativePath($path)
     {
-        if (empty($path)) return null;
+        if (empty($path)) {
+            return null;
+        }
         if (str_starts_with($path, 'http')) {
             $path = parse_url($path, PHP_URL_PATH);
         }
         $path = preg_replace('/^\/?storage\//', '', $path);
+
         return ltrim($path, '/');
     }
 
@@ -249,14 +255,16 @@ class ConvertImagesToWebp extends Command
      */
     private function processImage($path, $deleteOriginal)
     {
-        if (!$path) return null;
+        if (! $path) {
+            return null;
+        }
 
         // Jika bukan jpg/jpeg/png, abaikan
-        if (!preg_match('/\.(jpe?g|png)$/i', $path)) {
+        if (! preg_match('/\.(jpe?g|png)$/i', $path)) {
             return $path;
         }
 
-        if (!Storage::disk('public')->exists($path)) {
+        if (! Storage::disk('public')->exists($path)) {
             return $path; // File fisik tidak ditemukan
         }
 
@@ -275,7 +283,7 @@ class ConvertImagesToWebp extends Command
             }
         }
 
-        if (!$img) {
+        if (! $img) {
             return $path; // Gagal load gambar
         }
 

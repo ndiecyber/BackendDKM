@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Qurban;
 
+use App\Models\Qurban\QurbanSetting;
 use Illuminate\Foundation\Http\FormRequest;
 
 class RegisterShohibulRequest extends FormRequest
@@ -13,7 +14,7 @@ class RegisterShohibulRequest extends FormRequest
 
     public function rules(): array
     {
-        $paymentMode = \App\Models\Qurban\QurbanSetting::where('key', 'payment_mode')->value('value') ?? 'gateway';
+        $paymentMode = QurbanSetting::where('key', 'payment_mode')->value('value') ?? 'gateway';
 
         $rules = [
             'name' => ['required', 'string', 'max:255'],

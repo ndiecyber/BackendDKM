@@ -14,6 +14,7 @@ use Dedoc\Scramble\Attributes\Group;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Storage;
 
 #[Group('Qurban - Shohibul')]
 class ShohibulController extends Controller
@@ -216,7 +217,7 @@ class ShohibulController extends Controller
         // Hapus gambar bukti pembayaran dari storage sebelum hard delete
         $proofs = $shohibul->transactions()->whereNotNull('payment_proof_path')->pluck('payment_proof_path');
         if ($proofs->isNotEmpty()) {
-            \Illuminate\Support\Facades\Storage::disk('public')->delete($proofs->toArray());
+            Storage::disk('public')->delete($proofs->toArray());
         }
 
         $shohibul->forceDelete();

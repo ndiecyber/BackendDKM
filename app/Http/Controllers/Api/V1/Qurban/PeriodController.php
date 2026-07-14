@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Qurban\RolloverRequest;
 use App\Http\Requests\Qurban\StorePeriodRequest;
 use App\Models\Qurban\QurbanPeriod;
+use App\Models\Qurban\QurbanSetting;
 use App\Models\Qurban\Shohibul;
 use App\Services\Qurban\RolloverService;
 use App\Traits\ApiResponse;
@@ -33,7 +34,7 @@ class PeriodController extends Controller
         }
 
         // Build payment config from qurban_settings
-        $settings = \App\Models\Qurban\QurbanSetting::pluck('value', 'key');
+        $settings = QurbanSetting::pluck('value', 'key');
         $paymentMode = $settings['payment_mode'] ?? 'gateway';
 
         $payment = ['mode' => $paymentMode];

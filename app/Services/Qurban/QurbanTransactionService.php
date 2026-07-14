@@ -4,19 +4,18 @@ namespace App\Services\Qurban;
 
 use App\Models\Qurban\QurbanTransaction;
 use App\Models\Qurban\Shohibul;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
-
 use App\Services\ImageUploadService;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class QurbanTransactionService
 {
     public function __construct(
         private PaKasirService $paKasir
-    ) {
-    }
+    ) {}
 
     /**
      * Create a deposit transaction.
@@ -28,7 +27,7 @@ class QurbanTransactionService
     public function createDeposit(Shohibul $shohibul, int $amount, string $paymentMethod, ?UploadedFile $proofFile = null): array
     {
         // Generate unique order_id
-        $orderId = 'QRB-' . now()->format('ymd') . '-' . strtoupper(Str::random(6));
+        $orderId = 'QRB-'.now()->format('ymd').'-'.strtoupper(Str::random(6));
 
         return DB::transaction(function () use ($shohibul, $amount, $paymentMethod, $orderId, $proofFile) {
             // Handle payment proof upload for manual mode
@@ -43,7 +42,7 @@ class QurbanTransactionService
             // If qris with proof, it's manual mode QRIS; if qris without proof, it's gateway QRIS
             if ($paymentMethod === 'qris' && $proofFile) {
                 $isManualMethod = true;
-            } elseif ($paymentMethod === 'qris' && !$proofFile) {
+            } elseif ($paymentMethod === 'qris' && ! $proofFile) {
                 $isManualMethod = false;
             }
 
@@ -98,7 +97,7 @@ class QurbanTransactionService
         $status = $payload['status'] ?? null;
         $amount = $payload['amount'] ?? null;
 
-        if (!$orderId || !$status) {
+        if (! $orderId || ! $status) {
             Log::warning('PaKasir webhook: missing order_id or status', $payload);
 
             return false;
@@ -106,7 +105,7 @@ class QurbanTransactionService
 
         $transaction = QurbanTransaction::where('order_id', $orderId)->first();
 
-        if (!$transaction) {
+        if (! $transaction) {
             Log::warning('PaKasir webhook: transaction not found', ['order_id' => $orderId]);
 
             return false;
@@ -174,7 +173,7 @@ class QurbanTransactionService
      */
     public function manualDeposit(Shohibul $shohibul, int $amount): QurbanTransaction
     {
-        $orderId = 'TUNAI-' . now()->format('ymd') . '-' . strtoupper(Str::random(6));
+        $orderId = 'TUNAI-'.now()->format('ymd').'-'.strtoupper(Str::random(6));
 
         return DB::transaction(function () use ($shohibul, $amount, $orderId) {
             $transaction = QurbanTransaction::create([
@@ -201,7 +200,7 @@ class QurbanTransactionService
      */
     public function refund(Shohibul $shohibul, int $amount): QurbanTransaction
     {
-        $orderId = 'REFUND-' . now()->format('ymd') . '-' . strtoupper(Str::random(6));
+        $orderId = 'REFUND-'.now()->format('ymd').'-'.strtoupper(Str::random(6));
 
         return DB::transaction(function () use ($shohibul, $amount, $orderId) {
             // Kita simpan amount sebagai nilai negatif
@@ -254,23 +253,23 @@ class QurbanTransactionService
             }
 
             // Jika status pending dan bukan manual/tunai/transfer, batalkan di PaKasir
-            if ($transaction->status === 'pending' && !in_array($transaction->payment_method, ['tunai', 'transfer'])) {
+            if ($transaction->status === 'pending' && ! in_array($transaction->payment_method, ['tunai', 'transfer'])) {
                 try {
                     $this->paKasir->cancelTransaction($transaction->order_id, (int) $transaction->amount);
                 } catch (\Exception $e) {
-                    Log::warning('Gagal membatalkan transaksi di PaKasir: ' . $e->getMessage());
+                    Log::warning('Gagal membatalkan transaksi di PaKasir: '.$e->getMessage());
                 }
             }
 
             $transaction->update(['status' => 'cancelled']);
 
             $shohibul = $transaction->shohibul;
-            if ($shohibul->collected_amount <= 0 && !$shohibul->hasPendingTransaction()) {
+            if ($shohibul->collected_amount <= 0 && ! $shohibul->hasPendingTransaction()) {
                 $hasSuccess = $shohibul->transactions()->where('status', 'success')->exists();
-                if (!$hasSuccess) {
+                if (! $hasSuccess) {
                     $proofs = $shohibul->transactions()->whereNotNull('payment_proof_path')->pluck('payment_proof_path');
                     if ($proofs->isNotEmpty()) {
-                        \Illuminate\Support\Facades\Storage::disk('public')->delete($proofs->toArray());
+                        Storage::disk('public')->delete($proofs->toArray());
                     }
                     $shohibul->forceDelete();
                 }
