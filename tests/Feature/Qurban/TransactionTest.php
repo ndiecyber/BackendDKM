@@ -29,12 +29,19 @@ class TransactionTest extends TestCase
         $this->admin = User::factory()->create();
         $this->admin->assignRole('admin');
         $this->period = QurbanPeriod::create([
-            'name' => 'Test', 'sapi_price_per_slot' => 4000000,
-            'kambing_price' => 3500000, 'deadline_date' => '2027-06-01', 'is_active' => true,
+            'name' => 'Test',
+            'sapi_price_per_slot' => 4000000,
+            'kambing_price' => 3500000,
+            'deadline_date' => '2027-06-01',
+            'is_active' => true,
         ]);
         $this->shohibul = Shohibul::create([
-            'period_id' => $this->period->id, 'name' => 'Ahmad', 'phone' => '081',
-            'address' => 'Blok A', 'target_type' => 'sapi', 'target_amount' => 4000000,
+            'period_id' => $this->period->id,
+            'name' => 'Ahmad',
+            'phone' => '081',
+            'address' => 'Blok A',
+            'target_type' => 'sapi',
+            'target_amount' => 4000000,
         ]);
     }
 
@@ -49,18 +56,25 @@ class TransactionTest extends TestCase
     {
         $this->shohibul->update(['collected_amount' => 4000000]);
         $this->postJson('/v1/qurban/transactions/deposit', [
-            'shohibul_id' => $this->shohibul->id, 'amount' => 50000, 'payment_method' => 'qris',
+            'shohibul_id' => $this->shohibul->id,
+            'amount' => 50000,
+            'payment_method' => 'qris',
         ])->assertStatus(422)->assertJsonFragment(['success' => false]);
     }
 
     public function test_deposit_rejects_if_pending_exists(): void
     {
         QurbanTransaction::create([
-            'shohibul_id' => $this->shohibul->id, 'order_id' => 'TEST-001',
-            'amount' => 100000, 'status' => 'pending', 'payment_method' => 'qris',
+            'shohibul_id' => $this->shohibul->id,
+            'order_id' => 'TEST-001',
+            'amount' => 100000,
+            'status' => 'pending',
+            'payment_method' => 'qris',
         ]);
         $this->postJson('/v1/qurban/transactions/deposit', [
-            'shohibul_id' => $this->shohibul->id, 'amount' => 100000, 'payment_method' => 'qris',
+            'shohibul_id' => $this->shohibul->id,
+            'amount' => 100000,
+            'payment_method' => 'qris',
         ])->assertStatus(422);
     }
 
@@ -68,7 +82,9 @@ class TransactionTest extends TestCase
     {
         $this->shohibul->update(['collected_amount' => 3900000]);
         $this->postJson('/v1/qurban/transactions/deposit', [
-            'shohibul_id' => $this->shohibul->id, 'amount' => 200000, 'payment_method' => 'qris',
+            'shohibul_id' => $this->shohibul->id,
+            'amount' => 200000,
+            'payment_method' => 'qris',
         ])->assertStatus(422);
     }
 
@@ -76,12 +92,15 @@ class TransactionTest extends TestCase
     {
         Sanctum::actingAs($this->admin);
         $r = $this->postJson('/v1/qurban/admin/transactions/manual', [
-            'shohibul_id' => $this->shohibul->id, 'amount' => 500000,
+            'shohibul_id' => $this->shohibul->id,
+            'amount' => 500000,
         ]);
         $r->assertStatus(201);
         $this->assertEquals(500000, $this->shohibul->fresh()->collected_amount);
         $this->assertDatabaseHas('qurban_transactions', [
-            'shohibul_id' => $this->shohibul->id, 'status' => 'success', 'payment_method' => 'tunai',
+            'shohibul_id' => $this->shohibul->id,
+            'status' => 'success',
+            'payment_method' => 'tunai',
         ]);
     }
 
@@ -89,14 +108,18 @@ class TransactionTest extends TestCase
     {
         Sanctum::actingAs($this->admin);
 
-        // Mock PaKasir to avoid real HTTP call
+        $this->shohibul->update(['collected_amount' => 500000]);
+
         $this->mock(PaKasirService::class, function ($mock) {
             $mock->shouldReceive('cancelTransaction')->once()->andReturn(true);
         });
 
         $tx = QurbanTransaction::create([
-            'shohibul_id' => $this->shohibul->id, 'order_id' => 'TEST-CANCEL',
-            'amount' => 100000, 'status' => 'pending', 'payment_method' => 'qris',
+            'shohibul_id' => $this->shohibul->id,
+            'order_id' => 'TEST-CANCEL',
+            'amount' => 100000,
+            'status' => 'pending',
+            'payment_method' => 'qris',
         ]);
         $this->postJson("/v1/qurban/admin/transactions/{$tx->id}/cancel")->assertOk();
         $this->assertEquals('cancelled', $tx->fresh()->status);
@@ -105,8 +128,11 @@ class TransactionTest extends TestCase
     public function test_cancel_requires_auth(): void
     {
         $tx = QurbanTransaction::create([
-            'shohibul_id' => $this->shohibul->id, 'order_id' => 'TEST-NOAUTH',
-            'amount' => 100000, 'status' => 'pending', 'payment_method' => 'qris',
+            'shohibul_id' => $this->shohibul->id,
+            'order_id' => 'TEST-NOAUTH',
+            'amount' => 100000,
+            'status' => 'pending',
+            'payment_method' => 'qris',
         ]);
         $this->postJson("/v1/qurban/admin/transactions/{$tx->id}/cancel")->assertStatus(401);
     }
@@ -114,8 +140,11 @@ class TransactionTest extends TestCase
     public function test_list_transactions(): void
     {
         QurbanTransaction::create([
-            'shohibul_id' => $this->shohibul->id, 'order_id' => 'TX-1',
-            'amount' => 100000, 'status' => 'success', 'payment_method' => 'qris',
+            'shohibul_id' => $this->shohibul->id,
+            'order_id' => 'TX-1',
+            'amount' => 100000,
+            'status' => 'success',
+            'payment_method' => 'qris',
         ]);
         $this->getJson('/v1/qurban/transactions')->assertOk()->assertJsonPath('data.total', 1);
     }
