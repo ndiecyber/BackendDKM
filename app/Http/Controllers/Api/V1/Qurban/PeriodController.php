@@ -32,7 +32,25 @@ class PeriodController extends Controller
             return $this->errorResponse('Tidak ada periode qurban yang aktif saat ini.', 404);
         }
 
-        return $this->successResponse($period);
+        // Build payment config from qurban_settings
+        $settings = \App\Models\Qurban\QurbanSetting::pluck('value', 'key');
+        $paymentMode = $settings['payment_mode'] ?? 'gateway';
+
+        $payment = ['mode' => $paymentMode];
+
+        if ($paymentMode === 'manual') {
+            $payment['qris_string'] = $settings['manual_qris_string'] ?? '';
+            $payment['qris_name'] = $settings['manual_qris_name'] ?? '';
+            $payment['qris_nmid'] = $settings['manual_qris_nmid'] ?? null;
+            $payment['bank_name'] = $settings['manual_bank_name'] ?? '';
+            $payment['bank_account'] = $settings['manual_bank_account'] ?? '';
+            $payment['bank_holder'] = $settings['manual_bank_holder'] ?? '';
+        }
+
+        return $this->successResponse([
+            'period' => $period,
+            'payment' => $payment,
+        ]);
     }
 
     /**

@@ -88,9 +88,9 @@ class ShohibulController extends Controller
 
         $data = $request->validated();
 
-        // Prevent public users from using manual payment methods
-        if (in_array($data['payment_method'], ['tunai', 'transfer']) && ! auth('sanctum')->check()) {
-            return $this->errorResponse('Metode pembayaran manual (tunai/transfer) hanya dapat dilakukan oleh pengurus/admin.', 403);
+        // Prevent public users from using admin-only payment methods
+        if (in_array($data['payment_method'], ['tunai']) && ! auth('sanctum')->check()) {
+            return $this->errorResponse('Metode pembayaran tunai hanya dapat dilakukan oleh pengurus/admin.', 403);
         }
 
         // Check for duplicate (name + phone)
@@ -134,12 +134,13 @@ class ShohibulController extends Controller
             'collected_amount' => 0,
         ]);
 
-        // Create initial deposit via PaKasir
+        // Create initial deposit
         try {
             $result = $this->transactionService->createDeposit(
                 $shohibul,
                 $data['initial_amount'],
-                $data['payment_method']
+                $data['payment_method'],
+                $request->file('payment_proof')
             );
         } catch (\Exception $e) {
             // Rollback shohibul if payment creation fails

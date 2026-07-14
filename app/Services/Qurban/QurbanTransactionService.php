@@ -8,6 +8,9 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
+use App\Services\ImageUploadService;
+use Illuminate\Http\UploadedFile;
+
 class QurbanTransactionService
 {
     public function __construct(
@@ -15,16 +18,34 @@ class QurbanTransactionService
     ) {}
 
     /**
-     * Create a deposit transaction and request payment from PaKasir.
+     * Create a deposit transaction.
+     * In manual mode, stores the payment proof and creates a pending transaction.
+     * In gateway mode, requests payment from PaKasir.
      *
      * @return array{transaction: QurbanTransaction, payment: array}
      */
-    public function createDeposit(Shohibul $shohibul, int $amount, string $paymentMethod): array
+    public function createDeposit(Shohibul $shohibul, int $amount, string $paymentMethod, ?UploadedFile $proofFile = null): array
     {
         // Generate unique order_id
         $orderId = 'QRB-'.now()->format('ymd').'-'.strtoupper(Str::random(6));
 
-        return DB::transaction(function () use ($shohibul, $amount, $paymentMethod, $orderId) {
+        return DB::transaction(function () use ($shohibul, $amount, $paymentMethod, $orderId, $proofFile) {
+            // Handle payment proof upload for manual mode
+            $proofPath = null;
+            if ($proofFile) {
+                $proofPath = ImageUploadService::storeAsWebp($proofFile, 'qurban-proofs');
+            }
+
+            // Determine if this is a manual payment method
+            $isManualMethod = in_array($paymentMethod, ['tunai', 'transfer', 'qris', 'transfer_bsi']);
+            
+            // If qris with proof, it's manual mode QRIS; if qris without proof, it's gateway QRIS
+            if ($paymentMethod === 'qris' && $proofFile) {
+                $isManualMethod = true;
+            } elseif ($paymentMethod === 'qris' && !$proofFile) {
+                $isManualMethod = false;
+            }
+
             // Create transaction record
             $transaction = QurbanTransaction::create([
                 'shohibul_id' => $shohibul->id,
@@ -32,18 +53,24 @@ class QurbanTransactionService
                 'amount' => $amount,
                 'status' => 'pending',
                 'payment_method' => $paymentMethod,
+                'payment_proof_path' => $proofPath,
             ]);
 
-            if (in_array($paymentMethod, ['tunai', 'transfer'])) {
-                // Skip PaKasir for manual methods, admin will verify later
+            if ($isManualMethod) {
+                // Manual methods: no PaKasir call
                 $payment = [
                     'payment_number' => strtoupper($paymentMethod),
                     'total_payment' => $amount,
                     'expired_at' => now()->addDays(7)->toDateTimeString(),
                     'payment_method' => $paymentMethod,
                 ];
+
+                $transaction->update([
+                    'total_payment' => $amount,
+                    'expired_at' => now()->addDays(7),
+                ]);
             } else {
-                // Request payment from PaKasir
+                // Gateway mode: request payment from PaKasir
                 $payment = $this->paKasir->createTransaction($paymentMethod, $orderId, $amount);
 
                 // Update transaction with PaKasir response

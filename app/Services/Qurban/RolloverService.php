@@ -8,6 +8,7 @@ use App\Models\Qurban\QurbanTransaction;
 use App\Models\Qurban\Shohibul;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class RolloverService
 {
@@ -106,6 +107,39 @@ class RolloverService
                 'old_period' => $oldPeriod->id,
                 'new_period' => $newPeriod->id,
                 'total' => $cloned,
+            ]);
+
+            // 4. Clean up payment proof files for lunas shohibuls
+            $proofDeletedCount = 0;
+            $lunasShohibulIds = $shohibuls
+                ->filter(fn ($s) => $s->collected_amount >= $s->target_amount)
+                ->pluck('id');
+
+            if ($lunasShohibulIds->isNotEmpty()) {
+                $proofsToDelete = QurbanTransaction::whereIn('shohibul_id', $lunasShohibulIds)
+                    ->whereNotNull('payment_proof_path')
+                    ->get();
+
+                foreach ($proofsToDelete as $tx) {
+                    try {
+                        if ($tx->payment_proof_path && Storage::disk('public')->exists($tx->payment_proof_path)) {
+                            Storage::disk('public')->delete($tx->payment_proof_path);
+                            $proofDeletedCount++;
+                        }
+                        $tx->update(['payment_proof_path' => null]);
+                    } catch (\Exception $e) {
+                        Log::warning('Rollover: failed to delete payment proof', [
+                            'transaction_id' => $tx->id,
+                            'path' => $tx->payment_proof_path,
+                            'error' => $e->getMessage(),
+                        ]);
+                    }
+                }
+            }
+
+            Log::info('Rollover: cleaned up payment proofs', [
+                'deleted_files' => $proofDeletedCount,
+                'lunas_shohibuls' => $lunasShohibulIds->count(),
             ]);
 
             return $newPeriod;

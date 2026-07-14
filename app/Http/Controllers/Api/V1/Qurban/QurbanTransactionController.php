@@ -87,7 +87,8 @@ class QurbanTransactionController extends Controller
             $result = $this->transactionService->createDeposit(
                 $shohibul,
                 $request->amount,
-                $request->payment_method
+                $request->payment_method,
+                $request->file('payment_proof')
             );
         } catch (\Exception $e) {
             return $this->errorResponse($e->getMessage(), 500);
