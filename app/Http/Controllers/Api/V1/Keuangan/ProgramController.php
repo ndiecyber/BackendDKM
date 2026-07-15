@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V1\Keuangan;
 
 use App\Http\Controllers\Controller;
 use App\Models\BankKas;
+use App\Models\KeuanganSetting;
 use App\Models\Program;
 use App\Models\Transaction;
 use App\Services\TransactionService;
@@ -270,6 +271,50 @@ class ProgramController extends Controller
         });
 
         return $this->successResponse(null, 'Sisa dana berhasil disalurkan.');
+    }
+
+    /**
+     * Get public programs for landing page based on settings.
+     */
+    public function publicPrograms(Request $request): JsonResponse
+    {
+        $mode = KeuanganSetting::where('key', 'landing_program_mode')->value('value') ?? 'active';
+        $limit = (int) (KeuanganSetting::where('key', 'landing_program_limit')->value('value') ?? 3);
+        $year = $request->query('year');
+
+        $query = Program::query()
+            ->with(['transactions' => function ($q) {
+                $q->where('status', 'approved')->orderBy('tanggal', 'asc');
+            }])
+            ->withSum(['transactions as pemasukan' => function ($q) {
+                $q->where('status', 'approved')->where('tipe', 'pemasukan');
+            }], 'nominal')
+            ->withSum(['transactions as pengeluaran' => function ($q) {
+                $q->where('status', 'approved')->where('tipe', 'pengeluaran');
+            }], 'nominal');
+
+        if ($mode === 'active') {
+            $query->where('status', 'aktif');
+        }
+
+        if ($year) {
+            $query->where(function ($q) use ($year) {
+                $q->whereYear('tanggal_mulai', $year)
+                    ->orWhereYear('created_at', $year);
+            });
+        }
+
+        $programs = $query->latest()->limit($limit)->get();
+
+        $programs->transform(function ($program) {
+            $program->pemasukan = (float) ($program->pemasukan ?? 0);
+            $program->pengeluaran = (float) ($program->pengeluaran ?? 0);
+            $program->sisa_saldo = $program->pemasukan - $program->pengeluaran;
+
+            return $program;
+        });
+
+        return $this->successResponse($programs);
     }
 
     /**

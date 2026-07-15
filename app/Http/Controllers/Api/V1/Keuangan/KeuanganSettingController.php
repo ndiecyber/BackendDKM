@@ -78,6 +78,8 @@ class KeuanganSettingController extends Controller
             'donation_payment_account',
             'donation_payment_name',
             'donation_qris_image_path',
+            'landing_program_mode',
+            'landing_program_limit',
         ];
 
         $settings = KeuanganSetting::whereIn('key', $keys)->pluck('value', 'key');
