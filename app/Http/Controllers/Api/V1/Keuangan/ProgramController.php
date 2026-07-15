@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V1\Keuangan;
 
 use App\Http\Controllers\Controller;
 use App\Models\BankKas;
+use App\Models\KeuanganSetting;
 use App\Models\Program;
 use App\Models\Transaction;
 use App\Services\TransactionService;
@@ -277,8 +278,8 @@ class ProgramController extends Controller
      */
     public function publicPrograms(Request $request): JsonResponse
     {
-        $mode = \App\Models\KeuanganSetting::where('key', 'landing_program_mode')->value('value') ?? 'active';
-        $limit = (int) (\App\Models\KeuanganSetting::where('key', 'landing_program_limit')->value('value') ?? 3);
+        $mode = KeuanganSetting::where('key', 'landing_program_mode')->value('value') ?? 'active';
+        $limit = (int) (KeuanganSetting::where('key', 'landing_program_limit')->value('value') ?? 3);
         $year = $request->query('year');
 
         $query = Program::query()
@@ -299,7 +300,7 @@ class ProgramController extends Controller
         if ($year) {
             $query->where(function ($q) use ($year) {
                 $q->whereYear('tanggal_mulai', $year)
-                  ->orWhereYear('created_at', $year);
+                    ->orWhereYear('created_at', $year);
             });
         }
 
@@ -309,6 +310,7 @@ class ProgramController extends Controller
             $program->pemasukan = (float) ($program->pemasukan ?? 0);
             $program->pengeluaran = (float) ($program->pengeluaran ?? 0);
             $program->sisa_saldo = $program->pemasukan - $program->pengeluaran;
+
             return $program;
         });
 
