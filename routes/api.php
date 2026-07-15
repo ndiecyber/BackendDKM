@@ -35,6 +35,7 @@ Route::prefix('v1')->group(function () {
     });
 
     Route::get('/keuangan/public/settings', [KeuanganSettingController::class, 'publicSettings']);
+    Route::get('/keuangan/public/programs', [\App\Http\Controllers\Api\V1\Keuangan\ProgramController::class, 'publicPrograms']);
 
     // Qurban Module (contains both public and admin routes inside)
     Route::prefix('qurban')->group(base_path('routes/modules/kurban.php'));
