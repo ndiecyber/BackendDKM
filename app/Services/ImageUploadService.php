@@ -16,21 +16,21 @@ class ImageUploadService
     public static function storeAsWebp(UploadedFile $file, string $directory, string $disk = 'public'): string
     {
         // Jika ekstensi PHP GD tidak ada, langsung fallback ke upload normal agar tidak error (crash)
-        if (!extension_loaded('gd') || !function_exists('imagecreatefromjpeg') || !function_exists('imagecreatefrompng') || !function_exists('imagewebp')) {
+        if (! extension_loaded('gd') || ! function_exists('imagecreatefromjpeg') || ! function_exists('imagecreatefrompng') || ! function_exists('imagewebp')) {
             return $file->store($directory, $disk);
         }
 
         $extension = strtolower($file->getClientOriginalExtension());
         $isImage = in_array($extension, ['jpg', 'jpeg', 'png']);
 
-        if (!$isImage) {
+        if (! $isImage) {
             // Biarkan file non-gambar diupload secara normal
             return $file->store($directory, $disk);
         }
 
         // Buat nama file unik
-        $filename = Str::random(40) . '.webp';
-        $fullPath = rtrim($directory, '/') . '/' . $filename;
+        $filename = Str::random(40).'.webp';
+        $fullPath = rtrim($directory, '/').'/'.$filename;
 
         $img = null;
         try {
@@ -51,8 +51,9 @@ class ImageUploadService
                 $imageContent = ob_get_clean();
                 imagedestroy($img);
 
-                if (!empty($imageContent)) {
+                if (! empty($imageContent)) {
                     Storage::disk($disk)->put($fullPath, $imageContent);
+
                     return $fullPath;
                 }
             }
