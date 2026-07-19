@@ -32,8 +32,6 @@ class CancelExpiredQurbanTransactions extends Command
             ->get();
 
         if ($expiredTransactions->isEmpty()) {
-            $this->info('Tidak ada transaksi kadaluarsa yang perlu dibatalkan.');
-
             return;
         }
 
