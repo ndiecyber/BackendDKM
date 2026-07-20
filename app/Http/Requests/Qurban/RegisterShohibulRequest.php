@@ -15,6 +15,7 @@ class RegisterShohibulRequest extends FormRequest
     public function rules(): array
     {
         $paymentMode = QurbanSetting::where('key', 'payment_mode')->value('value') ?? 'gateway';
+        $isAdmin = auth('sanctum')->check();
 
         $rules = [
             'name' => ['required', 'string', 'max:255'],
@@ -25,8 +26,17 @@ class RegisterShohibulRequest extends FormRequest
         ];
 
         if ($paymentMode === 'manual') {
-            $rules['payment_method'] = ['required', 'string', 'in:qris,transfer_bsi'];
-            $rules['payment_proof'] = ['required', 'image', 'max:5120'];
+            // Admin can also use tunai/transfer in manual mode
+            $allowedMethods = $isAdmin
+                ? 'qris,transfer_bsi,tunai'
+                : 'qris,transfer_bsi';
+            $rules['payment_method'] = ['required', 'string', 'in:'.$allowedMethods];
+            // Payment proof only required for non-admin manual payments
+            if (! $isAdmin) {
+                $rules['payment_proof'] = ['required', 'image', 'max:5120'];
+            } else {
+                $rules['payment_proof'] = ['nullable', 'image', 'max:5120'];
+            }
         } else {
             $rules['payment_method'] = ['required', 'string', 'in:tunai,transfer,qris,bri_va,bni_va,cimb_niaga_va,permata_va,maybank_va,sampoerna_va,bnc_va,artha_graha_va,atm_bersama_va'];
         }
